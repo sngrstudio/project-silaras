@@ -1,13 +1,12 @@
 ---
 import Layout from '~/layouts/layout.astro'
+import { Debug } from 'astro:components'
+import { db } from '~/db'
+import { regionTable } from '~/db/schema/region'
+
+const testdata = await db.select().from(regionTable)
 ---
 
 <Layout>
-  <h1>Hello World!</h1>
-  <p>
-    This is Astro Base Template by <a href='/sngrcreative' target='_blank'>
-      SNGR Creative.
-    </a>
-  </p>
-  <a href='/about' role='button'>About</a>
+  <Debug {testdata} />
 </Layout>

@@ -12,10 +12,18 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4321],
+  "forwardPorts": [4321, 3306, 3307],
   "portsAttributes": {
     "4321": {
       "label": "Astro's Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3306": {
+      "label": "MySQL Database",
+      "onAutoForward": "silent"
+    },
+    "3307": {
+      "label": "phpMyAdmin",
       "onAutoForward": "notify"
     }
   },
@@ -35,8 +43,13 @@
     }
   },
 
+  "containerEnv": {
+    "DATABASE_URL": "mysql://test:test@localhost:3306/test"
+  },
+
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   // "remoteUser": "root"
 
-  "postCreateCommand": "bun install --frozen-lockfile"
+  "postStartCommand": "bun install --frozen-lockfile",
+  "postAttachCommand": "docker compose up -d"
 }
