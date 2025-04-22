@@ -1,0 +1,21 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+export interface Props extends Omit<HTMLAttributes<'body'>, 'title'> {
+  lang?: string | undefined
+}
+
+const { lang = 'en', ...bodyProps } = Astro.props
+---
+
+<html lang={lang}>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta name='generator' content={Astro.generator} />
+    <slot name='head' />
+  </head>
+  <body {...bodyProps}>
+    <slot />
+  </body>
+</html>

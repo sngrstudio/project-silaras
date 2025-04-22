@@ -1,0 +1,7 @@
+services:
+  devserver:
+    name: Astro Dev Server
+    commands:
+      start: bun run dev --host=0.0.0.0
+    triggeredBy:
+      - postEnvironmentStart
