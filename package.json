@@ -11,13 +11,15 @@
     "format": "prettier --write .",
     "preview": "astro preview",
     "db:push": "drizzle-kit push --config=drizzle.config.mjs",
-    "db:studio": "drizzle-kit studio --config=drizzle.config.mjs --host=0.0.0.0 --port=3308"
+    "db:studio": "drizzle-kit studio --config=drizzle.config.mjs --host=0.0.0.0 --port=3308",
+    "db:seed": "tsx ./src/db/seed/seed.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.2.1",
     "astro": "5.7.4",
     "drizzle-orm": "^0.42.0",
-    "mysql2": "^3.14.0"
+    "mysql2": "^3.14.0",
+    "nanoid": "^5.1.5"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.4",
@@ -27,6 +29,7 @@
     "prettier": "3.5.3",
     "prettier-config-standard": "7.0.0",
     "prettier-plugin-astro": "0.14.1",
+    "tsx": "^4.19.3",
     "typescript": "5.8.3"
   }
 }
