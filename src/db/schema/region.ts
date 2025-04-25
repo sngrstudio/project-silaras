@@ -38,7 +38,8 @@ export const regionTableRelations = relations(regionTable, ({ one }) => ({
 export const kbVillageTable = mysqlTable(
   'kb_village_table',
   {
-    id: varchar({ length: 8 }).references(() => regionTable.id)
+    id: varchar({ length: 8 }).references(() => regionTable.id),
+    handler: varchar({ length: 255 })
   },
   (table) => [primaryKey({ columns: [table.id] })]
 )
