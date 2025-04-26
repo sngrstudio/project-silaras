@@ -49,7 +49,7 @@ export const validateSessionToken = async (token: string) => {
       .select({ user: userTable, session: sessionTable })
       .from(sessionTable)
       .innerJoin(userTable, eq(userTable.id, sessionTable.userId))
-      .where(eq(sessionTable.userId, sessionId))
+      .where(eq(sessionTable.id, sessionId))
 
     if (!res) return emptySession
 

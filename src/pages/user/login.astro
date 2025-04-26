@@ -1,0 +1,10 @@
+---
+import LoginForm from '~/components/user/login'
+
+if (Astro.locals.user) {
+  return Astro.redirect('/')
+}
+---
+
+<h1>Login</h1>
+<LoginForm client:load />

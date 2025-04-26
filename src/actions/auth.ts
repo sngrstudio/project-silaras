@@ -1,6 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { db } from '~/db'
-import { userInsertZodSchema, userTable } from '~/db/schema/user'
+import { userTable } from '~/db/schema/user'
 import { hash, verify } from '@node-rs/argon2'
 import { eq } from 'drizzle-orm'
 import {
@@ -13,6 +13,13 @@ import {
   setSessionTokenCookie,
   deleteSessionTokenCookie
 } from '~/db/auth/cookies'
+import { createInsertSchema } from 'drizzle-zod'
+import { z } from 'astro:schema'
+
+export const userInsertZodSchema = createInsertSchema(userTable).extend({
+  password: z.string().min(8),
+  confirmPassword: z.string()
+})
 
 export const auth = {
   signup: defineAction({
@@ -63,7 +70,7 @@ export const auth = {
 
   logout: defineAction({
     handler: async (_, { cookies }) => {
-      const token = cookies.get('session')?.value ?? null
+      const token = cookies.get('user-session')?.value ?? null
       if (!token) {
         throw new ActionError({
           code: 'FORBIDDEN',
@@ -81,13 +88,7 @@ export const auth = {
   })
 }
 
-const hashPassword = async (password: string) =>
-  await hash(password, {
-    memoryCost: 19456,
-    timeCost: 2,
-    outputLen: 2,
-    parallelism: 1
-  })
+const hashPassword = async (password: string) => await hash(password)
 
 const verifyPassword = async (hash: string, password: string) =>
   await verify(hash, password)

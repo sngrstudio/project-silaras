@@ -2,8 +2,6 @@ import type { InferSelectModel } from 'drizzle-orm'
 import { mysqlTable, varchar, datetime } from 'drizzle-orm/mysql-core'
 import { kbVillageTable } from './region'
 import { nanoid } from 'nanoid'
-import { createInsertSchema } from 'drizzle-zod'
-import { z } from 'astro:schema'
 
 export const userTable = mysqlTable('user_table', {
   id: varchar({ length: 16 })
@@ -27,8 +25,3 @@ export const sessionTable = mysqlTable('session_table', {
 
 export type User = InferSelectModel<typeof userTable>
 export type Session = InferSelectModel<typeof sessionTable>
-
-export const userInsertZodSchema = createInsertSchema(userTable).extend({
-  password: z.string().min(8),
-  confirmPassword: z.string()
-})

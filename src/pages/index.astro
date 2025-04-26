@@ -1,16 +1,14 @@
 ---
 import Layout from '~/layouts/layout.astro'
+import LogoutButton from '~/components/user/logout'
 import { Debug } from 'astro:components'
-import { db } from '~/db'
-import { regionTable } from '~/db/schema/region'
 
 if (!Astro.locals.user) {
   return Astro.redirect('/user/login')
 }
-
-const testdata = await db.select().from(regionTable)
 ---
 
 <Layout>
-  <Debug {testdata} />
+  <Debug {Astro.locals.user} />
+  <LogoutButton client:load />
 </Layout>

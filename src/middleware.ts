@@ -6,11 +6,10 @@ import {
 import { validateSessionToken } from './db/auth/api'
 
 export const onRequest = defineMiddleware(async ({ cookies, locals }, next) => {
-  const token = cookies.get('session')?.value ?? null
+  const token = cookies.get('user-session')?.value ?? null
   if (!token) {
     locals.user = null
     locals.session = null
-
     return next()
   }
 

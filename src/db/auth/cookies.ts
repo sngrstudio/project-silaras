@@ -5,7 +5,7 @@ export const setSessionTokenCookie = (
   token: string,
   expiresAt: Date
 ) => {
-  cookies.set('session', token, {
+  cookies.set('user-session', token, {
     expires: expiresAt,
     path: '/',
     httpOnly: true,
@@ -15,7 +15,7 @@ export const setSessionTokenCookie = (
 }
 
 export const deleteSessionTokenCookie = (cookies: AstroCookies) => {
-  cookies.delete('session', {
+  cookies.delete('user-session', {
     path: '/',
     httpOnly: true,
     sameSite: import.meta.env.PROD ? 'strict' : 'lax',

@@ -2,7 +2,7 @@ import { type FC, useRef, useEffect } from 'react'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 
-const SignUpForm: FC = () => {
+const LoginForm: FC = () => {
   const ref = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
@@ -10,8 +10,8 @@ const SignUpForm: FC = () => {
       event.preventDefault()
 
       const formData = new FormData(ref.current!)
-      const { error } = await actions.auth.signup(formData)
-      if (!error) navigate('/user/login')
+      const { error } = await actions.auth.login(formData)
+      if (!error) navigate('/')
     })
   }, [])
 
@@ -26,24 +26,15 @@ const SignUpForm: FC = () => {
         <input
           name='password'
           type='password'
-          autoComplete='new-password'
+          autoComplete='current-password'
           required
         />
       </label>
       <label>
-        <span>Konfirmasi Password</span>
-        <input
-          name='confirmPassword'
-          type='password'
-          autoComplete='new-password'
-          required
-        />
-      </label>
-      <label>
-        <input type='submit' value='Buat akun' />
+        <input type='submit' value='Login' />
       </label>
     </form>
   )
 }
 
-export default SignUpForm
+export default LoginForm
