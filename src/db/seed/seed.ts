@@ -11,23 +11,23 @@ const main = async () => {
     // Regions
     await Promise.all(
       regionsData.map(async (reg) => {
-        const regId = await tx
+        const [regId] = await tx
           .insert(regionTable)
           .values({ name: reg.name })
           .$returningId()
         await Promise.all(
           reg.children.map(async (dist) => {
-            const distId = await tx
+            const [distId] = await tx
               .insert(regionTable)
-              .values({ name: dist.name, parentRegionId: regId[0]?.id })
+              .values({ name: dist.name, parentRegionId: regId?.id })
               .$returningId()
             await Promise.all(
               dist.children.map(async (sub) => {
-                const subId = await tx
+                const [subId] = await tx
                   .insert(regionTable)
-                  .values({ name: sub.name, parentRegionId: distId[0]?.id })
+                  .values({ name: sub.name, parentRegionId: distId?.id })
                   .$returningId()
-                await tx.insert(kbVillageTable).values({ id: subId[0]?.id })
+                await tx.insert(kbVillageTable).values({ id: subId?.id })
               })
             )
           })
