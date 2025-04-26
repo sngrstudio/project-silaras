@@ -1,4 +1,3 @@
-import type { APIContext } from 'astro'
 import { defineMiddleware } from 'astro:middleware'
 import {
   setSessionTokenCookie,
@@ -6,9 +5,7 @@ import {
 } from './db/auth/cookies'
 import { validateSessionToken } from './db/auth/api'
 
-export const onRequest = defineMiddleware(async (context, next) => {
-  const { cookies, locals } = context
-
+export const onRequest = defineMiddleware(async ({ cookies, locals }, next) => {
   const token = cookies.get('session')?.value ?? null
   if (!token) {
     locals.user = null
@@ -19,9 +16,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const { user, session } = await validateSessionToken(token)
   if (!!session) {
-    setSessionTokenCookie(context, token, session.expiresAt)
+    setSessionTokenCookie(cookies, token, session.expiresAt)
   } else {
-    deleteSessionTokenCookie(context)
+    deleteSessionTokenCookie(cookies)
   }
 
   locals.user = user

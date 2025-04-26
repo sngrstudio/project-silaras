@@ -5,7 +5,7 @@ import { db } from '~/db'
 import { regionTable } from '~/db/schema/region'
 
 if (!Astro.locals.user) {
-  return Astro.redirect('/login')
+  return Astro.redirect('/user/login')
 }
 
 const testdata = await db.select().from(regionTable)

@@ -1,11 +1,10 @@
-import type { APIContext } from 'astro'
+import type { AstroCookies } from 'astro'
 
 export const setSessionTokenCookie = (
-  context: APIContext,
+  cookies: AstroCookies,
   token: string,
   expiresAt: Date
 ) => {
-  const { cookies } = context
   cookies.set('session', token, {
     expires: expiresAt,
     path: '/',
@@ -15,8 +14,7 @@ export const setSessionTokenCookie = (
   })
 }
 
-export const deleteSessionTokenCookie = (context: APIContext) => {
-  const { cookies } = context
+export const deleteSessionTokenCookie = (cookies: AstroCookies) => {
   cookies.delete('session', {
     path: '/',
     httpOnly: true,
