@@ -38,7 +38,7 @@
         "astro-build.astro-vscode",
         "esbenp.prettier-vscode",
         "GitHub.vscode-github-actions",
-        "LinJun.ftp-support"
+        "humy2833.ftp-simple"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
