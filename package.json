@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "preview": "astro preview",
     "db:push": "drizzle-kit push --config=drizzle.config.mjs",
-    "db:migrate": "drizzle-kit generate --config=drizzle.config.mjs && drizzle-kit migrate --config=drizzle.config.mjs",
+    "db:generate": "drizzle-kit generate --config=drizzle.config.mjs",
+    "db:migrate": "drizzle-kit migrate --config=drizzle.config.mjs",
     "db:studio": "drizzle-kit studio --config=drizzle.config.mjs --host=0.0.0.0 --port=3308",
     "db:seed": "tsx ./src/db/seed/seed.ts"
   },
