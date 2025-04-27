@@ -1,7 +1,6 @@
 ---
 import Layout from '~/layouts/layout.astro'
 import LogoutButton from '~/components/user/logout'
-import { Debug } from 'astro:components'
 
 if (!Astro.locals.user) {
   return Astro.redirect('/user/login')
@@ -9,6 +8,5 @@ if (!Astro.locals.user) {
 ---
 
 <Layout>
-  <Debug {Astro.locals.user} />
   <LogoutButton client:load />
 </Layout>
