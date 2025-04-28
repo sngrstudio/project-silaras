@@ -1,4 +1,4 @@
-import { mysqlTable, varchar } from 'drizzle-orm/mysql-core'
+import { mysqlTable, varchar, float } from 'drizzle-orm/mysql-core'
 import { kbVillageTable } from './region'
 import { nanoid } from 'nanoid'
 
@@ -10,6 +10,8 @@ export const patientTable = mysqlTable('patient_table', {
   condition: varchar({ length: 8 })
     .notNull()
     .references(() => patientConditionsLookupTable.id),
+  initialWeight: float('initial_weight').notNull(),
+  initialHeight: float('initial_height').notNull(),
   address: varchar({ length: 255 }),
   phoneNumber: varchar('phone_number', { length: 255 }),
   kbVillageId: varchar('kb_village_id', { length: 8 })
