@@ -1,7 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { db } from '~/db'
 import { userTable } from '~/db/schema/user'
-import { hash, verify } from '@node-rs/argon2'
 import { eq } from 'drizzle-orm'
 import {
   generateSessionToken,
@@ -88,7 +87,7 @@ export const auth = {
   })
 }
 
-const hashPassword = async (password: string) => await hash(password)
+const hashPassword = async (password: string) => await Bun.password.hash(password)
 
 const verifyPassword = async (hash: string, password: string) =>
-  await verify(hash, password)
+  await Bun.password.verify(password, hash)
