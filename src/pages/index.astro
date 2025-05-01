@@ -1,13 +1,33 @@
 ---
 import Layout from '~/layouts/layout.astro'
+import { Debug } from 'astro:components'
+
+const data = {
+  user: Astro.locals.user,
+  session: Astro.locals.session
+}
 ---
 
 <Layout>
-  <h1>Hello World!</h1>
-  <p>
-    This is Astro Base Template by <a href='/sngrcreative' target='_blank'>
-      SNGR Creative.
-    </a>
-  </p>
-  <a href='/about' role='button'>About</a>
+  <Debug {data} />
 </Layout>
+
+<Fragment>
+  {
+    Astro.locals.session ? (
+      <button id='logoutBtn'>Log Out</button>
+    ) : (
+      <a href='/user/signup'>Login</a>
+    )
+  }
+</Fragment>
+
+<script>
+  import { actions } from 'astro:actions'
+  import { navigate } from 'astro:transitions/client'
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await actions.auth.logout()
+    navigate('/')
+  })
+</script>

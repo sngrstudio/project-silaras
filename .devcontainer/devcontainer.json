@@ -12,23 +12,23 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4321, 3306, 3307, 3308],
+  "forwardPorts": [4321, 4322, 3306, 4983],
   "portsAttributes": {
     "4321": {
       "label": "Astro's Dev Server",
+      "onAutoForward": "notify"
+    },
+    "4322": {
+      "label": "phpMyAdmin",
       "onAutoForward": "notify"
     },
     "3306": {
       "label": "MySQL Database",
       "onAutoForward": "silent"
     },
-    "3307": {
-      "label": "phpMyAdmin",
-      "onAutoForward": "notify"
-    },
-    "3308": {
+    "4983": {
       "label": "Drizzle Studio",
-      "onAutoForward": "notify"
+      "onAutoForward": "silent"
     }
   },
 

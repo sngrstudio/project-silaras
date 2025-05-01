@@ -21,7 +21,7 @@ services:
       PMA_USER: test
       PMA_PASSWORD: test
     ports:
-      - '3307:80'
+      - '4322:80'
     depends_on:
       - db
 

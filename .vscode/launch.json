@@ -6,6 +6,12 @@
       "name": "Development server",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "command": "bun run db:studio",
+      "name": "Drizzle Studio",
+      "request": "launch",
+      "type": "node-terminal"
     }
   ]
 }

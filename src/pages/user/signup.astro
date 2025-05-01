@@ -1,0 +1,33 @@
+---
+import { actions } from 'astro:actions'
+
+if (Astro.locals.session) {
+  return Astro.redirect('/')
+}
+
+const actionResult = Astro.getActionResult(actions.auth.signup)
+if (actionResult && !actionResult.error) {
+  return Astro.redirect('/')
+}
+---
+
+<form action={actions.auth.signup} method='post'>
+  <label for='userName'>Username</label>
+  <input type='text' name='userName' id='userName' required />
+
+  <label for='password'>Password</label>
+  <input type='password' name='password' id='password' required />
+
+  <label for='confirmPassword'>Confirm Password</label>
+  <input type='password' name='confirmPassword' id='confirmPassword' required />
+
+  <input type='submit' value='Buat Akun' />
+</form>
+
+<Fragment>
+  {
+    actionResult && actionResult.error && (
+      <div style='color: red;'>{JSON.stringify(actionResult.error)}</div>
+    )
+  }
+</Fragment>
