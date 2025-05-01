@@ -2,14 +2,8 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "npm run dev",
+      "command": "bun run dev --host=0.0.0.0",
       "name": "Development server",
-      "request": "launch",
-      "type": "node-terminal"
-    },
-    {
-      "command": "npm run db:studio",
-      "name": "Database Studio",
       "request": "launch",
       "type": "node-terminal"
     }

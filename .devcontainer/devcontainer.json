@@ -38,8 +38,7 @@
       "extensions": [
         "astro-build.astro-vscode",
         "esbenp.prettier-vscode",
-        "GitHub.vscode-github-actions",
-        "humy2833.ftp-simple"
+        "GitHub.vscode-github-actions"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
