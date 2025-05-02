@@ -1,10 +1,21 @@
-import { mysqlTable, varchar, datetime } from 'drizzle-orm/mysql-core'
+import {
+  mysqlTable,
+  mysqlEnum,
+  varchar,
+  datetime
+} from 'drizzle-orm/mysql-core'
 
 export const userTable = mysqlTable('user', {
   id: varchar({ length: 255 })
     .primaryKey()
     .$defaultFn(() => Bun.randomUUIDv7()),
   userName: varchar('user_name', { length: 255 }).unique().notNull(),
+  role: mysqlEnum([
+    'SUPER_ADMINISTRATOR',
+    'ADMINISTRATOR',
+    'USER',
+    'VIEWER'
+  ]).notNull(),
   passwordHash: varchar('password_hash', { length: 255 })
 })
 

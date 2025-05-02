@@ -35,11 +35,11 @@ export const auth = {
         path: ['confirmPassword']
       }
     ),
-    handler: async ({ userName, password }, { cookies }) => {
+    handler: async ({ userName, role, password }, { cookies }) => {
       try {
         // hash password and insert new user to database, returning its id
         const passwordHash = await hashPassword({ password })
-        await db.insert(userTable).values({ userName, passwordHash })
+        await db.insert(userTable).values({ userName, role, passwordHash })
 
         // autologin mechanism
         const [user] = await db
