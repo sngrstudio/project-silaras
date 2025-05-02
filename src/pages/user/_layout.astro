@@ -1,0 +1,15 @@
+---
+import MainLayout, {
+  type Props as MainLayoutProps
+} from '~/layouts/layout.astro'
+
+interface Props extends MainLayoutProps {}
+const props = Astro.props
+---
+
+<MainLayout {...props}>
+  <main class='min-h-screen flex flex-col items-center gap-8'>
+    <h1 class='font-bold'>{props.title}</h1>
+    <slot />
+  </main>
+</MainLayout>

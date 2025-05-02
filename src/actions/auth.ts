@@ -18,7 +18,7 @@ import { db } from '~/db/db'
 import { eq } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
-const insertUserSchema = createInsertSchema(userTable).extend({
+export const insertUserSchema = createInsertSchema(userTable).extend({
   password: z
     .string()
     .min(8, 'Password minimal terdiri dari delapan karakter.'),
