@@ -3,4 +3,8 @@ declare namespace App {
     user: import('./db/auth/api').ValidatedSessionToken['user']
     session: import('./db/auth/api').ValidatedSessionToken['session']
   }
+
+  interface SessionData {
+    token: string
+  }
 }

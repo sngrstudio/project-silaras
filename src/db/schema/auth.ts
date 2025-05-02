@@ -12,6 +12,9 @@ export const sessionTable = mysqlTable('session', {
   id: varchar({ length: 255 }).primaryKey(),
   userId: varchar('user_id', { length: 255 })
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade'
+    }),
   expiresAt: datetime('expires_at').notNull()
 })

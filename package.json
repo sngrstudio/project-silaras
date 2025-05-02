@@ -7,11 +7,13 @@
     "build": "conc bun:check:* && astro build",
     "check:astro": "astro check",
     "check:style": "prettier --check .",
+    "db:generate": "drizzle-kit generate --config=drizzle.config.mjs",
+    "db:migrate": "drizzle-kit migrate --config=drizzle.config.mjs",
+    "db:push": "drizzle-kit push --config=drizzle.config.mjs",
+    "db:studio": "drizzle-kit studio --host=0.0.0.0 --config=drizzle.config.mjs",
     "dev": "astro dev",
     "format": "prettier --write .",
-    "preview": "astro preview",
-    "db:push": "drizzle-kit push --config=drizzle.config.mjs",
-    "db:studio": "drizzle-kit studio --host=0.0.0.0 --config=drizzle.config.mjs"
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/node": "^9.2.1",
