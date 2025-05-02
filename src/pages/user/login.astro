@@ -6,27 +6,24 @@ if (Astro.locals.session) {
   return Astro.redirect('/')
 }
 
-const actionResult = Astro.getActionResult(actions.auth.signup)
+const actionResult = Astro.getActionResult(actions.auth.login)
 if (actionResult && !actionResult.error) {
   return Astro.redirect('/')
 }
 ---
 
-<h1>Buat Akun</h1>
+<h1>Login</h1>
 
-<form action={actions.auth.signup} method='post'>
+<form action={actions.auth.login} method='post'>
   <label for='userName'>Username</label>
   <input type='text' name='userName' id='userName' required />
 
   <label for='password'>Password</label>
   <input type='password' name='password' id='password' required />
 
-  <label for='confirmPassword'>Confirm Password</label>
-  <input type='password' name='confirmPassword' id='confirmPassword' required />
-
-  <input type='submit' value='Buat Akun' />
+  <input type='submit' value='Login' />
 </form>
 
 <ErrorBox result={actionResult} />
 
-<a href='/user/login' role='button'>Sudah punya akun?</a>
+<a href='/user/signup' role='button'>Buat akun</a>

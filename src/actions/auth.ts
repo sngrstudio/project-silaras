@@ -3,7 +3,7 @@ import { userTable } from '~/db/schema/auth'
 import { createInsertSchema } from 'drizzle-zod'
 import {
   hashPassword,
-  // verifyPassword,
+  verifyPassword,
   generateSessionToken,
   createSession,
   validateSessionToken,
@@ -24,11 +24,6 @@ const insertUserSchema = createInsertSchema(userTable).extend({
     .min(8, 'Password minimal terdiri dari delapan karakter.'),
   confirmPassword: z.string()
 })
-
-// const InvalidUsernameAndOrPassword = new ActionError({
-//   code: 'UNAUTHORIZED',
-//   message: 'Username dan/atau password yang anda masukkan salah.'
-// })
 
 export const auth = {
   signup: defineAction({
@@ -57,6 +52,50 @@ export const auth = {
           const session = await createSession({ token, userId: user.id })
           setSessionTokenCookie({ cookies, token, expires: session.expiresAt })
         }
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message
+          })
+        } else {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Telah terjadi kerusakan yang tidak diketahui.'
+          })
+        }
+      }
+    }
+  }),
+
+  login: defineAction({
+    accept: 'form',
+    input: insertUserSchema.pick({ userName: true, password: true }),
+    handler: async ({ userName, password }, { cookies }) => {
+      try {
+        const InvalidUsernameAndOrPassword = new ActionError({
+          code: 'UNAUTHORIZED',
+          message: 'Username dan/atau password yang anda masukkan salah.'
+        })
+        const [user] = await db
+          .select()
+          .from(userTable)
+          .where(eq(userTable.userName, userName))
+        if (!user) {
+          throw InvalidUsernameAndOrPassword
+        }
+
+        const isPasswordValid = await verifyPassword({
+          password,
+          hash: user.passwordHash!
+        })
+        if (!isPasswordValid) {
+          throw InvalidUsernameAndOrPassword
+        }
+
+        const token = generateSessionToken()
+        const session = await createSession({ token, userId: user.id })
+        setSessionTokenCookie({ cookies, token, expires: session.expiresAt })
       } catch (error) {
         if (error instanceof Error) {
           throw new ActionError({
