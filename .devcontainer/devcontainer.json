@@ -12,7 +12,7 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4321, 4322, 3306, 4983],
+  "forwardPorts": [4321, 4322, 4323, 3306, 4983, 24678],
   "portsAttributes": {
     "4321": {
       "label": "Astro's Dev Server",
@@ -22,12 +22,20 @@
       "label": "phpMyAdmin",
       "onAutoForward": "notify"
     },
+    "4323": {
+      "label": "Stories Development",
+      "onAutoForward": "notify"
+    },
     "3306": {
       "label": "MySQL Database",
       "onAutoForward": "silent"
     },
     "4983": {
       "label": "Drizzle Studio",
+      "onAutoForward": "silent"
+    },
+    "24678": {
+      "label": "Ladle's HMR Service",
       "onAutoForward": "silent"
     }
   },
@@ -38,11 +46,18 @@
       "extensions": [
         "astro-build.astro-vscode",
         "esbenp.prettier-vscode",
-        "GitHub.vscode-github-actions"
+        "GitHub.vscode-github-actions",
+        "bradlc.vscode-tailwindcss"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "files.associations": {
+          "*.css": "tailwindcss"
+        },
+        "editor.quickSuggestions": {
+          "strings": "on"
+        }
       }
     }
   },
