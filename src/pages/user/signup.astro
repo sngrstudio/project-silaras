@@ -1,0 +1,10 @@
+---
+import Layout from './_layout.astro'
+import SignupRC from '~/components/user/signup'
+
+const title = 'Buat Akun'
+---
+
+<Layout title={title}>
+  <SignupRC title={title} client:load />
+</Layout>

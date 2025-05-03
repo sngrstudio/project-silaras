@@ -18,7 +18,10 @@ import { db } from '~/db/db'
 import { eq } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
-export const insertUserSchema = createInsertSchema(userTable).extend({
+export const insertUserSchema = createInsertSchema(userTable, {
+  userName: (sch) =>
+    sch.min(4, 'Username harus terdiri dari setidaknya empat karakter')
+}).extend({
   password: z
     .string()
     .min(8, 'Password minimal terdiri dari delapan karakter.'),
@@ -54,10 +57,18 @@ export const auth = {
         }
       } catch (error) {
         if (error instanceof Error) {
-          throw new ActionError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error.message
-          })
+          // @ts-ignore
+          if (error.code === 'ER_DUP_ENTRY') {
+            throw new ActionError({
+              code: 'FORBIDDEN',
+              message: 'Username telah terdaftar.'
+            })
+          } else {
+            throw new ActionError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: error.message
+            })
+          }
         } else {
           throw new ActionError({
             code: 'INTERNAL_SERVER_ERROR',

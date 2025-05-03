@@ -9,20 +9,24 @@ const data = {
 ---
 
 <Layout>
-  <Debug {data} />
-</Layout>
+  <main class='p-4'>
+    <Debug {data} />
 
-<Fragment>
-  {
-    Astro.locals.session ? (
-      <button id='logoutBtn'>Log Out</button>
-    ) : (
-      <a href='/user/login' role='button'>
-        Login
-      </a>
-    )
-  }
-</Fragment>
+    <div class='mt-12 flex flex-row-reverse'>
+      {
+        Astro.locals.session ? (
+          <button class='btn btn-error' id='logoutBtn'>
+            Log Out
+          </button>
+        ) : (
+          <a href='/user/login' class='btn btn-neutral' role='button'>
+            Login
+          </a>
+        )
+      }
+    </div>
+  </main>
+</Layout>
 
 <script>
   import { actions } from 'astro:actions'

@@ -12,12 +12,6 @@
       "name": "Drizzle Studio",
       "request": "launch",
       "type": "node-terminal"
-    },
-    {
-      "command": "bun run story",
-      "name": "Story Development (w/ Ladle)",
-      "request": "launch",
-      "type": "node-terminal"
     }
   ]
 }

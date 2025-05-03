@@ -8,8 +8,7 @@ const props = Astro.props
 ---
 
 <MainLayout {...props}>
-  <main class='flex min-h-screen flex-col items-center gap-8'>
-    <h1 class='font-bold'>{props.title}</h1>
+  <main class='flex min-h-screen flex-col items-center justify-center gap-8'>
     <slot />
   </main>
 </MainLayout>
