@@ -16,12 +16,12 @@ const ToastWrapper: FC<PropsWithChildren> = ({ children }) => {
   }, [showToast])
 
   return (
-    <Toast.Provider duration={toastMessage?.error ? 5000 : 2500}>
+    <Toast.Provider duration={toastMessage?.error ? 5000 : 1500}>
       {children}
 
       {/* toast */}
       <Toast.Root
-        className='alert [[data-error=false]]:alert-success [[data-error=true]]:alert-error max-w-[320px] p-4'
+        className='alert data-[error=false]:alert-info data-[error=false]:alert-soft data-[error=true]:alert-error max-w-[320px] p-4'
         open={showToast}
         onOpenChange={$showToast.set}
         data-error={toastMessage?.error}

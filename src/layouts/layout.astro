@@ -1,6 +1,7 @@
 ---
 import BaseLayout, { type Props as BaseLayoutProps } from './base.astro'
 import Meta, { type Props as MetaProps } from './meta.astro'
+import ToastWrapper from '~/components/toast/toast'
 import './global.css'
 
 export interface Props extends BaseLayoutProps, MetaProps {}
@@ -10,7 +11,9 @@ const { title, description, canonical, ...props } = Astro.props
 
 <BaseLayout {...props}>
   {/* <body> */}
-  <slot />
+  <ToastWrapper client:load>
+    <slot />
+  </ToastWrapper>
 
   {/* <head> */}
   <Fragment slot='head'>

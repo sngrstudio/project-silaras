@@ -1,43 +1,17 @@
 ---
-import Layout from '~/layouts/layout.astro'
-import { Debug } from 'astro:components'
+import Layout from './_layout.astro'
 
 if (!Astro.locals.user || !Astro.locals.session) {
   return Astro.redirect('/user/login')
 }
-
-const data = {
-  user: Astro.locals.user,
-  session: Astro.locals.session
-}
 ---
 
 <Layout>
-  <main class='p-4'>
-    <Debug {data} />
-
-    <div class='mt-12 flex flex-row-reverse'>
-      {
-        Astro.locals.session ? (
-          <button class='btn btn-error' id='logoutBtn'>
-            Log Out
-          </button>
-        ) : (
-          <a href='/user/login' class='btn btn-neutral' role='button'>
-            Login
-          </a>
-        )
-      }
-    </div>
-  </main>
+  <h1>
+    {
+      Astro.locals.user
+        ? `Hello, ${Astro.locals.user.userName}`
+        : 'Not logged in.'
+    }
+  </h1>
 </Layout>
-
-<script>
-  import { actions } from 'astro:actions'
-  import { navigate } from 'astro:transitions/client'
-
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await actions.auth.logout()
-    navigate('/')
-  })
-</script>

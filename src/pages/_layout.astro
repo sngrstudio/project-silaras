@@ -2,13 +2,16 @@
 import MainLayout, {
   type Props as MainLayoutProps
 } from '~/layouts/layout.astro'
+import Navbar from './_navbar.astro'
+import Drawer from '~/components/layout/drawer'
 
 interface Props extends MainLayoutProps {}
 const props = Astro.props
 ---
 
 <MainLayout {...props}>
-  <main>
+  <Navbar />
+  <Drawer client:idle>
     <slot />
-  </main>
+  </Drawer>
 </MainLayout>

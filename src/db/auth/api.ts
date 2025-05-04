@@ -47,7 +47,10 @@ export const validateSessionToken = async ({ token }: { token: string }) => {
   const sessionId = encodeToken(token)
   const getSessionData = db
     .select({
-      user: { id: userTable.id, userName: userTable.userName },
+      user: {
+        userName: userTable.userName,
+        role: userTable.role
+      },
       session: sessionTable
     })
     .from(sessionTable)
