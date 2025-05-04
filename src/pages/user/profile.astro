@@ -1,0 +1,13 @@
+---
+import Layout, { type Props } from '../_layout.astro'
+
+if (!Astro.locals.user || !Astro.locals.session) {
+  return Astro.redirect('/user/login')
+}
+
+const props = {
+  title: 'Halaman Profil'
+} satisfies Props
+---
+
+<Layout {...props} />

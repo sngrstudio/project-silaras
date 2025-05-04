@@ -6,10 +6,10 @@ import './global.css'
 
 export interface Props extends BaseLayoutProps, MetaProps {}
 
-const { title, description, canonical, ...props } = Astro.props
+const { title, description, canonical, lang, ...props } = Astro.props
 ---
 
-<BaseLayout {...props}>
+<BaseLayout lang='id' {...props}>
   {/* <body> */}
   <ToastWrapper client:load>
     <slot />

@@ -19,13 +19,13 @@ const Drawer: FC<PropsWithChildren> = ({ children }) => {
         {/* Page content here */}
         <main className='p-4 lg:p-8'>{children}</main>
       </div>
-      <div className='drawer-side max-h-[calc(100vh-4rem)]'>
+      <div className='drawer-side lg:max-h-[calc(100vh-4rem)]'>
         <label
           htmlFor='drawer'
           aria-label='close sidebar'
           className='drawer-overlay'
         ></label>
-        <ul className='menu bg-base-200 text-base-content min-h-full w-80 p-4'>
+        <ul className='menu bg-base-200 text-base-content min-h-full w-80 p-4 max-lg:pt-[4rem]'>
           {/* Sidebar content here */}
           <li>
             <a>Sidebar Item 1</a>

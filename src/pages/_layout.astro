@@ -5,13 +5,14 @@ import MainLayout, {
 import Navbar from './_navbar.astro'
 import Drawer from '~/components/layout/drawer'
 
-interface Props extends MainLayoutProps {}
+export interface Props extends MainLayoutProps {}
 const props = Astro.props
 ---
 
 <MainLayout {...props}>
   <Navbar />
   <Drawer client:idle>
+    {props.title && <h1 class='text-4xl font-black'>{props.title}</h1>}
     <slot />
   </Drawer>
 </MainLayout>

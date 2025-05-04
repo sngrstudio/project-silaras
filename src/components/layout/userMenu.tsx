@@ -4,6 +4,7 @@ import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 import { $showToast, $toastMessage } from '../toast/store'
 import LogoutIcon from '~icons/lucide/log-out'
+import UserIcon from '~icons/lucide/user'
 
 const UserMenu: FC<{}> = ({}) => {
   return (
@@ -15,21 +16,24 @@ const UserMenu: FC<{}> = ({}) => {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          align='end'
-          sideOffset={8}
-          alignOffset={10}
-          asChild
-        >
+        <DropdownMenu.Content align='end' sideOffset={8} asChild>
           <ul
             tabIndex={0}
-            className='menu bg-base-100 border-base-300 w-[180px] border *:cursor-pointer'
+            className='menu bg-base-100 border-base-300 min-w-[180px] border shadow *:cursor-pointer'
           >
             <DropdownMenu.Label asChild>
               <span className='menu-title text-sm uppercase'>
                 Menu Pengguna
               </span>
             </DropdownMenu.Label>
+            <DropdownMenu.Item asChild>
+              <li>
+                <a href='/user/profile'>
+                  <UserIcon />
+                  <span>Halaman Profil</span>
+                </a>
+              </li>
+            </DropdownMenu.Item>
             <DropdownMenu.Item asChild>
               <li>
                 <LogoutButton />
@@ -60,8 +64,8 @@ const UserAvatar: FC<{ name: string }> = ({ name }) => {
     <Avatar.Root asChild>
       <div className='avatar avatar-placeholder'>
         <Avatar.Fallback asChild>
-          <div className='bg-secondary rounded-full p-2'>
-            <span className='text-secondary-content'>
+          <div className='bg-primary rounded-full p-2'>
+            <span className='text-primary-content text-xs lg:text-base'>
               {extractInitials(name)}
             </span>
           </div>
