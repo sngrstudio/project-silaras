@@ -3,10 +3,8 @@ import UserLoginSignupCard, { type UserLoginSignupCardProps } from './card'
 import { Form } from 'radix-ui'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
-import {
-  $showToast as showToast,
-  $toastMessage as toastMessage
-} from '../toast/store'
+import { useStore } from '@nanostores/react'
+import { $showToast, $toastMessage } from '../toast/store'
 
 interface SignupRCProps extends UserLoginSignupCardProps {
   createAdmin?: boolean | undefined
@@ -14,6 +12,7 @@ interface SignupRCProps extends UserLoginSignupCardProps {
 }
 
 const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
+  const toastMessage = useStore($toastMessage)
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const { error } = await actions.auth.signup(formData)
@@ -28,19 +27,19 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
                 ? error.fields.confirmPassword.join(', ')
                 : 'Terjadi kesalahan yang tidak diketahui.'
 
-        showToast.set(true)
-        toastMessage.set({
+        $showToast.set(true)
+        $toastMessage.set({
           error: true,
           message
         })
         return error
       } else {
-        showToast.set(true)
-        toastMessage.set({
+        $showToast.set(true)
+        $toastMessage.set({
           error: false,
           message: 'Sedang membuat akun...'
         })
-        showToast.subscribe((show) => {
+        $showToast.subscribe((show) => {
           if (!show) {
             navigate('/')
           }
@@ -63,6 +62,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
             <Form.Control
               className='input input-lg'
               placeholder='Username'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>
           </label>
@@ -78,6 +78,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               className='input input-lg'
               placeholder='Password'
               type='password'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>
           </label>
@@ -93,6 +94,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               className='input input-lg'
               placeholder='Konfirmasi Password'
               type='password'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>
           </label>
@@ -109,8 +111,15 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
         </Form.Field>
 
         {/* the submit button */}
-        <Form.Submit className='btn btn-primary mt-6' disabled={isPending}>
-          Buat Akun
+        <Form.Submit
+          className='btn btn-primary mt-6'
+          disabled={isPending || (toastMessage && !toastMessage.error)}
+        >
+          <span
+            className='loading loading-dots loading-xs mr-1 not-data-[show=true]:hidden'
+            data-show={isPending || (toastMessage && !toastMessage.error)}
+          ></span>
+          <span>Buat Akun</span>
         </Form.Submit>
         <a className='btn btn-link' href='/user/login' role='button'>
           Sudah ada akun?

@@ -1,0 +1,14 @@
+---
+import MainLayout, {
+  type Props as MainLayoutProps
+} from '~/layouts/layout.astro'
+
+interface Props extends MainLayoutProps {}
+const props = Astro.props
+---
+
+<MainLayout {...props}>
+  <main>
+    <slot />
+  </main>
+</MainLayout>

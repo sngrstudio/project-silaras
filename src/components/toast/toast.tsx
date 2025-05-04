@@ -1,4 +1,4 @@
-import type { FC, PropsWithChildren } from 'react'
+import { type FC, type PropsWithChildren, useEffect } from 'react'
 import { Toast } from 'radix-ui'
 import { useStore } from '@nanostores/react'
 import { $showToast, $toastMessage } from './store'
@@ -6,6 +6,14 @@ import { $showToast, $toastMessage } from './store'
 const ToastWrapper: FC<PropsWithChildren> = ({ children }) => {
   const showToast = useStore($showToast)
   const toastMessage = useStore($toastMessage)
+
+  useEffect(() => {
+    $showToast.subscribe((show) => {
+      if (!show) {
+        $toastMessage.set(undefined)
+      }
+    })
+  }, [showToast])
 
   return (
     <Toast.Provider duration={toastMessage?.error ? 5000 : 2500}>

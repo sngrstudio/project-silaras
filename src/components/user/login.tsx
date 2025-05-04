@@ -3,31 +3,30 @@ import UserLoginSignupCard, { type UserLoginSignupCardProps } from './card'
 import { Form } from 'radix-ui'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
-import {
-  $showToast as showToast,
-  $toastMessage as toastMessage
-} from '../toast/store'
+import { useStore } from '@nanostores/react'
+import { $showToast, $toastMessage } from '../toast/store'
 
 interface LoginRCProps extends UserLoginSignupCardProps {}
 
 const LoginRC: FC<LoginRCProps> = ({ title }) => {
+  const toastMessage = useStore($toastMessage)
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const { error } = await actions.auth.login(formData)
       if (error) {
-        showToast.set(true)
-        toastMessage.set({
+        $showToast.set(true)
+        $toastMessage.set({
           error: true,
           message: error.message
         })
         return error
       } else {
-        showToast.set(true)
-        toastMessage.set({
+        $showToast.set(true)
+        $toastMessage.set({
           error: false,
           message: 'Sedang masuk...'
         })
-        showToast.subscribe((show) => {
+        $showToast.subscribe((show) => {
           if (!show) {
             navigate('/')
           }
@@ -51,6 +50,7 @@ const LoginRC: FC<LoginRCProps> = ({ title }) => {
             <Form.Control
               className='input input-lg'
               placeholder='Username'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>
           </label>
@@ -66,14 +66,22 @@ const LoginRC: FC<LoginRCProps> = ({ title }) => {
               className='input input-lg'
               placeholder='Password'
               type='password'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>
           </label>
         </Form.Field>
 
         {/* the submit button */}
-        <Form.Submit className='btn btn-primary mt-6' disabled={isPending}>
-          Login
+        <Form.Submit
+          className='btn btn-primary mt-6'
+          disabled={isPending || (toastMessage && !toastMessage.error)}
+        >
+          <span
+            className='loading loading-dots loading-xs mr-1 not-data-[show=true]:hidden'
+            data-show={isPending || (toastMessage && !toastMessage.error)}
+          ></span>
+          <span>Login</span>
         </Form.Submit>
         <a className='btn btn-link' href='/user/signup' role='button'>
           Belum ada akun?
