@@ -11,13 +11,13 @@ const Drawer: FC<PropsWithChildren> = ({ children }) => {
       <input
         id='drawer'
         type='checkbox'
-        className='drawer-toggle lg:hidden'
+        className='drawer-toggle'
         checked={openDrawer}
         onChange={handleOpenDrawer}
       />
-      <div className='drawer-content'>
+      <div className='drawer-content flex flex-col'>
         {/* Page content here */}
-        <main className='p-4 lg:p-8'>{children}</main>
+        <main className='flex-1 p-4 lg:p-8'>{children}</main>
       </div>
       <div className='drawer-side lg:max-h-[calc(100vh-4rem)]'>
         <label

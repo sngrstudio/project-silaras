@@ -12,7 +12,12 @@ const props = Astro.props
 <MainLayout {...props}>
   <Navbar />
   <Drawer client:idle>
-    {props.title && <h1 class='text-4xl font-black'>{props.title}</h1>}
-    <slot />
+    <section class='mx-auto max-w-screen-md'>
+      {/* header */}
+      {props.title && <h1 class='mb-6 text-4xl font-black'>{props.title}</h1>}
+      {props.description && <p>{props.description}</p>}
+
+      <slot />
+    </section>
   </Drawer>
 </MainLayout>
