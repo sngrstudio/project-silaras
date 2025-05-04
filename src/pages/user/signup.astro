@@ -1,10 +1,17 @@
 ---
 import Layout from './_layout.astro'
 import SignupRC from '~/components/user/signup'
+import { actions } from 'astro:actions'
+
+if (Astro.locals.user || Astro.locals.session) {
+  return Astro.redirect('/')
+}
+
+const createAdmin = await Astro.callAction(actions.auth.isUserEmpty.orThrow, {})
 
 const title = 'Buat Akun'
 ---
 
 <Layout title={title}>
-  <SignupRC title={title} client:load />
+  <SignupRC title={title} createAdmin={createAdmin} client:load />
 </Layout>

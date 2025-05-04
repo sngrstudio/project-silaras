@@ -8,7 +8,7 @@ CREATE TABLE `session` (
 CREATE TABLE `user` (
 	`id` varchar(255) NOT NULL,
 	`user_name` varchar(255) NOT NULL,
-	`role` enum('SYSTEM','ADMINISTRATOR','USER','VIEWER') NOT NULL,
+	`role` enum('ADMINISTRATOR','USER','VIEWER') NOT NULL,
 	`password_hash` varchar(255),
 	CONSTRAINT `user_id` PRIMARY KEY(`id`),
 	CONSTRAINT `user_user_name_unique` UNIQUE(`user_name`)

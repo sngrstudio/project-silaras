@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "f37b7b80-77c2-4ba3-b5e6-718134a41eb0",
+  "id": "a5aa682f-c6b8-4437-b544-052b15790eb5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "session": {
@@ -75,7 +75,7 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('SYSTEM','ADMINISTRATOR','USER','VIEWER')",
+          "type": "enum('ADMINISTRATOR','USER','VIEWER')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -173,7 +173,7 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('SYSTEM','ADMINISTRATOR','USER','VIEWER')",
+          "type": "enum('ADMINISTRATOR','USER','VIEWER')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

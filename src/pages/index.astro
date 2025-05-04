@@ -2,6 +2,10 @@
 import Layout from '~/layouts/layout.astro'
 import { Debug } from 'astro:components'
 
+if (!Astro.locals.user || !Astro.locals.session) {
+  return Astro.redirect('/user/login')
+}
+
 const data = {
   user: Astro.locals.user,
   session: Astro.locals.session

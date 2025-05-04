@@ -1,5 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { userTable } from '~/db/schema/auth'
+import { userProfileTable } from '~/db/schema/user'
 import { createInsertSchema } from 'drizzle-zod'
 import {
   hashPassword,
@@ -38,22 +39,37 @@ export const auth = {
         path: ['confirmPassword']
       }
     ),
-    handler: async ({ userName, role, password }, { cookies }) => {
+    handler: async ({ userName, role = 'USER', password }, { cookies }) => {
       try {
-        // hash password and insert new user to database, returning its id
-        const passwordHash = await hashPassword({ password })
-        await db.insert(userTable).values({ userName, role, passwordHash })
+        const user = await db.transaction(async (tx) => {
+          // hash password and insert new user to database, returning its id
+          const passwordHash = await hashPassword({ password })
+          const [user] = await tx
+            .insert(userTable)
+            .values({ userName, role, passwordHash })
+            .$returningId()
+          if (user) {
+            // also populate user profile table
+            await tx
+              .insert(userProfileTable)
+              .values({ userId: user.id, fullName: userName })
 
-        // autologin mechanism
-        const [user] = await db
-          .select({ id: userTable.id, userName: userTable.userName })
-          .from(userTable)
-          .where(eq(userTable.userName, userName))
+            return user
+          } else {
+            tx.rollback()
+            return null
+          }
+        })
 
         if (user) {
+          // do autologin
           const token = generateSessionToken()
           const session = await createSession({ token, userId: user.id })
-          setSessionTokenCookie({ cookies, token, expires: session.expiresAt })
+          setSessionTokenCookie({
+            cookies,
+            token,
+            expires: session.expiresAt
+          })
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -64,12 +80,14 @@ export const auth = {
               message: 'Username telah terdaftar.'
             })
           } else {
+            console.log(error.message)
             throw new ActionError({
               code: 'INTERNAL_SERVER_ERROR',
-              message: error.message
+              message: `Terjadi kesalahan internal: ${error.cause}`
             })
           }
         } else {
+          console.log(error)
           throw new ActionError({
             code: 'INTERNAL_SERVER_ERROR',
             message: 'Telah terjadi kerusakan yang tidak diketahui.'
@@ -154,6 +172,16 @@ export const auth = {
           })
         }
       }
+    }
+  }),
+
+  isUserEmpty: defineAction({
+    handler: async () => {
+      const admins = await db.query.userTable.findFirst({
+        where: (c) => eq(c.role, 'ADMINISTRATOR')
+      })
+
+      return !admins
     }
   })
 }

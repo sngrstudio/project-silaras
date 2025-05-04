@@ -10,7 +10,7 @@ export const userTable = mysqlTable('user', {
     .primaryKey()
     .$defaultFn(() => Bun.randomUUIDv7()),
   userName: varchar('user_name', { length: 255 }).unique().notNull(),
-  role: mysqlEnum(['SYSTEM', 'ADMINISTRATOR', 'USER', 'VIEWER']).notNull(),
+  role: mysqlEnum(['ADMINISTRATOR', 'USER', 'VIEWER']).notNull(),
   passwordHash: varchar('password_hash', { length: 255 })
 })
 

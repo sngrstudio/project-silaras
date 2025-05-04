@@ -8,9 +8,12 @@ import {
   $toastMessage as toastMessage
 } from '../toast/store'
 
-interface SignupRCProps extends UserLoginSignupCardProps {}
+interface SignupRCProps extends UserLoginSignupCardProps {
+  createAdmin?: boolean | undefined
+  createViewer?: boolean | undefined
+}
 
-const SignupRC: FC<SignupRCProps> = ({ title }) => {
+const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const { error } = await actions.auth.signup(formData)
@@ -97,7 +100,12 @@ const SignupRC: FC<SignupRCProps> = ({ title }) => {
 
         {/* role (hidden) */}
         <Form.Field name='role' asChild>
-          <Form.Control type='hidden' value='USER'></Form.Control>
+          <Form.Control
+            type='hidden'
+            value={
+              createAdmin ? 'ADMINISTRATOR' : createViewer ? 'VIEWER' : 'USER'
+            }
+          ></Form.Control>
         </Form.Field>
 
         {/* the submit button */}
