@@ -8,6 +8,13 @@
       "when": 1746346737856,
       "tag": "0000_bright_sphinx",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1746458713038,
+      "tag": "0001_dapper_veda",
+      "breakpoints": true
     }
   ]
 }

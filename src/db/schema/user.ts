@@ -18,7 +18,7 @@ export const userProfileTable = mysqlTable(
         onUpdate: 'cascade'
       }),
     fullName: text('full_name'),
-    phoneNumber: text()
+    phoneNumber: text('phone_number').default('')
   },
   (t) => [primaryKey({ columns: [t.userId] })]
 )

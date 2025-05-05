@@ -1,5 +1,6 @@
 ---
 import Layout, { type Props } from '../_layout.astro'
+import ProfileCardRC from '~/components/pages/profile'
 
 if (!Astro.locals.user || !Astro.locals.session) {
   return Astro.redirect('/user/login')
@@ -11,4 +12,6 @@ const props = {
 } satisfies Props
 ---
 
-<Layout {...props} />
+<Layout {...props}>
+  <ProfileCardRC title='Profil Anda' client:idle />
+</Layout>

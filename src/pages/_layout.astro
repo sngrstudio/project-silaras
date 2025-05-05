@@ -13,10 +13,16 @@ const props = Astro.props
   <Navbar />
   <Drawer client:idle>
     <section class='mx-auto max-w-screen-md'>
-      {/* header */}
-      {props.title && <h1 class='mb-6 text-4xl font-black'>{props.title}</h1>}
-      {props.description && <p>{props.description}</p>}
-
+      {
+        /* header */
+        props.title && (
+          <header class='border-base-300 mb-4 border-b pb-4'>
+            <h1 class='text-4xl font-black'>{props.title}</h1>
+            {props.description && <p class='mt-2'>{props.description}</p>}
+          </header>
+        )
+      }
+      {/* content */}
       <slot />
     </section>
   </Drawer>
