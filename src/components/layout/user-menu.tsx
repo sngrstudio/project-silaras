@@ -1,17 +1,17 @@
-import type { FC } from 'react'
-import { DropdownMenu, Avatar } from 'radix-ui'
+import { type FC, type PropsWithChildren } from 'react'
+import { DropdownMenu } from 'radix-ui'
+import { $showToast, $toastMessage } from '../toast/store'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
-import { $showToast, $toastMessage } from '../toast/store'
 import LogoutIcon from '~icons/lucide/log-out'
 import UserIcon from '~icons/lucide/user'
 
-const UserMenu: FC<{}> = ({}) => {
+const UserMenuRC: FC<PropsWithChildren> = ({ children }) => {
   return (
     <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <div tabIndex={0} role='button' className='btn btn-circle btn-ghost'>
-          <UserAvatar name='Dashat Kotim' />
+          {children}
         </div>
       </DropdownMenu.Trigger>
 
@@ -46,34 +46,7 @@ const UserMenu: FC<{}> = ({}) => {
   )
 }
 
-export default UserMenu
-
-const UserAvatar: FC<{ name: string }> = ({ name }) => {
-  const extractInitials = (name: string): string =>
-    ((w: string[] = name.trim().split(/\s+/)) =>
-      w[0]
-        ? w.length < 2
-          ? w[0].slice(0, 2)
-          : w
-              .slice(0, 2)
-              .map((s) => s[0])
-              .join('')
-        : '')().toUpperCase()
-
-  return (
-    <Avatar.Root asChild>
-      <div className='avatar avatar-placeholder'>
-        <Avatar.Fallback asChild>
-          <div className='bg-primary rounded-full p-2'>
-            <span className='text-primary-content text-xs lg:text-base'>
-              {extractInitials(name)}
-            </span>
-          </div>
-        </Avatar.Fallback>
-      </div>
-    </Avatar.Root>
-  )
-}
+export default UserMenuRC
 
 const LogoutButton: FC = () => {
   const handleLogout = async () => {

@@ -12,7 +12,11 @@ export const user = {
     handler: async ({ userName }) => {
       try {
         const sql = db
-          .select()
+          .select({
+            fullName: userProfileView.fullName,
+            userName: userProfileView.userName,
+            role: userProfileView.role
+          })
           .from(userProfileView)
           .where(eq(userProfileView.userName, userName))
           .limit(1)

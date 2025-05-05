@@ -1,13 +1,10 @@
-import type { FC } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import { NavigationMenu } from 'radix-ui'
-import UserMenu from './userMenu'
 import { useStore } from '@nanostores/react'
 import { $openDrawer } from './store'
 import MenuIcon from '~icons/lucide/menu'
 
-interface NavbarProps {}
-
-const Navbar: FC<NavbarProps> = ({}) => {
+const Navbar: FC<PropsWithChildren> = ({ children }) => {
   const openDrawer = useStore($openDrawer)
   const handleOpenDrawer = () => $openDrawer.set(!openDrawer)
 
@@ -34,9 +31,7 @@ const Navbar: FC<NavbarProps> = ({}) => {
         </NavigationMenu.Item>
 
         <NavigationMenu.Item className='flex-none'>
-          <NavigationMenu.Link asChild>
-            <UserMenu />
-          </NavigationMenu.Link>
+          <NavigationMenu.Link asChild>{children}</NavigationMenu.Link>
         </NavigationMenu.Item>
       </NavigationMenu.List>
     </NavigationMenu.Root>

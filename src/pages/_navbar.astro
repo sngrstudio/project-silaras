@@ -1,5 +1,11 @@
 ---
 import NavbarRC from '~/components/layout/navbar'
+import UserMenuRC from '~/components/layout/user-menu'
+import UserAvatar from './_avatar.astro'
 ---
 
-<NavbarRC client:load />
+<NavbarRC client:load>
+  <UserMenuRC client:load>
+    <UserAvatar />
+  </UserMenuRC>
+</NavbarRC>

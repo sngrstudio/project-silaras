@@ -19,6 +19,7 @@
   "dependencies": {
     "@astrojs/node": "^9.2.1",
     "@astrojs/react": "^4.2.7",
+    "@nanostores/persistent": "^1.0.0",
     "@nanostores/react": "^1.0.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
