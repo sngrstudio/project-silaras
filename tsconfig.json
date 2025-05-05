@@ -3,7 +3,7 @@
   "include": [".astro/types.d.ts", ".ladle", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "types": ["unplugin-icons/types/react"],
+    "types": ["bun", "unplugin-icons/types/react"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]

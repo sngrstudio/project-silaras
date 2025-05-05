@@ -5,17 +5,26 @@ import { eq } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
 export const user = {
-  profile: defineAction({
+  get: defineAction({
     input: z.object({
       userName: z.string()
     }),
     handler: async ({ userName }) => {
       try {
-        const [profile] = await db
+        const sql = db
           .select()
           .from(userProfileView)
           .where(eq(userProfileView.userName, userName))
           .limit(1)
+          .prepare()
+
+        const [profile] = await sql.execute()
+        if (!profile) {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Terjadi masalah saat mengambil user.'
+          })
+        }
 
         return profile
       } catch (error) {
