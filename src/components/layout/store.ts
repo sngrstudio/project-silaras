@@ -8,7 +8,8 @@ export const $userProfile = persistentAtom<UserProfile>(
   {
     fullName: '',
     userName: '',
-    role: 'USER'
+    role: 'VIEWER',
+    phoneNumber: ''
   },
   {
     encode: JSON.stringify,

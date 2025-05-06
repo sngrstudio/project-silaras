@@ -1,18 +1,19 @@
 import { type FC, type PropsWithChildren, useEffect } from 'react'
 import { Toast } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { $showToast, $toastMessage } from './store'
+import {
+  $showToast,
+  $toastMessage,
+  setShowToast,
+  clearToastMessage
+} from './store'
 
 const ToastWrapper: FC<PropsWithChildren> = ({ children }) => {
   const showToast = useStore($showToast)
   const toastMessage = useStore($toastMessage)
 
   useEffect(() => {
-    $showToast.subscribe((show) => {
-      if (!show) {
-        $toastMessage.set(undefined)
-      }
-    })
+    clearToastMessage()
   }, [showToast])
 
   return (
@@ -23,7 +24,7 @@ const ToastWrapper: FC<PropsWithChildren> = ({ children }) => {
       <Toast.Root
         className='alert data-[error=false]:alert-info data-[error=false]:alert-soft data-[error=true]:alert-error max-w-[320px] p-4'
         open={showToast}
-        onOpenChange={$showToast.set}
+        onOpenChange={setShowToast}
         data-error={toastMessage?.error}
       >
         <Toast.Description>{toastMessage?.message}</Toast.Description>

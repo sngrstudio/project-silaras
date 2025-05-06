@@ -67,9 +67,9 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
             </span>
           </Form.Field>
 
-          <div className='flex flex-row-reverse items-center justify-between'>
+          <div className='flex flex-row-reverse items-center justify-between mt-4'>
             {/* the save button */}
-            <Form.Submit className='btn btn-primary mt-4 w-max'>
+            <Form.Submit className='btn btn-primary w-max'>
               <SaveIcon />
               <span>Simpan</span>
             </Form.Submit>

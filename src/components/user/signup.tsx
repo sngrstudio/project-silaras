@@ -4,7 +4,7 @@ import { Form } from 'radix-ui'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 import { useStore } from '@nanostores/react'
-import { $showToast, $toastMessage } from '../toast/store'
+import { $showToast, $toastMessage, setToastOn } from '../toast/store'
 
 interface SignupRCProps extends UserLoginSignupCardProps {
   createAdmin?: boolean | undefined
@@ -13,6 +13,8 @@ interface SignupRCProps extends UserLoginSignupCardProps {
 
 const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
   const toastMessage = useStore($toastMessage)
+  const showToast = useStore($showToast)
+
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const { error } = await actions.auth.signup(formData)
@@ -27,23 +29,17 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
                 ? error.fields.confirmPassword.join(', ')
                 : 'Terjadi kesalahan yang tidak diketahui.'
 
-        $showToast.set(true)
-        $toastMessage.set({
+        setToastOn({
           error: true,
           message
         })
         return error
       } else {
-        $showToast.set(true)
-        $toastMessage.set({
-          error: false,
-          message: 'Sedang membuat akun...'
-        })
-        $showToast.subscribe((show) => {
-          if (!show) {
-            navigate('/')
-          }
-        })
+        setToastOn({ message: 'Sedang membuat akun...' })
+        if (!showToast) {
+          navigate('/')
+        }
+
         return null
       }
     },
