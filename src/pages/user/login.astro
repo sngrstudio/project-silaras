@@ -13,9 +13,10 @@ if (userIsEmpty) {
   return Astro.redirect('/user/signup')
 }
 
+const username = Astro.url.searchParams.get('username') ?? undefined
 const title = 'Login'
 ---
 
 <Layout title={title}>
-  <LoginRC title={title} client:load />
+  <LoginRC title={title} username={username} client:load />
 </Layout>

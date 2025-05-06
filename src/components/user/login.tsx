@@ -7,9 +7,11 @@ import { useStore } from '@nanostores/react'
 import { setUserProfile } from '../layout/store'
 import { $showToast, $toastMessage, setToastOn } from '../toast/store'
 
-interface LoginRCProps extends UserLoginSignupCardProps {}
+interface LoginRCProps extends UserLoginSignupCardProps {
+  username?: string | undefined
+}
 
-const LoginRC: FC<LoginRCProps> = ({ title }) => {
+const LoginRC: FC<LoginRCProps> = ({ title, username }) => {
   const toastMessage = useStore($toastMessage)
   const showToast = useStore($showToast)
 
@@ -50,6 +52,7 @@ const LoginRC: FC<LoginRCProps> = ({ title }) => {
             <Form.Control
               className='input input-lg'
               placeholder='Username'
+              defaultValue={username}
               disabled={isPending || (toastMessage && !toastMessage.error)}
               required
             ></Form.Control>

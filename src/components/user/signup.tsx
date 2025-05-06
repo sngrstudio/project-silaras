@@ -17,6 +17,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
 
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
+      const username = formData.get('userName')?.toString()
       const { error } = await actions.auth.signup(formData)
       if (error) {
         const message = !isInputError(error)
@@ -37,7 +38,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
       } else {
         setToastOn({ message: 'Sedang membuat akun...' })
         if (!showToast) {
-          navigate('/user/login')
+          navigate(`/user/login/?username=${username}`)
         }
 
         return null
