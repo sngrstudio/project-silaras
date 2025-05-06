@@ -39,9 +39,9 @@ export const auth = {
         path: ['confirmPassword']
       }
     ),
-    handler: async ({ userName, role = 'USER', password }, { cookies }) => {
+    handler: async ({ userName, role = 'USER', password }) => {
       try {
-        const user = await db.transaction(async (tx) => {
+        await db.transaction(async (tx) => {
           // hash password and insert new user to database, returning its id
           const passwordHash = await hashPassword({ password })
           const [user] = await tx
@@ -60,17 +60,6 @@ export const auth = {
             return null
           }
         })
-
-        if (user) {
-          // do autologin
-          const token = generateSessionToken()
-          const session = await createSession({ token, userId: user.id })
-          setSessionTokenCookie({
-            cookies,
-            token,
-            expires: session.expiresAt
-          })
-        }
       } catch (error) {
         if (error instanceof Error) {
           // @ts-ignore
@@ -125,6 +114,8 @@ export const auth = {
         const token = generateSessionToken()
         const session = await createSession({ token, userId: user.id })
         setSessionTokenCookie({ cookies, token, expires: session.expiresAt })
+
+        return user.userName
       } catch (error) {
         if (error instanceof Error) {
           throw new ActionError({

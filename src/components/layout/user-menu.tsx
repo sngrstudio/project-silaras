@@ -1,6 +1,8 @@
 import { type FC, type PropsWithChildren } from 'react'
 import { DropdownMenu } from 'radix-ui'
-import { $showToast, $toastMessage } from '../toast/store'
+import { useStore } from '@nanostores/react'
+import { $showToast, setToastOn } from '../toast/store'
+import { setUserProfile } from './store'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 import LogoutIcon from '~icons/lucide/log-out'
@@ -9,10 +11,8 @@ import UserIcon from '~icons/lucide/user'
 const UserMenuRC: FC<PropsWithChildren> = ({ children }) => {
   return (
     <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
-        <div tabIndex={0} role='button' className='btn btn-circle btn-ghost'>
-          {children}
-        </div>
+      <DropdownMenu.Trigger className='btn btn-circle btn-ghost'>
+        {children}
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
@@ -49,18 +49,15 @@ const UserMenuRC: FC<PropsWithChildren> = ({ children }) => {
 export default UserMenuRC
 
 const LogoutButton: FC = () => {
+  const showToast = useStore($showToast)
+
   const handleLogout = async () => {
     await actions.auth.logout()
-    $showToast.set(true)
-    $toastMessage.set({
-      error: false,
-      message: 'Sedang logout...'
-    })
-    $showToast.subscribe((show) => {
-      if (!show) {
-        navigate('/')
-      }
-    })
+    setUserProfile(undefined)
+    setToastOn({ message: 'Sedang logout...' })
+    if (!showToast) {
+      navigate('/')
+    }
   }
   return (
     <div role='button' onClick={handleLogout}>

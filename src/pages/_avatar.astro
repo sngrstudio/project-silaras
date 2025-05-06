@@ -1,11 +1,7 @@
 ---
 import { UserAvatar } from '~/components/layout/avatar'
-import { actions } from 'astro:actions'
-
-const user = Astro.locals.user!
-const initialData = await Astro.callAction(actions.user.get.orThrow, {
-  userName: user.userName
-})
 ---
 
-<UserAvatar initialData={initialData} client:load />
+<UserAvatar client:load>
+  <slot />
+</UserAvatar>

@@ -37,7 +37,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
       } else {
         setToastOn({ message: 'Sedang membuat akun...' })
         if (!showToast) {
-          navigate('/')
+          navigate('/user/login')
         }
 
         return null

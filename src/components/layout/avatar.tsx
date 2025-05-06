@@ -1,31 +1,22 @@
-import { type FC, useEffect, useTransition } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import { Avatar } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { type UserProfile, $userProfile } from './store'
+import { $userProfile } from './store'
 
-export const UserAvatar: FC<{ initialData: UserProfile }> = ({
-  initialData
-}) => {
+export const UserAvatar: FC<PropsWithChildren> = ({ children }) => {
   const userProfile = useStore($userProfile)
-  const [isPending, startTransition] = useTransition()
-
-  useEffect(() => {
-    startTransition(() => {
-      $userProfile.set(initialData)
-    })
-  }, [initialData])
 
   return (
     <Avatar.Root asChild>
       <div className='avatar avatar-placeholder'>
+        {children}
         <Avatar.Fallback asChild>
-          <div
-            className='bg-primary data-[loading=true]:bg-primary/50 data-[loading=true]:skeleton h-[40px] w-[40px] rounded-full p-2 data-[loading=true]:rounded-full'
-            data-loading={isPending || userProfile.fullName}
-          >
-            <span className='text-primary-content text-xs lg:text-base'>
-              {extractInitials(userProfile.fullName as string)}
-            </span>
+          <div className='bg-secondary/60 h-[40px] w-[40px] rounded-full p-2'>
+            {userProfile && userProfile.fullName && (
+              <span className='text-secondary-content text-xs lg:text-base'>
+                {extractInitials(userProfile.fullName)}
+              </span>
+            )}
           </div>
         </Avatar.Fallback>
       </div>

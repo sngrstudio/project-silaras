@@ -4,6 +4,7 @@ import { Form } from 'radix-ui'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 import { useStore } from '@nanostores/react'
+import { setUserProfile } from '../layout/store'
 import { $showToast, $toastMessage, setToastOn } from '../toast/store'
 
 interface LoginRCProps extends UserLoginSignupCardProps {}
@@ -14,23 +15,25 @@ const LoginRC: FC<LoginRCProps> = ({ title }) => {
 
   const [_error, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
-      const { error } = await actions.auth.login(formData)
+      const { data: userName, error } = await actions.auth.login(formData)
       if (error) {
         setToastOn({
           error: true,
           message: error.message
         })
         return error
-      } else {
-        setToastOn({
-          message: 'Sedang masuk...'
-        })
-        if (!showToast) {
-          navigate('/')
-        }
-
-        return null
       }
+
+      const userProfile = await actions.user.get.orThrow({ userName })
+      setUserProfile(userProfile)
+      setToastOn({
+        message: 'Sedang masuk...'
+      })
+      if (!showToast) {
+        navigate('/')
+      }
+
+      return null
     },
     null
   )
