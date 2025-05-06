@@ -1,4 +1,5 @@
 ---
+import { actions } from 'astro:actions'
 export interface Props {
   title?: string | undefined
   description?: string | undefined
@@ -7,10 +8,11 @@ export interface Props {
 
 const { title, description, canonical } = Astro.props
 
+const settings = await Astro.callAction(actions.settings.get.orThrow, {})
 const site = {
-  title: 'Astro Base Template',
+  title: settings.find((s) => s.property === 'SITE_NAME')?.value || '',
   description:
-    'Astro Base Template is for used as base template for another template or be used directly'
+    settings.find((s) => s.property === 'SITE_DESCRIPTION')?.value || ''
 } satisfies Props
 ---
 

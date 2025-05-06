@@ -1,12 +1,15 @@
 import type { FC, PropsWithChildren } from 'react'
 import { NavigationMenu } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { $openDrawer } from './store'
+import { $openDrawer, setOpenDrawer } from './store'
+import { $siteName } from '../pages/store'
 import MenuIcon from '~icons/lucide/menu'
 
 const Navbar: FC<PropsWithChildren> = ({ children }) => {
+  const siteName = useStore($siteName)
   const openDrawer = useStore($openDrawer)
-  const handleOpenDrawer = () => $openDrawer.set(!openDrawer)
+
+  const handleOpenDrawer = () => setOpenDrawer(!openDrawer)
 
   return (
     <NavigationMenu.Root>
@@ -25,7 +28,7 @@ const Navbar: FC<PropsWithChildren> = ({ children }) => {
         <NavigationMenu.Item className='flex-1'>
           <NavigationMenu.Link asChild>
             <a href='/' className='btn btn-ghost'>
-              <span className='text-xl font-bold'>Dashat Kotim</span>
+              <span className='text-xl font-bold'>{siteName}</span>
             </a>
           </NavigationMenu.Link>
         </NavigationMenu.Item>

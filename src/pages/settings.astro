@@ -1,0 +1,17 @@
+---
+import Layout, { type Props } from './_layout.astro'
+import SettingsCardRC from '~/components/pages/settings'
+
+if (!Astro.locals.user || !Astro.locals.session) {
+  return Astro.redirect('/user/login')
+}
+
+const props = {
+  title: 'Pengaturan Aplikasi',
+  description: 'Pengaturan dasar sistem.'
+} satisfies Props
+---
+
+<Layout {...props}>
+  <SettingsCardRC title='Pengaturan' client:idle />
+</Layout>
