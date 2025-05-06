@@ -1,15 +1,45 @@
-import { type FC, type MouseEventHandler, useRef } from 'react'
+import { type FC, type MouseEventHandler, useActionState, useRef } from 'react'
 import CardTemplate from '../common/card'
 import LoadingCard from '../common/loading'
 import { Form } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { $userProfile } from '../layout/store'
+import { $userProfile, setUserProfile } from '../layout/store'
+import { setToastOn } from '../toast/store'
+import { actions, isInputError } from 'astro:actions'
 import SaveIcon from '~icons/lucide/save'
 import ResetIcon from '~icons/lucide/circle-x'
 
 const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
   const userProfile = useStore($userProfile)
   const ref = useRef<HTMLFormElement>(null)
+
+  const [_state, submitAction, isPending] = useActionState(
+    async (_prevState: any, formData: FormData) => {
+      const { data: profile, error } = await actions.user.set(formData)
+      if (error && !profile) {
+        const message = !isInputError(error)
+          ? error.message
+          : error.fields.fullName
+            ? error.fields.fullName.join(', ')
+            : error.fields.phoneNumber
+              ? error.fields.phoneNumber.join(', ')
+              : 'Terjadi kesalahan yang tidak diketahui.'
+
+        setToastOn({
+          error: true,
+          message
+        })
+        return null
+      }
+
+      setUserProfile(profile)
+      setToastOn({
+        message: 'Berhasil memperbarui data user.'
+      })
+      return null
+    },
+    null
+  )
 
   const handleReset: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault()
@@ -22,7 +52,11 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
 
   return (
     <CardTemplate title={title}>
-      <Form.Root className='flex flex-1 flex-col gap-4' ref={ref}>
+      <Form.Root
+        action={submitAction}
+        className='flex flex-1 flex-col gap-4'
+        ref={ref}
+      >
         {/* name */}
         <Form.Field name='fullName' className='flex flex-col gap-2'>
           <Form.Label className='font-bold'>Nama</Form.Label>
@@ -46,7 +80,7 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
         </Form.Field>
 
         {/* role */}
-        <Form.Field name='userName' className='flex flex-col gap-2'>
+        <Form.Field name='role' className='flex flex-col gap-2'>
           <Form.Label className='font-bold'>Hak Akses</Form.Label>
           <Form.Control
             className='input input-lg w-full'
@@ -72,8 +106,12 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
 
         <div className='mt-4 flex flex-row-reverse items-center justify-between'>
           {/* the save button */}
-          <Form.Submit className='btn btn-primary w-max'>
-            <SaveIcon />
+          <Form.Submit className='btn btn-primary w-max' disabled={isPending}>
+            {isPending ? (
+              <span className='loading loading-dots loading-xs'></span>
+            ) : (
+              <SaveIcon />
+            )}
             <span>Simpan</span>
           </Form.Submit>
 
