@@ -4,6 +4,7 @@ import MainLayout, {
 } from '~/layouts/layout.astro'
 import Navbar from './_navbar.astro'
 import Drawer from '~/components/layout/drawer'
+import Main from '~/components/layout/main'
 
 export interface Props extends MainLayoutProps {
   width?: 'normal' | 'full'
@@ -15,21 +16,23 @@ const { width = 'normal', ...props } = Astro.props
 <MainLayout {...props}>
   <Navbar />
   <Drawer client:idle>
-    <section
-      class='mx-auto max-w-screen-md data-[width=full]:max-w-screen-xl'
-      data-width={width}
-    >
-      {
-        /* header */
-        props.title && (
-          <header class='border-base-300 mb-4 border-b pb-4'>
-            <h1 class='text-4xl font-black'>{props.title}</h1>
-            {props.description && <p class='mt-2'>{props.description}</p>}
-          </header>
-        )
-      }
-      {/* content */}
-      <slot />
-    </section>
+    <Main client:idle>
+      <section
+        class='mx-auto max-w-screen-md data-[width=full]:max-w-screen-xl'
+        data-width={width}
+      >
+        {
+          /* header */
+          props.title && (
+            <header class='border-base-300 mb-4 border-b pb-4'>
+              <h1 class='text-4xl font-black'>{props.title}</h1>
+              {props.description && <p class='mt-2'>{props.description}</p>}
+            </header>
+          )
+        }
+        {/* content */}
+        <slot />
+      </section>
+    </Main>
   </Drawer>
 </MainLayout>

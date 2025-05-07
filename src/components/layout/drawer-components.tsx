@@ -21,6 +21,9 @@ export const DrawerMenu: FC = () => {
           </NavigationMenu.List>
         </NavigationMenu.Root>
       </ScrollArea.Viewport>
+      <ScrollArea.Scrollbar orientation='vertical'>
+        <ScrollArea.Thumb />
+      </ScrollArea.Scrollbar>
     </ScrollArea.Root>
   )
 }

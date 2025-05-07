@@ -1,4 +1,4 @@
-import { type FC, type PropsWithChildren } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import { DrawerMenu } from './drawer-components'
 import { useStore } from '@nanostores/react'
 import { $openDrawer, setOpenDrawer } from './store'
@@ -17,8 +17,8 @@ const Drawer: FC<PropsWithChildren> = ({ children }) => {
         onChange={handleOpenDrawer}
       />
       <div className='drawer-content flex flex-col'>
-        {/* Page content here */}
-        <main className='flex-1 p-4 lg:p-8'>{children}</main>
+        {/* Content */}
+        {children}
       </div>
       <div className='drawer-side lg:max-h-[calc(100vh-4rem)]'>
         <label

@@ -9,10 +9,6 @@ import {
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import { $users, type User } from './stores/users'
-import { setToastOn } from '../toast/store'
-import { actions, isInputError } from 'astro:actions'
-import SaveIcon from '~icons/lucide/save'
-import ResetIcon from '~icons/lucide/circle-x'
 
 const UsersCardRC: FC<{ title: string }> = ({ title }) => {
   const data = useStore($users)
