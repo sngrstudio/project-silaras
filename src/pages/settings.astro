@@ -6,12 +6,16 @@ if (!Astro.locals.user || !Astro.locals.session) {
   return Astro.redirect('/user/login')
 }
 
+if (Astro.locals.user.role !== 'ADMINISTRATOR') {
+  return Astro.redirect('/')
+}
+
 const props = {
-  title: 'Pengaturan Aplikasi',
+  title: 'Pengaturan Umum',
   description: 'Pengaturan dasar sistem.'
 } satisfies Props
 ---
 
 <Layout {...props}>
-  <SettingsCardRC title='Pengaturan' client:idle />
+  <SettingsCardRC title='Pengaturan Aplikasi' client:idle />
 </Layout>

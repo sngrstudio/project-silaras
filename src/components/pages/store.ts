@@ -8,8 +8,14 @@ export const $settings = persistentAtom<Settings | undefined>(
   'settings',
   undefined,
   {
-    encode: JSON.stringify,
-    decode: JSON.parse
+    encode: (d) =>
+      btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(d)))),
+    decode: (e) =>
+      JSON.parse(
+        new TextDecoder().decode(
+          Uint8Array.from(atob(e), (c) => c.charCodeAt(0))
+        )
+      )
   }
 )
 

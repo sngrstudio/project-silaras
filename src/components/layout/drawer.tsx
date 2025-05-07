@@ -1,10 +1,11 @@
 import { type FC, type PropsWithChildren } from 'react'
+import { DrawerMenu } from './drawer-components'
 import { useStore } from '@nanostores/react'
-import { $openDrawer } from './store'
+import { $openDrawer, setOpenDrawer } from './store'
 
 const Drawer: FC<PropsWithChildren> = ({ children }) => {
   const openDrawer = useStore($openDrawer)
-  const handleOpenDrawer = () => $openDrawer.set(!openDrawer)
+  const handleOpenDrawer = () => setOpenDrawer(!openDrawer)
 
   return (
     <div className='drawer lg:drawer-open' data-open={openDrawer}>
@@ -25,15 +26,7 @@ const Drawer: FC<PropsWithChildren> = ({ children }) => {
           aria-label='close sidebar'
           className='drawer-overlay'
         ></label>
-        <ul className='menu bg-base-200 text-base-content min-h-full w-80 p-4 max-lg:pt-[4rem]'>
-          {/* Sidebar content here */}
-          <li>
-            <a>Sidebar Item 1</a>
-          </li>
-          <li>
-            <a>Sidebar Item 2</a>
-          </li>
-        </ul>
+        <DrawerMenu />
       </div>
     </div>
   )

@@ -3,9 +3,9 @@ import CardTemplate from '../common/card'
 import LoadingCard from '../common/loading'
 import { Form } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { $settings } from './store'
+import { $settings, setSettings } from './store'
 import { setToastOn } from '../toast/store'
-// import { actions, isInputError } from 'astro:actions'
+import { actions, isInputError } from 'astro:actions'
 import SaveIcon from '~icons/lucide/save'
 import ResetIcon from '~icons/lucide/circle-x'
 
@@ -15,34 +15,30 @@ const SettingsCardRC: FC<{ title: string }> = ({ title }) => {
 
   const [_state, submitAction, isPending] = useActionState(
     async (_prevState: any, formData: FormData) => {
-      const settingsData = {
-        name: formData.get('settings.name')?.toString(),
-        description: formData.get('settings.description')?.toString()
+      const { data: settings, error } = await actions.settings.set(formData)
+      if (error && !settings) {
+        const message = !isInputError(error)
+          ? error.message
+          : error.fields.name
+            ? error.fields.name.join(', ')
+            : error.fields.description
+              ? error.fields.description.join(', ')
+              : 'Terjadi kesalahan yang tidak diketahui.'
+
+        setToastOn({
+          error: true,
+          message
+        })
+        return null
       }
 
-      // const { data: profile, error } = await actions.user.set(formData)
-      // if (error && !profile) {
-      //   const message = !isInputError(error)
-      //     ? error.message
-      //     : error.fields.fullName
-      //       ? error.fields.fullName.join(', ')
-      //       : error.fields.phoneNumber
-      //         ? error.fields.phoneNumber.join(', ')
-      //         : 'Terjadi kesalahan yang tidak diketahui.'
-
-      //   setToastOn({
-      //     error: true,
-      //     message
-      //   })
-      //   return null
-      // }
-
-      alert(JSON.stringify(settingsData))
+      setSettings(settings)
       setToastOn({
         message: 'Berhasil memperbarui pengaturan.'
       })
       return null
     },
+
     null
   )
 
@@ -68,7 +64,7 @@ const SettingsCardRC: FC<{ title: string }> = ({ title }) => {
         ref={ref}
       >
         {/* name */}
-        <Form.Field name='settings.name' className='flex flex-col gap-2'>
+        <Form.Field name='name' className='flex flex-col gap-2'>
           <Form.Label className='font-bold'>Nama</Form.Label>
           <Form.Control
             className='input input-lg w-full'
@@ -77,7 +73,7 @@ const SettingsCardRC: FC<{ title: string }> = ({ title }) => {
         </Form.Field>
 
         {/* description */}
-        <Form.Field name='settings.description' className='flex flex-col gap-2'>
+        <Form.Field name='description' className='flex flex-col gap-2'>
           <Form.Label className='font-bold'>Nama</Form.Label>
           <Form.Control
             className='input input-lg w-full'
