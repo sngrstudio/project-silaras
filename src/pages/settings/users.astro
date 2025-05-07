@@ -1,0 +1,22 @@
+---
+import Layout, { type Props } from '../_layout.astro'
+import UsersCardRC from '~/components/pages/users'
+
+if (!Astro.locals.user || !Astro.locals.session) {
+  return Astro.redirect('/user/login')
+}
+
+if (Astro.locals.user.role !== 'ADMINISTRATOR') {
+  return Astro.redirect('/')
+}
+
+const props = {
+  title: 'Pengaturan Pengguna',
+  description: 'Pengaturan administrasi pengguna.',
+  width: 'full'
+} satisfies Props
+---
+
+<Layout {...props}>
+  <UsersCardRC title='Pengguna' client:idle />
+</Layout>

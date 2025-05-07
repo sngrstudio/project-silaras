@@ -49,6 +49,44 @@ export const user = {
     }
   }),
 
+  getAll: defineAction({
+    handler: async (_, { locals }) => {
+      try {
+        const localUser = locals.user
+        if (!localUser) {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Silahkan log in.'
+          })
+        }
+
+        if (localUser.role !== 'ADMINISTRATOR') {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Operasi khusus Administrator!'
+          })
+        }
+
+        const getAllProfileSql = db.select().from(userProfileView).prepare()
+        const users = await getAllProfileSql.execute()
+
+        return users
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message
+          })
+        } else {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Telah terjadi kerusakan yang tidak diketahui.'
+          })
+        }
+      }
+    }
+  }),
+
   set: defineAction({
     accept: 'form',
     input: updateProfileSchema,

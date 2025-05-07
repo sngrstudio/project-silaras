@@ -5,14 +5,20 @@ import MainLayout, {
 import Navbar from './_navbar.astro'
 import Drawer from '~/components/layout/drawer'
 
-export interface Props extends MainLayoutProps {}
-const props = Astro.props
+export interface Props extends MainLayoutProps {
+  width?: 'normal' | 'full'
+}
+
+const { width = 'normal', ...props } = Astro.props
 ---
 
 <MainLayout {...props}>
   <Navbar />
   <Drawer client:idle>
-    <section class='mx-auto max-w-screen-md'>
+    <section
+      class='mx-auto max-w-screen-md data-[width=full]:max-w-screen-xl'
+      data-width={width}
+    >
       {
         /* header */
         props.title && (

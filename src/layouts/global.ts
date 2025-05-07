@@ -1,5 +1,6 @@
 import { onMount, task } from 'nanostores'
-import { $settings, setSettings } from '~/components/pages/store'
+import { $settings, setSettings } from '~/components/pages/stores/settings'
+import { $users, setUsers } from '~/components/pages/stores/users'
 import { actions } from 'astro:actions'
 
 onMount($settings, () => {
@@ -10,5 +11,16 @@ onMount($settings, () => {
 
   return () => {
     setSettings(undefined)
+  }
+})
+
+onMount($users, () => {
+  task(async () => {
+    const initialUsers = await actions.user.getAll.orThrow()
+    setUsers(initialUsers)
+  })
+
+  return () => {
+    setUsers([])
   }
 })

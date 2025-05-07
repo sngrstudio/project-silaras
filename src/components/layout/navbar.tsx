@@ -2,7 +2,7 @@ import type { FC, PropsWithChildren } from 'react'
 import { NavigationMenu } from 'radix-ui'
 import { useStore } from '@nanostores/react'
 import { $openDrawer, setOpenDrawer } from './store'
-import { $siteName } from '../pages/store'
+import { $siteName } from '../pages/stores/settings'
 import MenuIcon from '~icons/lucide/menu'
 
 const Navbar: FC<PropsWithChildren> = ({ children }) => {

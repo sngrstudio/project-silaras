@@ -5,11 +5,6 @@ import { $userProfile } from './store'
 
 export const DrawerMenu: FC = () => {
   const userProfile = useStore($userProfile)
-  const [path, setPath] = useState<string>('')
-
-  useEffect(() => {
-    setPath(window.location.pathname)
-  }, [])
 
   return (
     <ScrollArea.Root className='bg-base-200 min-h-full w-64'>
@@ -17,18 +12,11 @@ export const DrawerMenu: FC = () => {
         <NavigationMenu.Root orientation='vertical'>
           <NavigationMenu.List className='menu w-full'>
             {/* Beranda */}
-            <NavigationMenu.Item>
-              <NavigationMenu.Link
-                href='/'
-                className={path === '/' ? 'menu-active' : ''}
-              >
-                Beranda
-              </NavigationMenu.Link>
-            </NavigationMenu.Item>
+            <MenuLink title='Beranda' path='/' />
 
             {/* Pengaturan Umum */}
             {userProfile && userProfile.role === 'ADMINISTRATOR' && (
-              <AdminOnlyMenu path={path} />
+              <AdminOnlyMenu />
             )}
           </NavigationMenu.List>
         </NavigationMenu.Root>
@@ -37,20 +25,39 @@ export const DrawerMenu: FC = () => {
   )
 }
 
-export const AdminOnlyMenu: FC<{ path: string }> = ({ path }) => {
+export const AdminOnlyMenu: FC = () => {
   return (
     <>
-      <NavigationMenu.Item className='menu-title mt-6 uppercase'>
-        Administrasi
-      </NavigationMenu.Item>
-      <NavigationMenu.Item>
-        <NavigationMenu.Link
-          href='/settings/general'
-          className={path === '/settings/general' ? 'menu-active' : ''}
-        >
-          Pengaturan Umum
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
+      <MenuLabel title='Administrasi' />
+      <MenuLink title='Pengaturan Umum' path='/settings/general' />
+      <MenuLink title='Pengaturan Pengguna' path='/settings/users' />
     </>
+  )
+}
+
+const MenuLink: FC<{ title: string; path: string }> = ({ title, path }) => {
+  const [currentPath, setCurrentPath] = useState<string>('')
+
+  useEffect(() => {
+    setCurrentPath(window.location.pathname)
+  }, [])
+
+  return (
+    <NavigationMenu.Item>
+      <NavigationMenu.Link
+        href={path}
+        className={currentPath === path ? 'menu-active' : ''}
+      >
+        {title}
+      </NavigationMenu.Link>
+    </NavigationMenu.Item>
+  )
+}
+
+const MenuLabel: FC<{ title: string }> = ({ title }) => {
+  return (
+    <NavigationMenu.Item className='menu-title mt-6 uppercase'>
+      {title}
+    </NavigationMenu.Item>
   )
 }
