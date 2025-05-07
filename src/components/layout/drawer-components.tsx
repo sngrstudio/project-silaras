@@ -45,8 +45,8 @@ export const AdminOnlyMenu: FC<{ path: string }> = ({ path }) => {
       </NavigationMenu.Item>
       <NavigationMenu.Item>
         <NavigationMenu.Link
-          href='/settings'
-          className={path === '/settings' ? 'menu-active' : ''}
+          href='/settings/general'
+          className={path === '/settings/general' ? 'menu-active' : ''}
         >
           Pengaturan Umum
         </NavigationMenu.Link>

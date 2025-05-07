@@ -9,7 +9,7 @@ import icons from 'unplugin-icons/vite'
 export default defineConfig({
   output: 'server',
   adapter: node({
-    mode: 'standalone'
+    mode: 'middleware'
   }),
   integrations: [react()],
   vite: {
