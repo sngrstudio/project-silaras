@@ -7,7 +7,7 @@ export interface TableProps {
 
 const TableTemplate: FC<TableProps> = ({ table }) => {
   return (
-    <table className='table'>
+    <table className='table table-auto'>
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
