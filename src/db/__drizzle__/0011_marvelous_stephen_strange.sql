@@ -1,1 +1,0 @@
-ALTER TABLE `region` MODIFY COLUMN `code` varchar(255);

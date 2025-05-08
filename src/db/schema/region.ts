@@ -1,5 +1,6 @@
 import {
   mysqlTable,
+  mysqlView,
   primaryKey,
   foreignKey,
   varchar,
@@ -7,6 +8,7 @@ import {
   mysqlEnum
 } from 'drizzle-orm/mysql-core'
 import { userProfileTable } from './user'
+import { eq } from 'drizzle-orm'
 
 export const regionTable = mysqlTable(
   'region',
@@ -41,4 +43,22 @@ export const villageOnWatchTable = mysqlTable(
       .references(() => userProfileTable.userId)
   },
   (t) => [primaryKey({ columns: [t.regionId, t.userId] })]
+)
+
+export const villageOnWatchView = mysqlView('village_on_watch_view').as((qb) =>
+  qb
+    .select({
+      regionId: regionTable.id,
+      userId: userProfileTable.userId,
+      regionName: regionTable.name,
+      regionCode: regionTable.code,
+      handler: userProfileTable.fullName,
+      phone: userProfileTable.phoneNumber
+    })
+    .from(villageOnWatchTable)
+    .leftJoin(regionTable, eq(regionTable.id, villageOnWatchTable.regionId))
+    .leftJoin(
+      userProfileTable,
+      eq(userProfileTable.userId, villageOnWatchTable.userId)
+    )
 )

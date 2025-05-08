@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "a5aa682f-c6b8-4437-b544-052b15790eb5",
+  "id": "d4c8b7de-7aa5-4e82-854f-88d2e7d914a1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "session": {
@@ -108,6 +108,170 @@
       },
       "checkConstraint": {}
     },
+    "region": {
+      "name": "region",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('DISTRICT','SUBDISTRICT','VILLAGE')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'VILLAGE'"
+        },
+        "parentId": {
+          "name": "parentId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "region_parent_id_id_fk": {
+          "name": "region_parent_id_id_fk",
+          "tableFrom": "region",
+          "tableTo": "region",
+          "columnsFrom": [
+            "parentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "region_id": {
+          "name": "region_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "region_code_unique": {
+          "name": "region_code_unique",
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "village_on_watch": {
+      "name": "village_on_watch",
+      "columns": {
+        "regionId": {
+          "name": "regionId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "village_on_watch_regionId_region_id_fk": {
+          "name": "village_on_watch_regionId_region_id_fk",
+          "tableFrom": "village_on_watch",
+          "tableTo": "region",
+          "columnsFrom": [
+            "regionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "village_on_watch_userId_user_profile_user_id_fk": {
+          "name": "village_on_watch_userId_user_profile_user_id_fk",
+          "tableFrom": "village_on_watch",
+          "tableTo": "user_profile",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "village_on_watch_regionId_userId_pk": {
+          "name": "village_on_watch_regionId_userId_pk",
+          "columns": [
+            "regionId",
+            "userId"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "settings": {
+      "name": "settings",
+      "columns": {
+        "property": {
+          "name": "property",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "settings_property": {
+          "name": "settings_property",
+          "columns": [
+            "property"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "user_profile": {
       "name": "user_profile",
       "columns": {
@@ -125,12 +289,13 @@
           "notNull": false,
           "autoincrement": false
         },
-        "phoneNumber": {
-          "name": "phoneNumber",
+        "phone_number": {
+          "name": "phone_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "('')"
         }
       },
       "indexes": {},
@@ -162,6 +327,58 @@
     }
   },
   "views": {
+    "village_on_watch_view": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "('')"
+        }
+      },
+      "name": "village_on_watch_view",
+      "isExisting": false,
+      "definition": "select `region`.`id`, `user_profile`.`user_id`, `region`.`name`, `region`.`code`, `user_profile`.`full_name`, `user_profile`.`phone_number` from `village_on_watch` left join `region` on `region`.`id` = `village_on_watch`.`regionId` left join `user_profile` on `user_profile`.`user_id` = `village_on_watch`.`userId`",
+      "algorithm": "undefined",
+      "sqlSecurity": "definer"
+    },
     "user_profile_view": {
       "columns": {
         "user_name": {
@@ -185,17 +402,18 @@
           "notNull": false,
           "autoincrement": false
         },
-        "phoneNumber": {
-          "name": "phoneNumber",
+        "phone_number": {
+          "name": "phone_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "('')"
         }
       },
       "name": "user_profile_view",
       "isExisting": false,
-      "definition": "select `user`.`user_name`, `user`.`role`, `user_profile`.`full_name`, `user_profile`.`phoneNumber` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id`",
+      "definition": "select `user`.`user_name`, `user`.`role`, `user_profile`.`full_name`, `user_profile`.`phone_number` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id`",
       "algorithm": "undefined",
       "sqlSecurity": "definer"
     }
