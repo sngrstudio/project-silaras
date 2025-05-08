@@ -1,7 +1,12 @@
 import { seedSettings } from './settings'
+import { seedRegions } from './region'
 
 const main = async () => {
-  await seedSettings()
+  await seedSettings().then(() =>
+    console.log('Seeding Settings table complete!')
+  )
+
+  await seedRegions().then(() => console.log('Seeding Region table complete!'))
 }
 
 main()

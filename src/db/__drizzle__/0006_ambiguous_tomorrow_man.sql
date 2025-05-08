@@ -1,0 +1,1 @@
+ALTER TABLE `region` ADD `type` enum('DISTRICT','SUBDISTRICT','VILLAGE') NOT NULL;
