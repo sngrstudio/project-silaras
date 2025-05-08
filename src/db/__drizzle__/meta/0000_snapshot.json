@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d4c8b7de-7aa5-4e82-854f-88d2e7d914a1",
+  "id": "67a40c12-af5e-44bb-ae55-c5543726ccf7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "session": {
@@ -294,8 +294,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "default": "('')"
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -369,8 +368,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "default": "('')"
+          "autoincrement": false
         }
       },
       "name": "village_on_watch_view",
@@ -407,8 +405,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "default": "('')"
+          "autoincrement": false
         }
       },
       "name": "user_profile_view",

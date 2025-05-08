@@ -54,6 +54,7 @@ const LoginRC: FC<LoginRCProps> = ({ title, username }) => {
               placeholder='Username'
               defaultValue={username}
               disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='username'
               required
             ></Form.Control>
           </label>
@@ -70,6 +71,7 @@ const LoginRC: FC<LoginRCProps> = ({ title, username }) => {
               placeholder='Password'
               type='password'
               disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='current-password'
               required
             ></Form.Control>
           </label>

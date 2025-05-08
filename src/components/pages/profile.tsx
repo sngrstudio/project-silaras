@@ -63,6 +63,7 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
           <Form.Control
             className='input input-lg w-full'
             defaultValue={userProfile.fullName || ''}
+            autoComplete='name'
           />
         </Form.Field>
 
@@ -72,7 +73,7 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
           <Form.Control
             className='input input-lg w-full'
             value={userProfile.userName}
-            disabled
+            readOnly
           />
           <span className='text-base-content/50 text-sm'>
             Username tidak dapat diganti.
@@ -97,7 +98,9 @@ const ProfileCardRC: FC<{ title: string }> = ({ title }) => {
           <Form.Label className='font-bold'>Nomor Telepon</Form.Label>
           <Form.Control
             className='input input-lg w-full'
+            type='tel'
             defaultValue={userProfile.phoneNumber || ''}
+            autoComplete='tel'
           />
           <span className='text-base-content/50 text-sm'>
             Isilah untuk kemudahan admin menghubungi Anda.

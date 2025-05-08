@@ -39,7 +39,7 @@ CREATE TABLE `settings` (
 CREATE TABLE `user_profile` (
 	`user_id` varchar(255) NOT NULL,
 	`full_name` text,
-	`phone_number` text DEFAULT (''),
+	`phone_number` text,
 	CONSTRAINT `user_profile_user_id_pk` PRIMARY KEY(`user_id`)
 );
 --> statement-breakpoint

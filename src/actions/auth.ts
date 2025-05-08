@@ -16,30 +16,41 @@ import {
   deleteSessionTokenCookie
 } from '~/db/auth/cookies'
 import { db } from '~/db/db'
-import { eq } from 'drizzle-orm'
+import { eq, count } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
-export const insertUserSchema = createInsertSchema(userTable, {
+const insertUserSchema = createInsertSchema(userTable, {
   userName: (sch) =>
     sch.min(4, 'Username harus terdiri dari setidaknya empat karakter')
-}).extend({
-  password: z
-    .string()
-    .min(8, 'Password minimal terdiri dari delapan karakter.'),
-  confirmPassword: z.string()
+})
+  .extend({
+    password: z
+      .string()
+      .min(8, 'Password minimal terdiri dari delapan karakter.'),
+    confirmPassword: z.string()
+  })
+  .omit({ passwordHash: true })
+
+const insertUserProfileSchema = createInsertSchema(userProfileTable).omit({
+  userId: true
 })
 
 export const auth = {
   signup: defineAction({
     accept: 'form',
-    input: insertUserSchema.refine(
-      ({ password, confirmPassword }) => password === confirmPassword,
-      {
+    input: insertUserSchema
+      .merge(insertUserProfileSchema)
+      .refine(({ password, confirmPassword }) => password === confirmPassword, {
         message: 'Password harus sama di kedua kolom.',
         path: ['confirmPassword']
-      }
-    ),
-    handler: async ({ userName, role = 'USER', password }) => {
+      }),
+    handler: async ({
+      userName,
+      role = 'USER',
+      password,
+      fullName,
+      phoneNumber
+    }) => {
       try {
         await db.transaction(async (tx) => {
           // hash password and insert new user to database, returning its id
@@ -52,7 +63,7 @@ export const auth = {
             // also populate user profile table
             await tx
               .insert(userProfileTable)
-              .values({ userId: user.id, fullName: userName })
+              .values({ userId: user.id, fullName, phoneNumber })
 
             return user
           } else {
@@ -173,6 +184,21 @@ export const auth = {
       })
 
       return !admins
+    }
+  }),
+
+  isOnlyAdmin: defineAction({
+    handler: async () => {
+      const [admins] = await db
+        .select({ count: count() })
+        .from(userTable)
+        .where(eq(userTable.role, 'ADMINISTRATOR'))
+
+      if (admins && admins.count > 1) {
+        return false
+      } else {
+        return true
+      }
     }
   })
 }

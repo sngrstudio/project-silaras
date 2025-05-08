@@ -6,9 +6,13 @@ import { eq, sql } from 'drizzle-orm'
 import { createUpdateSchema } from 'drizzle-zod'
 import { z } from 'astro:schema'
 
-const updateProfileSchema = createUpdateSchema(userProfileTable).omit({
-  userId: true
-})
+const insertUserSchema = createUpdateSchema(userTable).pick({ userName: true })
+
+const updateProfileSchema = createUpdateSchema(userProfileTable)
+  .merge(insertUserSchema)
+  .omit({
+    userId: true
+  })
 
 const getProfileSql = db
   .select()
@@ -90,13 +94,22 @@ export const user = {
   set: defineAction({
     accept: 'form',
     input: updateProfileSchema,
-    handler: async (inputs, { locals }) => {
+    handler: async ({ userName, fullName, phoneNumber }, { locals }) => {
       try {
         const localUser = locals.user
         if (!localUser) {
           throw new ActionError({
             code: 'FORBIDDEN',
             message: 'Silahkan log in.'
+          })
+        }
+
+        const isAdmin = localUser.role === 'ADMINISTRATOR'
+
+        if (!isAdmin && userName !== localUser.userName) {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Operasi terbatas.'
           })
         }
 
@@ -111,18 +124,18 @@ export const user = {
 
         const updateProfileSql = db
           .update(userProfileTable)
-          .set(inputs)
+          .set({ fullName, phoneNumber })
           .where(eq(userProfileTable.userId, sql.placeholder('userId')))
           .prepare()
 
         const profile = await db.transaction(async (tx) => {
           const [user] = await getUserIdSql.execute({
-            userName: localUser.userName
+            userName: isAdmin ? userName : localUser.userName
           })
           if (user) {
             await updateProfileSql.execute({ userId: user.id })
             const [newProfile] = await getProfileSql.execute({
-              userName: localUser.userName
+              userName: isAdmin ? userName : localUser.userName
             })
 
             return newProfile
@@ -152,6 +165,35 @@ export const user = {
           })
         }
       }
+    }
+  }),
+
+  delete: defineAction({
+    input: insertUserSchema,
+    handler: async ({ userName }, { locals }) => {
+      const localUser = locals.user
+      if (!localUser) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Silahkan log in.'
+        })
+      }
+
+      if (localUser.role !== 'ADMINISTRATOR') {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Operasi khusus Administrator!'
+        })
+      }
+
+      if (!userName) {
+        throw new ActionError({
+          code: 'BAD_REQUEST',
+          message: 'User tidak ditemukan.'
+        })
+      }
+
+      await db.delete(userTable).where(eq(userTable.userName, userName))
     }
   })
 }

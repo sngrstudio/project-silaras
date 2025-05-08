@@ -1,6 +1,11 @@
 import { onMount, task } from 'nanostores'
 import { $settings, setSettings } from '~/components/pages/stores/settings'
-import { $users, setUsers } from '~/components/pages/stores/users'
+import {
+  $users,
+  $isOnlyAdmin,
+  setUsers,
+  setIsOnlyAdmin
+} from '~/components/pages/stores/users'
 import { actions } from 'astro:actions'
 
 onMount($settings, () => {
@@ -22,5 +27,16 @@ onMount($users, () => {
 
   return () => {
     setUsers([])
+  }
+})
+
+onMount($isOnlyAdmin, () => {
+  task(async () => {
+    const isOnlyAdmin = await actions.auth.isOnlyAdmin.orThrow()
+    setIsOnlyAdmin(isOnlyAdmin)
+  })
+
+  return () => {
+    setIsOnlyAdmin(undefined)
   }
 })

@@ -8,10 +8,9 @@ import { $showToast, $toastMessage, setToastOn } from '../toast/store'
 
 interface SignupRCProps extends UserLoginSignupCardProps {
   createAdmin?: boolean | undefined
-  createViewer?: boolean | undefined
 }
 
-const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
+const SignupRC: FC<SignupRCProps> = ({ title, createAdmin }) => {
   const toastMessage = useStore($toastMessage)
   const showToast = useStore($showToast)
 
@@ -28,7 +27,11 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               ? error.fields.password.join(', ')
               : error.fields.confirmPassword
                 ? error.fields.confirmPassword.join(', ')
-                : 'Terjadi kesalahan yang tidak diketahui.'
+                : error.fields.fullName
+                  ? error.fields.fullName.join(', ')
+                  : error.fields.phoneNumber
+                    ? error.fields.phoneNumber.join(', ')
+                    : 'Terjadi kesalahan yang tidak diketahui.'
 
         setToastOn({
           error: true,
@@ -60,6 +63,23 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               className='input input-lg'
               placeholder='Username'
               disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='username'
+              required
+            ></Form.Control>
+          </label>
+        </Form.Field>
+
+        {/* name */}
+        <Form.Field name='fullName' asChild>
+          <label className='floating-label'>
+            <Form.Label asChild>
+              <span>Nama</span>
+            </Form.Label>
+            <Form.Control
+              className='input input-lg'
+              placeholder='Nama'
+              disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='name'
               required
             ></Form.Control>
           </label>
@@ -76,6 +96,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               placeholder='Password'
               type='password'
               disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='new-password'
               required
             ></Form.Control>
           </label>
@@ -92,6 +113,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
               placeholder='Konfirmasi Password'
               type='password'
               disabled={isPending || (toastMessage && !toastMessage.error)}
+              autoComplete='new-password'
               required
             ></Form.Control>
           </label>
@@ -101,9 +123,7 @@ const SignupRC: FC<SignupRCProps> = ({ title, createAdmin, createViewer }) => {
         <Form.Field name='role' asChild>
           <Form.Control
             type='hidden'
-            value={
-              createAdmin ? 'ADMINISTRATOR' : createViewer ? 'VIEWER' : 'USER'
-            }
+            value={createAdmin ? 'ADMINISTRATOR' : 'USER'}
           ></Form.Control>
         </Form.Field>
 
