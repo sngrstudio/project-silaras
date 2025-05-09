@@ -1,1 +1,3 @@
-export const server = {}
+import user from './user'
+
+export const server = { user }

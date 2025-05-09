@@ -1,0 +1,4 @@
+ALTER TABLE `user` MODIFY COLUMN `password_hash` varchar(255) NOT NULL;--> statement-breakpoint
+CREATE OR REPLACE ALGORITHM = undefined
+SQL SECURITY definer
+VIEW `user_view` AS (select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo`, `access_level_map`.`description` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id` right join `access_level_map` on `access_level_map`.`id` = `user`.`access_level`);

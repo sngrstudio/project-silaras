@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ae9946ba-4475-402e-bba9-4310ca7f8e8d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "69733afa-ff06-40cb-9b29-5d9e85463045",
+  "prevId": "42da395d-cb11-4dc1-8cb3-6600bf814206",
   "tables": {
     "access_level_map": {
       "name": "access_level_map",
@@ -181,7 +181,7 @@
           "name": "password_hash",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -257,18 +257,11 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         }
       },
       "name": "user_view",
       "isExisting": false,
-      "definition": "select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo`, `access_level_map`.`description` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id` left join `access_level_map` on `access_level_map`.`id` = `user`.`access_level`",
+      "definition": "select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id`",
       "algorithm": "undefined",
       "sqlSecurity": "definer"
     }

@@ -7,10 +7,11 @@ import icons from 'unplugin-icons/vite'
 
 // https://astro.build/config
 export default defineConfig({
+  integrations: [react()],
   adapter: node({
     mode: 'middleware'
   }),
-  integrations: [react()],
+  output: 'server',
   vite: {
     plugins: [tailwindcss(), icons({ compiler: 'jsx', jsx: 'react' })]
   }

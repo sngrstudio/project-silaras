@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ae9946ba-4475-402e-bba9-4310ca7f8e8d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "42da395d-cb11-4dc1-8cb3-6600bf814206",
+  "prevId": "e0012388-8d83-4cee-92ea-0da96b5b4282",
   "tables": {
     "access_level_map": {
       "name": "access_level_map",
@@ -181,7 +181,7 @@
           "name": "password_hash",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },

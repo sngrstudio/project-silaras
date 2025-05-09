@@ -1,14 +1,22 @@
 ---
 import Layout, { type Props as LProps } from '../_layout.astro'
+import ToastRC from '~/components/toast/toast'
+import UserLayoutRC from '~/components/user/layout'
 
-interface Props extends LProps {}
+export interface Props extends LProps {
+  title: string
+}
 
 const { ...props } = Astro.props
 ---
 
 <Layout {...props}>
   {/* <body /> */}
-  <slot />
+  <ToastRC client:idle>
+    <UserLayoutRC title={props.title} client:load>
+      <slot />
+    </UserLayoutRC>
+  </ToastRC>
 
   {/* <head /> */}
   <Fragment slot='head'>

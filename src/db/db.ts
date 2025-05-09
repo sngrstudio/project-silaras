@@ -8,5 +8,5 @@ export const db = drizzle(DATABASE_URL, {
   schema: {
     ...userSchemas
   },
-  logger: import.meta.env.DEV || false
+  logger: true
 })

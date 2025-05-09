@@ -1,5 +1,5 @@
 import { db } from '~/db/db'
-import { sessionTable, userTable } from '~/db/schema/user'
+import { sessionTable, userView } from '~/db/schema/user'
 import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase
@@ -19,9 +19,13 @@ export const createSessionId = (token: string) =>
 export const createSession = async (token: string, userId: string) => {
   const sessionId = createSessionId(token)
 
-  return await db.transaction(async () => {
+  return await db.transaction(async (tx) => {
     await insertSessionSQL.execute({ sessionId, userId })
     const [freshSession] = await getSessionSQL.execute({ sessionId })
+    if (!freshSession) {
+      tx.rollback()
+      throw new Error('Ada masalah di server kami.')
+    }
 
     return freshSession
   })
@@ -89,13 +93,16 @@ const getSessionSQL = db
 const getSessionJoinUserSQL = db
   .select({
     user: {
-      name: userTable.name,
-      role: userTable.role
+      id: userView.userId,
+      userName: userView.userName,
+      fullName: userView.fullName,
+      phoneNumber: userView.phoneNumber,
+      profilePhoto: userView.profilePhoto
     },
     session: sessionTable
   })
   .from(sessionTable)
-  .innerJoin(userTable, eq(userTable.id, sessionTable.userId))
+  .innerJoin(userView, eq(userView.userId, sessionTable.userId))
   .where(eq(sessionTable.id, sql.placeholder('sessionId')))
   .prepare()
 
@@ -116,3 +123,7 @@ const deleteSessionByUserSQL = db
   .delete(sessionTable)
   .where(eq(sessionTable.userId, sql.placeholder('userId')))
   .prepare()
+
+// types
+
+export type UserSession = Awaited<ReturnType<typeof validateSessionToken>>

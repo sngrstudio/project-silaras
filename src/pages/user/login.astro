@@ -1,9 +1,12 @@
 ---
-import UserLayout from './_user.astro'
+import UserLayout, { type Props as LProps } from './_user.astro'
 
-export const prerender = false
+const props = {
+  title: 'Login',
+  description: 'Halaman login.'
+} satisfies LProps
 ---
 
-<UserLayout>
+<UserLayout {...props}>
   <p>LOGIN</p>
 </UserLayout>

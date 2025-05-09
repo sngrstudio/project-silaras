@@ -1,9 +1,13 @@
 ---
-import UserLayout from './_user.astro'
+import UserLayout, { type Props as LProps } from './_user.astro'
+import SignupRC from '~/components/user/signup'
 
-export const prerender = false
+const props = {
+  title: 'Buat Akun',
+  description: 'Halaman pendaftaran.'
+} satisfies LProps
 ---
 
-<UserLayout>
-  <p>SIGNUP</p>
+<UserLayout {...props}>
+  <SignupRC client:load />
 </UserLayout>
