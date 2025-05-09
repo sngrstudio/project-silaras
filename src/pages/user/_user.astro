@@ -1,0 +1,17 @@
+---
+import Layout, { type Props as LProps } from '../_layout.astro'
+
+interface Props extends LProps {}
+
+const { ...props } = Astro.props
+---
+
+<Layout {...props}>
+  {/* <body /> */}
+  <slot />
+
+  {/* <head /> */}
+  <Fragment slot='head'>
+    <slot name='head' />
+  </Fragment>
+</Layout>
