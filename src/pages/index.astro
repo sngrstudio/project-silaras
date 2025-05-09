@@ -1,11 +1,7 @@
 ---
-import Layout from './_layout.astro'
-
-if (!Astro.locals.user || !Astro.locals.session) {
-  return Astro.redirect('/user/login')
-}
+import DashboardLayout from './_dashboard.astro'
 ---
 
-<Layout>
-  <p>Under Construction</p>
-</Layout>
+<DashboardLayout>
+  <p>RESET</p>
+</DashboardLayout>

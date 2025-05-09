@@ -1,38 +1,24 @@
 ---
-import MainLayout, {
-  type Props as MainLayoutProps
-} from '~/layouts/layout.astro'
-import Navbar from './_navbar.astro'
-import Drawer from '~/components/layout/drawer'
-import Main from '~/components/layout/main'
+import BaseLayout from './_base.astro'
+import Meta, { type Props as MProps } from './_meta.astro'
+import '~/styles/global.css'
 
-export interface Props extends MainLayoutProps {
-  width?: 'normal' | 'full'
-}
+export interface Props extends MProps {}
 
-const { width = 'normal', ...props } = Astro.props
+const { title, description } = Astro.props
 ---
 
-<MainLayout {...props}>
-  <Navbar />
-  <Drawer client:idle>
-    <Main client:idle>
-      <section
-        class='mx-auto max-w-screen-md data-[width=full]:max-w-screen-xl'
-        data-width={width}
-      >
-        {
-          /* header */
-          props.title && (
-            <header class='border-base-300 mb-4 border-b pb-4'>
-              <h1 class='text-4xl font-black'>{props.title}</h1>
-              {props.description && <p class='mt-2'>{props.description}</p>}
-            </header>
-          )
-        }
-        {/* content */}
-        <slot />
-      </section>
-    </Main>
-  </Drawer>
-</MainLayout>
+<BaseLayout>
+  {/* <body /> */}
+  <slot />
+
+  {/* <head /> */}
+  <Fragment slot='head'>
+    <Meta title={title} description={description} />
+    <slot name='head' />
+  </Fragment>
+</BaseLayout>
+
+<script>
+  import '~/scripts/global'
+</script>

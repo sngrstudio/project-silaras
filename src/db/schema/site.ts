@@ -1,9 +1,0 @@
-import { mysqlTable, varchar, text } from 'drizzle-orm/mysql-core'
-
-export const settingsTable = mysqlTable('settings', {
-  property: varchar({
-    length: 255,
-    enum: ['SITE_NAME', 'SITE_DESCRIPTION', 'SITE_LOGO']
-  }).primaryKey(),
-  value: text().notNull()
-})
