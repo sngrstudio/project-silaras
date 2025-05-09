@@ -12,7 +12,7 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4321, 4322, 4323, 3306, 4983],
+  "forwardPorts": [4321, 4322, 4323, 3306, 4983, 9000, 9001],
   "portsAttributes": {
     "4321": {
       "label": "Astro's Dev Server",
@@ -32,6 +32,14 @@
     },
     "4983": {
       "label": "Drizzle Studio",
+      "onAutoForward": "silent"
+    },
+    "9000": {
+      "label": "MinIO API",
+      "onAutoForward": "notify"
+    },
+    "9001": {
+      "label": "MinIO Console",
       "onAutoForward": "silent"
     }
   },

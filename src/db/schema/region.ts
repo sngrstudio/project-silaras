@@ -32,8 +32,8 @@ export const regionTable = mysqlTable(
   ]
 )
 
-export const villageOnWatchTable = mysqlTable(
-  'village_on_watch',
+export const regionOnWatchTable = mysqlTable(
+  'region_on_watch',
   {
     regionId: varchar({ length: 255 })
       .notNull()
@@ -45,7 +45,7 @@ export const villageOnWatchTable = mysqlTable(
   (t) => [primaryKey({ columns: [t.regionId, t.userId] })]
 )
 
-export const villageOnWatchView = mysqlView('village_on_watch_view').as((qb) =>
+export const regionOnWatchView = mysqlView('region_on_watch_view').as((qb) =>
   qb
     .select({
       regionId: regionTable.id,
@@ -55,10 +55,10 @@ export const villageOnWatchView = mysqlView('village_on_watch_view').as((qb) =>
       handler: userProfileTable.fullName,
       phone: userProfileTable.phoneNumber
     })
-    .from(villageOnWatchTable)
-    .leftJoin(regionTable, eq(regionTable.id, villageOnWatchTable.regionId))
+    .from(regionOnWatchTable)
+    .leftJoin(regionTable, eq(regionTable.id, regionOnWatchTable.regionId))
     .leftJoin(
       userProfileTable,
-      eq(userProfileTable.userId, villageOnWatchTable.userId)
+      eq(userProfileTable.userId, regionOnWatchTable.userId)
     )
 )
