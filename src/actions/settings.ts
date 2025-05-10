@@ -1,6 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { db } from '~/db/db'
-import { settingsTable } from '~/db/schema/site'
+import { settingsTable, menuTable } from '~/db/schema/site'
 
 const settings = {
   get: defineAction({
@@ -15,7 +15,24 @@ const settings = {
         })
       }
     }
-  })
+  }),
+
+  // menu specific action
+  menu: {
+    get: defineAction({
+      handler: async () => {
+        try {
+          return await getMenuSQL.execute()
+        } catch (error) {
+          console.log(error)
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Terjadi masalah di server kami.'
+          })
+        }
+      }
+    })
+  }
 }
 
 export default settings
@@ -23,3 +40,5 @@ export default settings
 // prepared SQLs
 
 const getSettingsSQL = db.select().from(settingsTable).prepare()
+
+const getMenuSQL = db.select().from(menuTable).prepare()

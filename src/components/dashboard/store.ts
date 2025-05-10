@@ -1,5 +1,5 @@
 import { persistentAtom } from '@nanostores/persistent'
-import { computed } from 'nanostores'
+import { atom, computed } from 'nanostores'
 import { actions } from 'astro:actions'
 
 type Settings = Awaited<ReturnType<typeof actions.settings.get.orThrow>>
@@ -26,3 +26,17 @@ export const $site = computed($settings, (settings) => {
     return undefined
   }
 })
+
+export const $openDrawer = atom<boolean | undefined>(undefined)
+
+export const setOpenDrawer = (state: boolean | undefined) =>
+  $openDrawer.set(state)
+
+type Menu = Awaited<ReturnType<typeof actions.settings.menu.get.orThrow>>
+
+export const $menu = persistentAtom<Menu | undefined>('menu', undefined, {
+  encode: JSON.stringify,
+  decode: JSON.parse
+})
+
+export const setMenu = (state: Menu | undefined) => $menu.set(state)

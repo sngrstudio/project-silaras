@@ -1,8 +1,10 @@
 import seedSettings from './settings'
+import seedMenu from './menu'
 import seedALM from './access-level-map'
 
 const main = async () => {
   await seedSettings()
+  await seedMenu()
   await seedALM()
 }
 

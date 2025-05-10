@@ -2,6 +2,7 @@
 import Layout, { type Props as LProps } from './_layout.astro'
 import ToastRC from '~/components/toast/toast'
 import NavbarRC from '~/components/dashboard/navbar'
+import DrawerRC from '~/components/dashboard/drawer'
 
 interface Props extends LProps {}
 
@@ -12,7 +13,9 @@ const { ...props } = Astro.props
   {/* <body /> */}
   <ToastRC client:idle>
     <NavbarRC client:load />
-    <slot />
+    <DrawerRC client:load>
+      <slot />
+    </DrawerRC>
   </ToastRC>
 
   {/* <head /> */}

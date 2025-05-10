@@ -17,6 +17,7 @@ const initialSettings = [
 
 const seedSettings = async () => {
   await db.insert(settingsTable).values(initialSettings)
+  console.log('Seeding settings completed!')
 }
 
 export default seedSettings

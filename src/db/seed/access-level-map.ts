@@ -9,6 +9,7 @@ const ALM_VALUES = ['Viewer', 'User', 'Coordinator', 'Administrator'].map(
 
 const seedALM = async () => {
   await db.insert(accessLevelMapTable).values(ALM_VALUES)
+  console.log('Seeding access levels completed!')
 }
 
 export default seedALM

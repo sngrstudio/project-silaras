@@ -1,14 +1,14 @@
 import type { FC, PropsWithChildren } from 'react'
 import { NavigationMenu as Nav } from 'radix-ui'
 import { useStore } from '@nanostores/react'
-import { $site } from './store'
+import { $site, setOpenDrawer } from './store'
 import MenuIcon from '~icons/lucide/menu'
 
 const NavbarRC: FC = () => {
   const site = useStore($site)
 
   const handleOpenDrawer = () => {
-    console.log('open')
+    setOpenDrawer(true)
   }
 
   if (!site) {
