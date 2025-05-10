@@ -1,4 +1,6 @@
 ---
+import { actions } from 'astro:actions'
+
 export interface Props {
   title?: string | undefined
   description?: string | undefined
@@ -6,9 +8,11 @@ export interface Props {
 
 const { title, description } = Astro.props
 
+const settings = await Astro.callAction(actions.settings.get.orThrow, {})
+
 const site = {
-  title: 'Project Silaras',
-  description: 'Bersama untuk Kotim bebas stunting'
+  title: settings.find((s) => s.property === 'SITE_NAME')?.value,
+  description: settings.find((s) => s.property === 'SITE_DESCRIPTION')?.value
 } satisfies Props
 ---
 

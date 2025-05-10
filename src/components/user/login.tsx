@@ -82,11 +82,11 @@ const LoginRC: FC<LoginRCProps> = ({ username }) => {
         <input
           className='btn btn-primary'
           type='submit'
-          value='Buat akunku'
+          value='Login'
           disabled={isPending}
         />
         <a className='btn btn-link' href='/user/login'>
-          Sudah punya akun?
+          Buat akun
         </a>
       </div>
     </form>

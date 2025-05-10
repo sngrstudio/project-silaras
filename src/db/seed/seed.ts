@@ -1,6 +1,8 @@
+import seedSettings from './settings'
 import seedALM from './access-level-map'
 
 const main = async () => {
+  await seedSettings()
   await seedALM()
 }
 
