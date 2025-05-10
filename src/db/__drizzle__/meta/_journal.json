@@ -43,6 +43,13 @@
       "when": 1746809454813,
       "tag": "0005_abandoned_true_believers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1746860379663,
+      "tag": "0006_misty_alex_power",
+      "breakpoints": true
     }
   ]
 }

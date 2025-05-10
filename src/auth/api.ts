@@ -1,5 +1,5 @@
 import { db } from '~/db/db'
-import { sessionTable, userView } from '~/db/schema/user'
+import { sessionTable, userTable } from '~/db/schema/user'
 import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase
@@ -93,16 +93,14 @@ const getSessionSQL = db
 const getSessionJoinUserSQL = db
   .select({
     user: {
-      id: userView.userId,
-      userName: userView.userName,
-      fullName: userView.fullName,
-      phoneNumber: userView.phoneNumber,
-      profilePhoto: userView.profilePhoto
+      id: userTable.id,
+      userName: userTable.userName,
+      accessLevel: userTable.accessLevel
     },
     session: sessionTable
   })
   .from(sessionTable)
-  .innerJoin(userView, eq(userView.userId, sessionTable.userId))
+  .innerJoin(userTable, eq(userTable.id, sessionTable.userId))
   .where(eq(sessionTable.id, sql.placeholder('sessionId')))
   .prepare()
 

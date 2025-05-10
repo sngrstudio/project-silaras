@@ -5,15 +5,15 @@ import { useStore } from '@nanostores/react'
 import { $showToast, setToastMessage } from '~/components/toast/store'
 import { navigate } from 'astro:transitions/client'
 
-interface SignupRCProps {
-  first?: boolean | undefined
+interface LoginRCProps {
+  username?: string | undefined
 }
 
-const SignupRC: FC<SignupRCProps> = ({ first }) => {
+const LoginRC: FC<LoginRCProps> = ({ username }) => {
   const showToast = useStore($showToast)
 
   const handleSignup = async (_: any, formData: FormData) => {
-    const { data, error } = await actions.user.create(formData)
+    const { error } = await actions.user.login(formData)
     if (error) {
       if (isInputError(error)) {
         return error
@@ -27,11 +27,11 @@ const SignupRC: FC<SignupRCProps> = ({ first }) => {
     }
 
     setToastMessage({
-      message: 'Mendaftarkan akun...'
+      message: 'Sedang masuk...'
     })
 
     if (!showToast) {
-      navigate(`/user/login?user=${data?.userName}`)
+      navigate('/')
     }
     return undefined
   }
@@ -43,28 +43,12 @@ const SignupRC: FC<SignupRCProps> = ({ first }) => {
 
   return (
     <form action={submitAction} className='flex w-full flex-col gap-4'>
-      <FormLabel label='Nama'>
-        <input
-          className='input input-lg validator w-full'
-          type='text'
-          name='fullName'
-          placeholder='Nama'
-          disabled={isPending}
-          autoComplete='name'
-          required
-        />
-        {error && error.fields.fullName && (
-          <span className='text-error'>
-            {error.fields.fullName.join(' | ')}
-          </span>
-        )}
-      </FormLabel>
-
       <FormLabel label='Username'>
         <input
           className='input input-lg validator w-full'
           type='text'
           name='userName'
+          defaultValue={username}
           placeholder='Username'
           disabled={isPending}
           autoComplete='username'
@@ -94,26 +78,6 @@ const SignupRC: FC<SignupRCProps> = ({ first }) => {
         )}
       </FormLabel>
 
-      <FormLabel label='Konfirmasi Password'>
-        <input
-          className='input input-lg validator w-full'
-          type='password'
-          name='confirmPassword'
-          placeholder='Konfirmasi Password'
-          disabled={isPending}
-          autoComplete='new-password'
-          required
-        />
-        {error && error.fields.confirmPassword && (
-          <span className='text-error'>
-            {error.fields.confirmPassword.join(' | ')}
-          </span>
-        )}
-      </FormLabel>
-
-      {/* by default, access level is 2 = User */}
-      <input type='hidden' name='accessLevel' value={first ? 4 : 2} />
-
       <div className='mt-6 flex flex-col gap-2'>
         <input
           className='btn btn-primary'
@@ -129,4 +93,4 @@ const SignupRC: FC<SignupRCProps> = ({ first }) => {
   )
 }
 
-export default SignupRC
+export default LoginRC

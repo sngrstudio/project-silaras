@@ -1,6 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { db } from '~/db/db'
-import { userTable, userProfileTable } from '~/db/schema/user'
+import { userTable, userProfileTable, userView } from '~/db/schema/user'
 import {
   setSessionTokenCookie,
   deleteSessionTokenCookie,
@@ -172,6 +172,26 @@ const user = {
         })
       }
     }
+  }),
+
+  isUserEmpty: defineAction({
+    handler: async () => {
+      try {
+        const users = await getUsersSQL.execute()
+
+        if (users.length < 1) {
+          return true
+        } else {
+          return false
+        }
+      } catch (error) {
+        console.log(error)
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Terjadi masalah di server kami.'
+        })
+      }
+    }
   })
 }
 
@@ -203,6 +223,8 @@ const insertUserProfileSQL = db
     profilePhoto: sql.placeholder('profilePhoto')
   })
   .prepare()
+
+const getUsersSQL = db.select().from(userView).prepare()
 
 const getUserByUsernameSQL = db
   .select()

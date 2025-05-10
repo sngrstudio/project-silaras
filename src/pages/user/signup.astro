@@ -2,12 +2,18 @@
 import UserLayout, { type Props as LProps } from './_user.astro'
 import SignupRC from '~/components/user/signup'
 
+if (Astro.locals.session && Astro.locals.user) {
+  return Astro.redirect('/')
+}
+
 const props = {
   title: 'Buat Akun',
   description: 'Halaman pendaftaran.'
 } satisfies LProps
+
+const first = !!Astro.url.searchParams.get('first')
 ---
 
 <UserLayout {...props}>
-  <SignupRC client:load />
+  <SignupRC first={first} client:load />
 </UserLayout>
