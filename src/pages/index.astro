@@ -8,25 +8,4 @@ if (!Astro.locals.session || !Astro.locals.user) {
 
 <DashboardLayout>
   <p>RESET</p>
-  <button id='toast' class='btn'>Toast!</button>
-  <button id='error' class='btn btn-error'>Error!</button>
 </DashboardLayout>
-
-<script>
-  import { setToastMessage } from '~/components/toast/store'
-
-  const testToastBtn = document.getElementById('toast')
-  testToastBtn?.addEventListener('click', () => {
-    setToastMessage({
-      message: 'Toast!'
-    })
-  })
-
-  const testErrorBtn = document.getElementById('error')
-  testErrorBtn?.addEventListener('click', () => {
-    setToastMessage({
-      error: true,
-      message: 'Error!'
-    })
-  })
-</script>

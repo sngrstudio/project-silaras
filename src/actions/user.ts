@@ -98,6 +98,31 @@ const user = {
     }
   }),
 
+  get: defineAction({
+    input: z.object({
+      userName: z.string()
+    }),
+    handler: async ({ userName }) => {
+      try {
+        const [user] = await getUserSQL.execute({ userName })
+        if (!user) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+            message: 'User tidak ada.'
+          })
+        }
+
+        return user
+      } catch (error) {
+        console.log(error)
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Terjadi masalah di server kami.'
+        })
+      }
+    }
+  }),
+
   // update: defineAction({
   //   handler: (_, ctx) => {}
   // }),
@@ -222,6 +247,13 @@ const insertUserProfileSQL = db
     phoneNumber: sql.placeholder('phoneNumber'),
     profilePhoto: sql.placeholder('profilePhoto')
   })
+  .prepare()
+
+const getUserSQL = db
+  .select()
+  .from(userView)
+  .where(eq(userView.userName, sql.placeholder('userName')))
+  .limit(1)
   .prepare()
 
 const getUsersSQL = db.select().from(userView).prepare()

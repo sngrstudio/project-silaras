@@ -1,0 +1,42 @@
+---
+import DashboardLayout, { type Props as LProps } from '../_dashboard.astro'
+import ProfileRC from '~/components/profile/profile'
+
+if (!Astro.locals.session || !Astro.locals.user) {
+  return Astro.redirect('/user/login')
+}
+
+const { userName } = Astro.locals.user
+
+const props = {
+  title: 'Profil Saya',
+  description: 'Edit dan ubah profil pengguna.'
+} satisfies LProps
+---
+
+<DashboardLayout {...props}>
+  <ProfileRC client:idle />
+</DashboardLayout>
+
+<user-loader data-user={userName}></user-loader>
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $user, setUser } from '~/components/profile/store'
+  import { actions } from 'astro:actions'
+
+  class UserLoader extends HTMLElement {
+    connectedCallback() {
+      const userName = this.dataset.user!
+      console.log(userName)
+
+      onMount($user, () => {
+        task(async () => {
+          const state = await actions.user.get.orThrow({ userName })
+          setUser(state)
+        })
+      })
+    }
+  }
+
+  customElements.define('user-loader', UserLoader)
+</script>

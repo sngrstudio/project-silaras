@@ -59,7 +59,8 @@ export const userView = mysqlView('user_view').as((qb) => {
       userName: userTable.userName,
       fullName: userProfileTable.fullName,
       phoneNumber: userProfileTable.phoneNumber,
-      profilePhoto: userProfileTable.profilePhoto
+      profilePhoto: userProfileTable.profilePhoto,
+      accessLevel: userTable.accessLevel
     })
     .from(userTable)
     .innerJoin(userProfileTable, eq(userProfileTable.userId, userTable.id))
