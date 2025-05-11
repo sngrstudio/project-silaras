@@ -1,7 +1,8 @@
 import { persistentAtom } from '@nanostores/persistent'
+import { atom } from 'nanostores'
 import { actions } from 'astro:actions'
 
-export type User = Awaited<ReturnType<typeof actions.user.get.orThrow>>
+type User = Awaited<ReturnType<typeof actions.user.getCurrentUser.orThrow>>
 
 export const $user = persistentAtom<User | undefined>('user', undefined, {
   encode: JSON.stringify,
@@ -9,3 +10,12 @@ export const $user = persistentAtom<User | undefined>('user', undefined, {
 })
 
 export const setUser = (state: User | undefined) => $user.set(state)
+
+type AccessLevels = Awaited<
+  ReturnType<typeof actions.user.getAccessLevels.orThrow>
+>
+
+export const $accessLevels = atom<AccessLevels | undefined>(undefined)
+
+export const setAccessLevels = (state: AccessLevels | undefined) =>
+  $accessLevels.set(state)

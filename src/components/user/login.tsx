@@ -1,5 +1,5 @@
 import { type FC, useActionState } from 'react'
-import { FormLabel } from './components'
+import { FormLabel } from './form'
 import { actions, isInputError } from 'astro:actions'
 import { useStore } from '@nanostores/react'
 import { $showToast, setToastMessage } from '~/components/toast/store'

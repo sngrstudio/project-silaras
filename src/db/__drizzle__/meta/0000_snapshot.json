@@ -1,9 +1,85 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ae9946ba-4475-402e-bba9-4310ca7f8e8d",
+  "id": "ca8ec3fd-ed41-4a11-b0ac-c86f7e5f909d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "menu": {
+      "name": "menu",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "path": {
+          "name": "path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "menu_id": {
+          "name": "menu_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "settings": {
+      "name": "settings",
+      "columns": {
+        "property": {
+          "name": "property",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "settings_property": {
+          "name": "settings_property",
+          "columns": [
+            "property"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "access_level_map": {
       "name": "access_level_map",
       "columns": {
@@ -72,8 +148,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -131,8 +207,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -181,7 +257,7 @@
           "name": "password_hash",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -258,9 +334,9 @@
           "notNull": false,
           "autoincrement": false
         },
-        "description": {
-          "name": "description",
-          "type": "text",
+        "access_level": {
+          "name": "access_level",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -268,7 +344,7 @@
       },
       "name": "user_view",
       "isExisting": false,
-      "definition": "select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo`, `access_level_map`.`description` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id` left join `access_level_map` on `access_level_map`.`id` = `user`.`access_level`",
+      "definition": "select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo`, `user`.`access_level` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id`",
       "algorithm": "undefined",
       "sqlSecurity": "definer"
     }

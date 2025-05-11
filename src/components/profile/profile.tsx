@@ -1,8 +1,10 @@
-import { type FC } from 'react'
+import type { FC } from 'react'
 import Card from '../card/card'
 import LoadingCard from '../card/loading'
+import { FormLabel } from '../form/form'
 import { useStore } from '@nanostores/react'
-import { $user } from './store'
+import { $user, $accessLevels } from './store'
+import SaveIcon from '~icons/lucide/save'
 
 const ProfileRC: FC = () => {
   return (
@@ -16,6 +18,7 @@ export default ProfileRC
 
 const ProfileForm: FC = () => {
   const user = useStore($user)
+  const accessLevels = useStore($accessLevels)
 
   if (!user) {
     return <LoadingCard />
@@ -23,47 +26,64 @@ const ProfileForm: FC = () => {
 
   return (
     <form action='' className='flex flex-col gap-4'>
-      <label className='flex flex-col gap-1'>
-        <span className='font-bold lg:text-lg'>Nama</span>
+      <FormLabel label='Nama'>
         <input
           className='input input-lg w-full'
           type='text'
           defaultValue={user.fullName}
         />
-      </label>
+      </FormLabel>
 
-      <label className='flex flex-col gap-1'>
-        <span className='font-bold lg:text-lg'>Username</span>
+      <FormLabel label='Username'>
         <input
           className='input input-lg w-full'
           type='text'
-          value={user.userName}
+          defaultValue={user.userName}
           disabled
         />
-      </label>
+        <span className='italic'>
+          Username bersifat permanen dan tidak dapat diganti.
+        </span>
+      </FormLabel>
 
-      <label className='flex flex-col gap-1'>
-        <span className='font-bold lg:text-lg'>Akses Level</span>
-        <input
-          className='input input-lg w-full'
-          type='text'
-          defaultValue={user.accessLevel}
-        />
-      </label>
+      <FormLabel label='Hak Akses'>
+        <select className='select select-lg w-full' disabled>
+          {accessLevels &&
+            accessLevels.map((level) => (
+              <option
+                value={level.id}
+                selected={level.id === user.accessLevel}
+                key={level.id}
+              >
+                {level.description}
+              </option>
+            ))}
+        </select>
+        <span className='italic'>
+          Hak akses hanya dapat diganti oleh Administrator.
+        </span>
+      </FormLabel>
 
-      <label className='flex flex-col gap-1'>
-        <span className='font-bold lg:text-lg'>No Telepon</span>
+      <FormLabel label='Nomor Telepon'>
         <input
           className='input input-lg w-full'
           type='text'
           defaultValue={user.phoneNumber || ''}
         />
-      </label>
+      </FormLabel>
 
-      <div className='mt-6'>
-        <input className='btn btn-primary' type='submit'>
+      <div className='mt-6 flex flex-row-reverse gap-4'>
+        <button
+          className='btn btn-primary flex items-center gap-2'
+          type='submit'
+        >
+          <SaveIcon />
           <span>Simpan</span>
-        </input>
+        </button>
+
+        <button className='btn flex items-center gap-2' type='reset'>
+          <span>Batalkan</span>
+        </button>
       </div>
     </form>
   )

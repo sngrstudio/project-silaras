@@ -1,6 +1,11 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { db } from '~/db/db'
-import { userTable, userProfileTable, userView } from '~/db/schema/user'
+import {
+  userTable,
+  userProfileTable,
+  userView,
+  accessLevelMapTable
+} from '~/db/schema/user'
 import {
   setSessionTokenCookie,
   deleteSessionTokenCookie,
@@ -98,21 +103,19 @@ const user = {
     }
   }),
 
-  get: defineAction({
-    input: z.object({
-      userName: z.string()
-    }),
-    handler: async ({ userName }) => {
+  getCurrentUser: defineAction({
+    handler: async (_, ctx) => {
       try {
-        const [user] = await getUserSQL.execute({ userName })
+        const user = ctx.locals.user
         if (!user) {
           throw new ActionError({
-            code: 'NOT_FOUND',
-            message: 'User tidak ada.'
+            code: 'UNAUTHORIZED',
+            message: 'Anda belum login.'
           })
         }
 
-        return user
+        const { userId: _id, ...returnedUser } = user
+        return returnedUser
       } catch (error) {
         console.log(error)
         throw new ActionError({
@@ -217,6 +220,20 @@ const user = {
         })
       }
     }
+  }),
+
+  getAccessLevels: defineAction({
+    handler: async () => {
+      try {
+        return await getAccessLevelsSQL.execute()
+      } catch (error) {
+        console.log(error)
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Terjadi masalah di server kami.'
+        })
+      }
+    }
   })
 }
 
@@ -249,13 +266,6 @@ const insertUserProfileSQL = db
   })
   .prepare()
 
-const getUserSQL = db
-  .select()
-  .from(userView)
-  .where(eq(userView.userName, sql.placeholder('userName')))
-  .limit(1)
-  .prepare()
-
 const getUsersSQL = db.select().from(userView).prepare()
 
 const getUserByUsernameSQL = db
@@ -272,3 +282,5 @@ const getUserWithPasswordHashSQL = db
   .from(userTable)
   .where(eq(userTable.userName, sql.placeholder('userName')))
   .prepare()
+
+const getAccessLevelsSQL = db.select().from(accessLevelMapTable).prepare()
