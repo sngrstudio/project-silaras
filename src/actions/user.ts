@@ -17,12 +17,12 @@ import {
   validateSessionToken,
   invalidateSession
 } from '~/auth/api'
-import { createInsertSchema } from 'drizzle-zod'
+import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 import { z } from 'astro:schema'
 import { eq, sql } from 'drizzle-orm'
 
 // input schemas
-const createSchema = z
+const createuserSchema = z
   .object({})
   .merge(
     createInsertSchema(userTable, {
@@ -39,12 +39,20 @@ const createSchema = z
     confirmPassword: z.string()
   })
 
-const loginSchema = createSchema.pick({ userName: true, password: true })
+const updateUserSchema = z
+  .object({})
+  .merge(createUpdateSchema(userProfileTable).omit({ userId: true }))
+  .merge(createUpdateSchema(userTable).pick({ accessLevel: true }))
+  .extend({
+    requestedBy: z.string()
+  })
+
+const loginSchema = createuserSchema.pick({ userName: true, password: true })
 
 const user = {
   create: defineAction({
     accept: 'form',
-    input: createSchema.refine(
+    input: createuserSchema.refine(
       ({ password, confirmPassword }) => password === confirmPassword,
       {
         message: 'Password harus sama di kedua kolom.',
@@ -106,15 +114,24 @@ const user = {
   getCurrentUser: defineAction({
     handler: async (_, ctx) => {
       try {
-        const user = ctx.locals.user
-        if (!user) {
+        const localUser = ctx.locals.user
+        if (!localUser) {
           throw new ActionError({
-            code: 'UNAUTHORIZED',
-            message: 'Anda belum login.'
+            code: 'FORBIDDEN',
+            message: 'Operasi terbatas!'
           })
         }
 
-        const { userId: _id, ...returnedUser } = user
+        const [returnedUser] = await getUserSQL.execute({
+          userId: localUser.userId
+        })
+        if (!returnedUser) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+            message: 'User tidak ditemukan.'
+          })
+        }
+
         return returnedUser
       } catch (error) {
         console.log(error)
@@ -126,9 +143,70 @@ const user = {
     }
   }),
 
-  // update: defineAction({
-  //   handler: (_, ctx) => {}
-  // }),
+  update: defineAction({
+    accept: 'form',
+    input: updateUserSchema,
+    handler: async (input, ctx) => {
+      try {
+        const RestrictedActionError = new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Operasi terbatas!'
+        })
+
+        const { requestedBy, accessLevel, ...userProfile } = input
+        const localUser = ctx.locals.user
+
+        if (!localUser) {
+          throw RestrictedActionError
+        }
+
+        const isCurrentUser = localUser.userName === requestedBy
+        const isAdmin = localUser.accessLevel === 4
+
+        if (!isAdmin && !isCurrentUser) {
+          throw RestrictedActionError
+        }
+
+        await db.transaction(async (tx) => {
+          const updateUserProfileTableSQL = tx
+            .update(userProfileTable)
+            .set({ ...userProfile })
+            .where(eq(userProfileTable.userId, localUser.userId))
+            .prepare()
+
+          await updateUserProfileTableSQL.execute()
+
+          if (accessLevel) {
+            const updateUserTableSQL = tx
+              .update(userTable)
+              .set({ accessLevel })
+              .where(eq(userTable.id, localUser.userId))
+              .prepare()
+
+            await updateUserTableSQL.execute()
+          }
+        })
+
+        const [updatedUser] = await getUserSQL.execute({
+          userId: localUser.userId
+        })
+        if (!updatedUser) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+            message: 'User tidak ditemukan.'
+          })
+        }
+
+        return updatedUser
+      } catch (error) {
+        console.log(error)
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Terjadi masalah di server kami.'
+        })
+      }
+    }
+  }),
 
   // delete: defineAction({
   //   handler: (_, ctx) => {}
@@ -270,6 +348,18 @@ const insertUserProfileSQL = db
     phoneNumber: sql.placeholder('phoneNumber'),
     profilePhoto: sql.placeholder('profilePhoto')
   })
+  .prepare()
+
+const getUserSQL = db
+  .select({
+    userName: userView.userName,
+    fullName: userView.fullName,
+    phoneNumber: userView.phoneNumber,
+    profilePhoto: userView.profilePhoto,
+    accessLevel: userView.accessLevel
+  })
+  .from(userView)
+  .where(eq(userView.userId, sql.placeholder('userId')))
   .prepare()
 
 const getUsersSQL = db.select().from(userView).prepare()

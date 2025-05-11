@@ -43,7 +43,7 @@ const MainMenuRC: FC = () => {
     <Nav.Root orientation='vertical'>
       <Nav.List className='menu bg-base-200 text-base-content h-[calc(100vh-4rem)] min-h-full w-[320px] p-4 lg:w-[240px]'>
         {rootMenu.map((item) => (
-          <Nav.Item>
+          <Nav.Item key={item.id}>
             <Nav.Link asChild>
               <a href={item.path}>{item.label}</a>
             </Nav.Link>
@@ -54,7 +54,7 @@ const MainMenuRC: FC = () => {
           Menu Administrasi
         </Nav.Item>
         {adminMenu.map((item) => (
-          <Nav.Item>
+          <Nav.Item key={item.id}>
             <Nav.Link asChild>
               <a href={item.path}>{item.label}</a>
             </Nav.Link>
@@ -63,7 +63,7 @@ const MainMenuRC: FC = () => {
 
         <Nav.Item className='menu-title mt-4 uppercase'>Menu Pengguna</Nav.Item>
         {userMenu.map((item) => (
-          <Nav.Item>
+          <Nav.Item key={item.id}>
             <Nav.Link asChild>
               <a href={item.path}>{item.label}</a>
             </Nav.Link>

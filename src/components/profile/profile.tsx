@@ -1,9 +1,17 @@
-import type { FC } from 'react'
+import {
+  type FC,
+  type MouseEventHandler,
+  useActionState,
+  useState,
+  useRef
+} from 'react'
 import Card from '../card/card'
 import LoadingCard from '../card/loading'
 import { FormLabel } from '../form/form'
 import { useStore } from '@nanostores/react'
-import { $user, $accessLevels } from './store'
+import { $user, $accessLevels, setUser } from './store'
+import { $showToast, setToastMessage } from '~/components/toast/store'
+import { actions, isInputError } from 'astro:actions'
 import SaveIcon from '~icons/lucide/save'
 
 const ProfileRC: FC = () => {
@@ -17,28 +25,77 @@ const ProfileRC: FC = () => {
 export default ProfileRC
 
 const ProfileForm: FC = () => {
+  const ref = useRef<HTMLFormElement>(null)
+  const [formChanged, setFormChanged] = useState(false)
+
+  const updateUser = async (_: any, formData: FormData) => {
+    const { data, error } = await actions.user.update(formData)
+    if (error && !data) {
+      if (isInputError(error)) {
+        return error
+      }
+
+      setToastMessage({
+        error: true,
+        message: error.message
+      })
+      return undefined
+    }
+
+    setToastMessage({
+      message: 'Menyimpan perubahan...'
+    })
+    if (!showToast) {
+      setUser(data)
+      setFormChanged(false)
+    }
+    return undefined
+  }
+
+  const [error, submitAction, isPending] = useActionState(updateUser, undefined)
+
   const user = useStore($user)
   const accessLevels = useStore($accessLevels)
+  const showToast = useStore($showToast)
+
+  const handleFormChange = () => {
+    setFormChanged(true)
+  }
+
+  const handleReset: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault()
+    ref.current?.reset()
+    setFormChanged(false)
+  }
 
   if (!user) {
     return <LoadingCard />
   }
 
   return (
-    <form action='' className='flex flex-col gap-4'>
+    <form action={submitAction} className='flex flex-col gap-4' ref={ref}>
       <FormLabel label='Nama'>
         <input
+          name='fullName'
           className='input input-lg w-full'
           type='text'
           defaultValue={user.fullName}
+          disabled={isPending || showToast}
+          onChange={handleFormChange}
         />
+        {error && error.fields.fullName && (
+          <span className='text-error'>
+            {error.fields.fullName.join(' | ')}
+          </span>
+        )}
       </FormLabel>
 
       <FormLabel label='Username'>
         <input
+          name='userName'
           className='input input-lg w-full'
           type='text'
-          defaultValue={user.userName}
+          value={user.userName}
           disabled
         />
         <span className='italic'>
@@ -47,18 +104,18 @@ const ProfileForm: FC = () => {
       </FormLabel>
 
       <FormLabel label='Hak Akses'>
-        <select className='select select-lg w-full' disabled>
-          {accessLevels &&
-            accessLevels.map((level) => (
-              <option
-                value={level.id}
-                selected={level.id === user.accessLevel}
-                key={level.id}
-              >
-                {level.description}
-              </option>
-            ))}
-        </select>
+        <input
+          name='accessLevel'
+          className='input input-lg w-full'
+          type='text'
+          value={
+            accessLevels
+              ? accessLevels.find((lv) => lv.id === user.accessLevel)
+                  ?.description
+              : '...'
+          }
+          disabled
+        />
         <span className='italic'>
           Hak akses hanya dapat diganti oleh Administrator.
         </span>
@@ -66,22 +123,37 @@ const ProfileForm: FC = () => {
 
       <FormLabel label='Nomor Telepon'>
         <input
+          name='phoneNumber'
           className='input input-lg w-full'
           type='text'
           defaultValue={user.phoneNumber || ''}
+          disabled={isPending || showToast}
+          onChange={handleFormChange}
         />
+        {error && error.fields.phoneNumber && (
+          <span className='text-error'>
+            {error.fields.phoneNumber.join(' | ')}
+          </span>
+        )}
       </FormLabel>
+
+      <input name='requestedBy' type='hidden' value={user.userName} />
 
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button
           className='btn btn-primary flex items-center gap-2'
           type='submit'
+          disabled={isPending || showToast || !formChanged}
         >
           <SaveIcon />
           <span>Simpan</span>
         </button>
 
-        <button className='btn flex items-center gap-2' type='reset'>
+        <button
+          className='btn flex items-center gap-2'
+          disabled={isPending || showToast || !formChanged}
+          onClick={handleReset}
+        >
           <span>Batalkan</span>
         </button>
       </div>

@@ -20,13 +20,13 @@ const ToastRC: FC<PropsWithChildren> = ({ children }) => {
   }
 
   return (
-    <Toast.Provider>
+    <Toast.Provider duration={3000}>
       {children}
       <Toast.Root
         className='alert data-[error=false]:alert-info data-[error=false]:alert-soft data-[error=true]:alert-error w-[320px] rounded-full px-4 py-2'
         open={showToast}
         onOpenChange={handleToastChange}
-        data-error={toastMessage?.error}
+        data-error={toastMessage && toastMessage.error}
       >
         {toastMessage && toastMessage.error ? <ErrorIcon /> : <InfoIcon />}
         <Toast.Description>{toastMessage?.message}</Toast.Description>
