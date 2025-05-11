@@ -39,7 +39,7 @@ const props = {
 
   onMount($accessLevels, () => {
     task(async () => {
-      const state = await actions.user.getAccessLevels.orThrow()
+      const state = await actions.user.accessLevels.get.orThrow()
       setAccessLevels(state)
     })
 

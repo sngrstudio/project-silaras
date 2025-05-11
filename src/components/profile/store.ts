@@ -12,7 +12,7 @@ export const $user = persistentAtom<User | undefined>('user', undefined, {
 export const setUser = (state: User | undefined) => $user.set(state)
 
 type AccessLevels = Awaited<
-  ReturnType<typeof actions.user.getAccessLevels.orThrow>
+  ReturnType<typeof actions.user.accessLevels.get.orThrow>
 >
 
 export const $accessLevels = atom<AccessLevels | undefined>(undefined)

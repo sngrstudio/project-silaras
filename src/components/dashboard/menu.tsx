@@ -23,7 +23,7 @@ const MainMenuRC: FC = () => {
   const userMenu = menu.filter((m) => m.category === 'Pengguna')
 
   const handleLogout = async () => {
-    const { error } = await actions.user.logout()
+    const { error } = await actions.user.auth.logout()
     if (error) {
       setToastMessage({
         error: true,

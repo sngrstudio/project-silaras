@@ -13,7 +13,7 @@ const LoginRC: FC<LoginRCProps> = ({ username }) => {
   const showToast = useStore($showToast)
 
   const handleSignup = async (_: any, formData: FormData) => {
-    const { error } = await actions.user.login(formData)
+    const { error } = await actions.user.auth.login(formData)
     if (error) {
       if (isInputError(error)) {
         return error

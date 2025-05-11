@@ -7,7 +7,7 @@ if (Astro.locals.session && Astro.locals.user) {
   return Astro.redirect('/')
 }
 
-if (await Astro.callAction(actions.user.isUserEmpty.orThrow, {})) {
+if (await Astro.callAction(actions.user.checks.isUserEmpty.orThrow, {})) {
   return Astro.redirect('/user/signup?first=true')
 }
 

@@ -134,107 +134,113 @@ const user = {
   //   handler: (_, ctx) => {}
   // }),
 
-  login: defineAction({
-    accept: 'form',
-    input: loginSchema,
-    handler: async ({ userName, password }, ctx) => {
-      try {
-        const InvalidUsernameAndOrPassword = new ActionError({
-          code: 'UNAUTHORIZED',
-          message: 'Username dan/atau password yang anda masukkan salah.'
-        })
+  auth: {
+    login: defineAction({
+      accept: 'form',
+      input: loginSchema,
+      handler: async ({ userName, password }, ctx) => {
+        try {
+          const InvalidUsernameAndOrPassword = new ActionError({
+            code: 'UNAUTHORIZED',
+            message: 'Username dan/atau password yang anda masukkan salah.'
+          })
 
-        // get the user and test if user is exist
-        const [user] = await getUserWithPasswordHashSQL.execute({ userName })
-        if (!user) {
-          throw InvalidUsernameAndOrPassword
-        }
+          // get the user and test if user is exist
+          const [user] = await getUserWithPasswordHashSQL.execute({ userName })
+          if (!user) {
+            throw InvalidUsernameAndOrPassword
+          }
 
-        // check password
-        const isPasswordValid = await verifyPassword(
-          password,
-          user.passwordHash
-        )
-        if (!isPasswordValid) {
-          throw InvalidUsernameAndOrPassword
-        }
+          // check password
+          const isPasswordValid = await verifyPassword(
+            password,
+            user.passwordHash
+          )
+          if (!isPasswordValid) {
+            throw InvalidUsernameAndOrPassword
+          }
 
-        // proceed to login
-        const token = generateSessionToken()
-        const session = await createSession(token, user.id)
-        setSessionTokenCookie(ctx, token, session.expiresAt)
-      } catch (error) {
-        console.log(error)
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Terjadi masalah di server kami.'
-        })
-      }
-    }
-  }),
-
-  logout: defineAction({
-    handler: async (_, ctx) => {
-      try {
-        // find token and test if token actually exist
-        const token = ctx.cookies.get(AUTH_COOKIE_NAME)?.value
-        if (!token) {
+          // proceed to login
+          const token = generateSessionToken()
+          const session = await createSession(token, user.id)
+          setSessionTokenCookie(ctx, token, session.expiresAt)
+        } catch (error) {
+          console.log(error)
           throw new ActionError({
-            code: 'FORBIDDEN',
-            message: 'Operasi tidak diizinkan.'
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Terjadi masalah di server kami.'
           })
         }
+      }
+    }),
 
-        // validate token before logout, then delete session from db along with token
-        const { session } = await validateSessionToken(token)
-        if (session) {
-          await invalidateSession(session.id)
+    logout: defineAction({
+      handler: async (_, ctx) => {
+        try {
+          // find token and test if token actually exist
+          const token = ctx.cookies.get(AUTH_COOKIE_NAME)?.value
+          if (!token) {
+            throw new ActionError({
+              code: 'FORBIDDEN',
+              message: 'Operasi tidak diizinkan.'
+            })
+          }
+
+          // validate token before logout, then delete session from db along with token
+          const { session } = await validateSessionToken(token)
+          if (session) {
+            await invalidateSession(session.id)
+          }
+
+          deleteSessionTokenCookie(ctx)
+        } catch (error) {
+          console.log(error)
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Terjadi masalah di server kami.'
+          })
         }
-
-        deleteSessionTokenCookie(ctx)
-      } catch (error) {
-        console.log(error)
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Terjadi masalah di server kami.'
-        })
       }
-    }
-  }),
+    })
+  },
 
-  isUserEmpty: defineAction({
-    handler: async () => {
-      try {
-        const users = await getUsersSQL.execute()
-
-        if (users.length < 1) {
-          return true
-        } else {
-          return false
+  accessLevels: {
+    get: defineAction({
+      handler: async () => {
+        try {
+          return await getAccessLevelsSQL.execute()
+        } catch (error) {
+          console.log(error)
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Terjadi masalah di server kami.'
+          })
         }
-      } catch (error) {
-        console.log(error)
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Terjadi masalah di server kami.'
-        })
       }
-    }
-  }),
+    })
+  },
 
-  getAccessLevels: defineAction({
-    handler: async () => {
-      try {
-        return await getAccessLevelsSQL.execute()
-      } catch (error) {
-        console.log(error)
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Terjadi masalah di server kami.'
-        })
+  checks: {
+    isUserEmpty: defineAction({
+      handler: async () => {
+        try {
+          const users = await getUsersSQL.execute()
+
+          if (users.length < 1) {
+            return true
+          } else {
+            return false
+          }
+        } catch (error) {
+          console.log(error)
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Terjadi masalah di server kami.'
+          })
+        }
       }
-    }
-  })
+    })
+  }
 }
 
 export default user
