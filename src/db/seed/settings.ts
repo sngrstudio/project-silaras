@@ -12,6 +12,10 @@ const initialSettings = [
   {
     property: 'SITE_DESCRIPTION',
     value: 'Untuk Kotim yang Bebas Stunting'
+  },
+  {
+    property: 'SITE_LOGO',
+    value: ''
   }
 ] satisfies Array<InsertSettings>
 

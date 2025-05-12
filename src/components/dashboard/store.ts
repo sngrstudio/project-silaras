@@ -20,7 +20,8 @@ export const $site = computed($settings, (settings) => {
     return {
       name: settings.find((s) => s.property === 'SITE_NAME')?.value ?? '',
       description:
-        settings.find((s) => s.property === 'SITE_DESCRIPTION')?.value ?? ''
+        settings.find((s) => s.property === 'SITE_DESCRIPTION')?.value ?? '',
+      logo: settings.find((s) => s.property === 'SITE_LOGO')?.value ?? ''
     }
   } else {
     return undefined

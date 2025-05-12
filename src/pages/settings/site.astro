@@ -1,0 +1,50 @@
+---
+import DashboardLayout, { type Props as LProps } from '../_dashboard.astro'
+import SettingsSiteRC from '~/components/settings/site'
+
+if (!Astro.locals.session || !Astro.locals.user) {
+  return Astro.redirect('/user/login')
+}
+
+const props = {
+  title: 'Pengaturan Situs',
+  description: 'Edit dan ubah pengaturan situs.'
+} satisfies LProps
+---
+
+<DashboardLayout {...props}>
+  <SettingsSiteRC client:idle />
+</DashboardLayout>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $user,
+    setUser,
+    $accessLevels,
+    setAccessLevels
+  } from '~/components/profile/store'
+  import { actions } from 'astro:actions'
+
+  onMount($user, () => {
+    task(async () => {
+      const state = await actions.user.getCurrentUser.orThrow()
+      setUser(state)
+    })
+
+    return () => {
+      setUser(undefined)
+    }
+  })
+
+  onMount($accessLevels, () => {
+    task(async () => {
+      const state = await actions.user.accessLevels.get.orThrow()
+      setAccessLevels(state)
+    })
+
+    return () => {
+      setAccessLevels(undefined)
+    }
+  })
+</script>
