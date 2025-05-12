@@ -8,6 +8,9 @@ import icons from 'unplugin-icons/vite'
 // https://astro.build/config
 export default defineConfig({
   integrations: [react()],
+  image: {
+    domains: ['localhost:9000']
+  },
   adapter: node({
     mode: 'middleware'
   }),

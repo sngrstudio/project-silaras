@@ -8,6 +8,7 @@ import {
 import Card from '../card/card'
 import LoadingCard from '../card/loading'
 import { FormLabel } from '../form/form'
+import Image from '../image/image'
 import { useStore } from '@nanostores/react'
 import { $site, setSettings } from '../dashboard/store'
 import { $showToast, setToastMessage } from '~/components/toast/store'
@@ -116,6 +117,13 @@ const ProfileForm: FC = () => {
           <span className='text-error'>{error.fields.logo.join(' | ')}</span>
         )}
       </FormLabel>
+
+      <Image
+        className='h-[180px] w-[180px]'
+        src={site.logo}
+        width={180}
+        height={180}
+      />
 
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button

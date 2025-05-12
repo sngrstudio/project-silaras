@@ -1,6 +1,7 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { getPresignedImage, insertPresignedImage } from '~/db/queries/image'
 import { s3 } from '~/lib/s3'
+import { getImage } from 'astro:assets'
 import { z } from 'astro:schema'
 
 const image = {
@@ -52,6 +53,23 @@ const image = {
           message: 'Terjadi masalah di server kami.'
         })
       }
+    }
+  }),
+
+  transform: defineAction({
+    input: z.object({
+      src: z.string(),
+      width: z.number().optional(),
+      height: z.number().optional()
+    }),
+    handler: async (input) => {
+      const { src, width, height } = input
+      return await getImage({
+        src,
+        width,
+        height,
+        inferSize: !width && !height
+      })
     }
   })
 }
