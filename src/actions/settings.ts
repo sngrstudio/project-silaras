@@ -1,12 +1,11 @@
 import { defineAction, ActionError } from 'astro:actions'
-import { db } from '~/db/db'
-import { settingsTable, menuTable } from '~/db/schema/site'
+import { getSettings, getMenu } from '~/db/queries/settings'
 
 const settings = {
   get: defineAction({
     handler: async () => {
       try {
-        return await getSettingsSQL.execute()
+        return await getSettings()
       } catch (error) {
         console.log(error)
         throw new ActionError({
@@ -22,7 +21,7 @@ const settings = {
     get: defineAction({
       handler: async () => {
         try {
-          return await getMenuSQL.execute()
+          return await getMenu()
         } catch (error) {
           console.log(error)
           throw new ActionError({
@@ -36,9 +35,3 @@ const settings = {
 }
 
 export default settings
-
-// prepared SQLs
-
-const getSettingsSQL = db.select().from(settingsTable).prepare()
-
-const getMenuSQL = db.select().from(menuTable).prepare()
