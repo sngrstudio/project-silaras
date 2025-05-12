@@ -1,0 +1,1219 @@
+[
+  {
+    "code": "6202",
+    "name": "Kotawaringin Timur",
+    "type": "DISTRICT"
+  },
+  {
+    "code": "620201",
+    "name": "Kota Besi",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202012003",
+    "name": "Palangan",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012004",
+    "name": "Hanjalipan",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012005",
+    "name": "Simpur",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012006",
+    "name": "Pamalian",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012007",
+    "name": "Camba",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012008",
+    "name": "Kandan",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202011009",
+    "name": "Kota Besi Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202011010",
+    "name": "Kota Besi Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012012",
+    "name": "Bajarum",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012015",
+    "name": "Rasau Tumbuh",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "6202012017",
+    "name": "Soren",
+    "type": "VILLAGE",
+    "parentCode": "620201"
+  },
+  {
+    "code": "620202",
+    "name": "Cempaga",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202022004",
+    "name": "Rubung Buyung",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022005",
+    "name": "Patai",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022006",
+    "name": "Luwuk Ranggan",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022007",
+    "name": "Jemaras",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022008",
+    "name": "Cempaka Mulia Timur",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022009",
+    "name": "Cempaka Mulia Barat",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022010",
+    "name": "Luwuk Bunter",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "6202022011",
+    "name": "Sungai Paring",
+    "type": "VILLAGE",
+    "parentCode": "620202"
+  },
+  {
+    "code": "620203",
+    "name": "Mentaya Hulu",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202032001",
+    "name": "Tangar",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032002",
+    "name": "Baampah",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032003",
+    "name": "Kawan Batu",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032004",
+    "name": "Tanjung Bantur",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032005",
+    "name": "Penda Durian",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032006",
+    "name": "Pahirangan",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032007",
+    "name": "Satiung",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032008",
+    "name": "Santilik",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032009",
+    "name": "Tangka Robah",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032010",
+    "name": "Pemantang",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032011",
+    "name": "Tumbang Sapiri",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202031012",
+    "name": "Kuala Kuayan",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032014",
+    "name": "Bawan",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032015",
+    "name": "Tanjung Jariangau",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032031",
+    "name": "Kapuk",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "6202032032",
+    "name": "Pantap",
+    "type": "VILLAGE",
+    "parentCode": "620203"
+  },
+  {
+    "code": "620204",
+    "name": "Parenggean",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202042001",
+    "name": "Tehang",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042002",
+    "name": "Kabuau",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202041004",
+    "name": "Parenggean",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042007",
+    "name": "Barunang Miri",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042009",
+    "name": "Sumber Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042010",
+    "name": "Mekar Jaya",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042011",
+    "name": "Karang Tunggal",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042012",
+    "name": "Bandar Agung",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042013",
+    "name": "Beringin Tunggal Jaya",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042015",
+    "name": "Sari Harapan",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042016",
+    "name": "Karang Sari",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042019",
+    "name": "Bajarau",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042023",
+    "name": "Bukit Harapan",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042024",
+    "name": "Manjalin",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "6202042025",
+    "name": "Karya Bersama",
+    "type": "VILLAGE",
+    "parentCode": "620204"
+  },
+  {
+    "code": "620205",
+    "name": "Baamang",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202051001",
+    "name": "Baamang Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "6202051002",
+    "name": "Baamang Tengah",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "6202051003",
+    "name": "Baamang Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "6202052006",
+    "name": "Tinduk",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "6202051007",
+    "name": "Tanah Mas",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "6202051008",
+    "name": "Baamang Barat",
+    "type": "VILLAGE",
+    "parentCode": "620205"
+  },
+  {
+    "code": "620206",
+    "name": "Mentawa Baru Ketapang",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202061001",
+    "name": "Mentawa Baru Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202061002",
+    "name": "Mentawa Baru Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202061003",
+    "name": "Ketapang",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062005",
+    "name": "Pelangsian",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062006",
+    "name": "Bapeang",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062007",
+    "name": "Sawahan",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062008",
+    "name": "Eka Bahurui",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202061009",
+    "name": "Pasir Putih",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062010",
+    "name": "Telaga Baru",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062011",
+    "name": "Bangkuang Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "6202062012",
+    "name": "Bapanggang Raya",
+    "type": "VILLAGE",
+    "parentCode": "620206"
+  },
+  {
+    "code": "620207",
+    "name": "Mentaya Hilir Utara",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202072001",
+    "name": "Pondok Damar",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072002",
+    "name": "Bagendang Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072003",
+    "name": "Bagendang Tengah",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072004",
+    "name": "Natai Baru",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072005",
+    "name": "Bagendang Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072006",
+    "name": "Sumber Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "6202072007",
+    "name": "Bagendang Permai",
+    "type": "VILLAGE",
+    "parentCode": "620207"
+  },
+  {
+    "code": "620208",
+    "name": "Mentaya Hilir Selatan",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202082005",
+    "name": "Sebamban",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082006",
+    "name": "Samuda Besar",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082007",
+    "name": "Samuda Kecil",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202081008",
+    "name": "Samuda Kota",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202081009",
+    "name": "Basirih Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082010",
+    "name": "Jaya Kelapa",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082011",
+    "name": "Basirih Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082012",
+    "name": "Jaya Karet",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082013",
+    "name": "Handil Sohor",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "6202082014",
+    "name": "Sei Ijum Raya",
+    "type": "VILLAGE",
+    "parentCode": "620208"
+  },
+  {
+    "code": "620209",
+    "name": "Pulau Hanaut",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202092001",
+    "name": "Bapinang Hulu",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092002",
+    "name": "Bapinang Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092003",
+    "name": "Bapinang Hilir Laut",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092004",
+    "name": "Satiruk",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092005",
+    "name": "Mekarti Jaya",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092006",
+    "name": "Rawa Sari",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092007",
+    "name": "Hanaut",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092008",
+    "name": "Babirah",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092009",
+    "name": "Serambut",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092010",
+    "name": "Babaung",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092011",
+    "name": "Bamadu",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092012",
+    "name": "Penyaguan",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092013",
+    "name": "Hantipan",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "6202092014",
+    "name": "Bantian",
+    "type": "VILLAGE",
+    "parentCode": "620209"
+  },
+  {
+    "code": "620210",
+    "name": "Antang Kalang",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202102001",
+    "name": "Tumbang Kalang",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102002",
+    "name": "Kuluk Telawang",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102003",
+    "name": "Sungai Puring",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102004",
+    "name": "Tumbang Ngahan",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102005",
+    "name": "Tumbang Ramei",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102006",
+    "name": "Tumbang Hejan",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102007",
+    "name": "Sungai Hanya",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102008",
+    "name": "Tumbang Sepayang",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102016",
+    "name": "Buntut Nusa",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102017",
+    "name": "Tumbang Gagu",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102021",
+    "name": "Tumbang Manya",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102025",
+    "name": "Gunung Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102027",
+    "name": "Mulya Agung",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102028",
+    "name": "Bhakti Karya",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "6202102029",
+    "name": "Waringin Agung",
+    "type": "VILLAGE",
+    "parentCode": "620210"
+  },
+  {
+    "code": "620211",
+    "name": "Teluk Sampit",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202112001",
+    "name": "Parebok",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "6202112002",
+    "name": "Basawang",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "6202112003",
+    "name": "Lampuyang",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "6202112004",
+    "name": "Ujung Pandaran",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "6202112005",
+    "name": "Regei Lestari",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "6202112006",
+    "name": "Kuin Permai",
+    "type": "VILLAGE",
+    "parentCode": "620211"
+  },
+  {
+    "code": "620212",
+    "name": "Seranau",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202121001",
+    "name": "Mentaya Seberang",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "6202122002",
+    "name": "Terantang",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "6202122003",
+    "name": "Batuah",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "6202122004",
+    "name": "Terantang Hilir",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "6202122005",
+    "name": "Ganepo",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "6202122006",
+    "name": "Seragam Jaya",
+    "type": "VILLAGE",
+    "parentCode": "620212"
+  },
+  {
+    "code": "620213",
+    "name": "Cempaga Hulu",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202132001",
+    "name": "Pundu",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132002",
+    "name": "Keruing",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132003",
+    "name": "Parit",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132004",
+    "name": "Pantai Harapan",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132005",
+    "name": "Pelantaran",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132006",
+    "name": "Tumbang Koling",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132007",
+    "name": "Sudan",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132008",
+    "name": "Bukit Batu",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132009",
+    "name": "Bukit Raya",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132010",
+    "name": "Selucing",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "6202132011",
+    "name": "Sungai Ubar Mandiri",
+    "type": "VILLAGE",
+    "parentCode": "620213"
+  },
+  {
+    "code": "620214",
+    "name": "Telawang",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202142001",
+    "name": "Sebabi",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "6202142002",
+    "name": "Tanah Putih",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "6202142003",
+    "name": "Sumber Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "6202142004",
+    "name": "Kenyala",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "6202142005",
+    "name": "Penyang",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "6202142006",
+    "name": "Biru Maju",
+    "type": "VILLAGE",
+    "parentCode": "620214"
+  },
+  {
+    "code": "620215",
+    "name": "Bukit Santuai",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202152001",
+    "name": "Tumbang Tilap",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152002",
+    "name": "Tumbang Kaminting",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152003",
+    "name": "Tanah Haluan",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152004",
+    "name": "Tumbang Penyahuan",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152005",
+    "name": "Tumbang Sapia",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152006",
+    "name": "Tumbang Getas",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152007",
+    "name": "Tewai Hara",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152008",
+    "name": "Tumbang Payang",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152009",
+    "name": "Tumbang Kania",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152010",
+    "name": "Tumbang Tawan",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152011",
+    "name": "Lunuk Bagantung",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152012",
+    "name": "Tumbang Torung",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152013",
+    "name": "Tumbang Batu",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "6202152014",
+    "name": "Tumbang Saluang",
+    "type": "VILLAGE",
+    "parentCode": "620215"
+  },
+  {
+    "code": "620216",
+    "name": "Tualan Hulu",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202162001",
+    "name": "Luwuk Sampun",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162002",
+    "name": "Tumbang Mujam",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162003",
+    "name": "Merah",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162004",
+    "name": "Tanjung Jorong",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162005",
+    "name": "Sebungsu",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162006",
+    "name": "Bukit Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162007",
+    "name": "Wonosari",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162008",
+    "name": "Mekar Sari",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162009",
+    "name": "Damar Makmur",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162010",
+    "name": "Cempaka Putih",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "6202162011",
+    "name": "Jati Waringin",
+    "type": "VILLAGE",
+    "parentCode": "620216"
+  },
+  {
+    "code": "620217",
+    "name": "Telaga Antang",
+    "type": "SUBDISTRICT",
+    "parentCode": "6202"
+  },
+  {
+    "code": "6202172001",
+    "name": "Tumbang Boloi",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172002",
+    "name": "Luwuk Kowan",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172003",
+    "name": "Rantau Tampang",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172004",
+    "name": "Tumbang Mangkup",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172005",
+    "name": "Rantau Katang",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172006",
+    "name": "Tumbang Sangai",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172007",
+    "name": "Tukang Langit",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172008",
+    "name": "Beringin Agung",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172009",
+    "name": "Agung Mulya",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172010",
+    "name": "Batu Agung",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172011",
+    "name": "Bukit Indah",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172012",
+    "name": "Tumbang Puan",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172013",
+    "name": "Rantau Suang",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172014",
+    "name": "Rantau Sawang",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172015",
+    "name": "Tanjung Harapan",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172016",
+    "name": "Buana Mustika",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172017",
+    "name": "Tri Buana",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  },
+  {
+    "code": "6202172018",
+    "name": "Tumbang Bajanei",
+    "type": "VILLAGE",
+    "parentCode": "620217"
+  }
+]
