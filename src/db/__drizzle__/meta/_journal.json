@@ -15,6 +15,20 @@
       "when": 1747023341573,
       "tag": "0001_messy_zeigeist",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1747037691885,
+      "tag": "0002_sticky_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1747041797432,
+      "tag": "0003_smart_the_initiative",
+      "breakpoints": true
     }
   ]
 }

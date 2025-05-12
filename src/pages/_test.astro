@@ -1,0 +1,14 @@
+---
+import { Debug } from 'astro:components'
+import { actions } from 'astro:actions'
+import { Picture } from 'astro:assets'
+
+const settings = await Astro.callAction(actions.settings.get.orThrow, {})
+
+const src = settings.find((s) => s.property === 'SITE_LOGO')?.value || ''
+const image = await Astro.callAction(actions.image.presign.orThrow, { src })
+---
+
+<Debug {image} />
+
+<Picture src={image} alt='' inferSize />

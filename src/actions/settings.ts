@@ -31,13 +31,17 @@ const settings = {
         const existingSettings = await getSettings()
         let logo = undefined
         if (logoFile) {
-          const existingLogo = existingSettings.find(p => p.property == 'SITE_LOGO')
+          const existingLogo = existingSettings.find(
+            (p) => p.property == 'SITE_LOGO'
+          )
           if (existingLogo) {
             const exFile = s3.file(existingLogo.value)
             await exFile.delete()
           }
 
-          const fileExt = logoFile.name.substring(logoFile.name.lastIndexOf('.'))
+          const fileExt = logoFile.name.substring(
+            logoFile.name.lastIndexOf('.')
+          )
           const fileName = `logo-${Bun.randomUUIDv7()}${fileExt}`
           const file = s3.file(fileName)
 

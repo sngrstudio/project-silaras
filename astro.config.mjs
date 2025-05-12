@@ -14,5 +14,8 @@ export default defineConfig({
   output: 'server',
   vite: {
     plugins: [tailwindcss(), icons({ compiler: 'jsx', jsx: 'react' })]
+  },
+  experimental: {
+    responsiveImages: true
   }
 })
