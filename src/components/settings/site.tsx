@@ -103,6 +103,20 @@ const ProfileForm: FC = () => {
         )}
       </FormLabel>
 
+      <FormLabel label='Logo Situs'>
+        <input
+          name='logo'
+          className='file-input file-input-lg w-full'
+          type='file'
+          accept='image/*'
+          disabled={isPending || showToast}
+          onChange={handleFormChange}
+        />
+        {error && error.fields.logo && (
+          <span className='text-error'>{error.fields.logo.join(' | ')}</span>
+        )}
+      </FormLabel>
+
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button
           className='btn btn-primary flex items-center gap-2'

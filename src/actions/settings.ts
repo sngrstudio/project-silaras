@@ -1,5 +1,7 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { getSettings, updateSettings, getMenu } from '~/db/queries/settings'
+import { s3 } from '~/lib/s3'
+import { write } from 'bun'
 import { z } from 'astro:schema'
 
 const settings = {
@@ -21,11 +23,29 @@ const settings = {
     accept: 'form',
     input: z.object({
       name: z.string().optional(),
-      description: z.string().optional()
+      description: z.string().optional(),
+      logo: z.instanceof(File).optional()
     }),
-    handler: async (input) => {
+    handler: async ({ logo: logoFile, ...input }) => {
       try {
-        return await updateSettings(input)
+        const existingSettings = await getSettings()
+        let logo = undefined
+        if (logoFile) {
+          const existingLogo = existingSettings.find(p => p.property == 'SITE_LOGO')
+          if (existingLogo) {
+            const exFile = s3.file(existingLogo.value)
+            await exFile.delete()
+          }
+
+          const fileExt = logoFile.name.substring(logoFile.name.lastIndexOf('.'))
+          const fileName = `logo-${Bun.randomUUIDv7()}${fileExt}`
+          const file = s3.file(fileName)
+
+          await write(file, logoFile)
+          logo = fileName
+        }
+
+        return await updateSettings({ logo, ...input })
       } catch (error) {
         console.log(error)
         throw new ActionError({
