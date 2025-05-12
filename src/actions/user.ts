@@ -17,6 +17,8 @@ import {
   validateSessionToken,
   invalidateSession
 } from '~/auth/api'
+import { s3 } from '~/lib/s3'
+import { write } from 'bun'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 import { z } from 'astro:schema'
 import { eq, sql } from 'drizzle-orm'
@@ -41,9 +43,15 @@ const createuserSchema = z
 
 const updateUserSchema = z
   .object({})
-  .merge(createUpdateSchema(userProfileTable).omit({ userId: true }))
+  .merge(
+    createUpdateSchema(userProfileTable).omit({
+      userId: true,
+      profilePhoto: true
+    })
+  )
   .merge(createUpdateSchema(userTable).pick({ accessLevel: true }))
   .extend({
+    profilePhoto: z.instanceof(File).optional(),
     requestedBy: z.string()
   })
 
@@ -153,7 +161,12 @@ const user = {
           message: 'Operasi terbatas!'
         })
 
-        const { requestedBy, accessLevel, ...userProfile } = input
+        const {
+          requestedBy,
+          accessLevel,
+          profilePhoto: profilePhotoFile,
+          ...userProfile
+        } = input
         const localUser = ctx.locals.user
 
         if (!localUser) {
@@ -167,10 +180,27 @@ const user = {
           throw RestrictedActionError
         }
 
+        let profilePhoto = undefined
+        if (profilePhotoFile) {
+          if (localUser.profilePhoto) {
+            const exFile = s3.file(localUser.profilePhoto)
+            await exFile.delete()
+          }
+
+          const fileExt = profilePhotoFile.name.substring(
+            profilePhotoFile.name.lastIndexOf('.')
+          )
+          const fileName = `user-${requestedBy}-${Bun.randomUUIDv7()}${fileExt}`
+          const file = s3.file(fileName)
+
+          await write(file, profilePhotoFile)
+          profilePhoto = fileName
+        }
+
         await db.transaction(async (tx) => {
           const updateUserProfileTableSQL = tx
             .update(userProfileTable)
-            .set({ ...userProfile })
+            .set({ profilePhoto, ...userProfile })
             .where(eq(userProfileTable.userId, localUser.userId))
             .prepare()
 

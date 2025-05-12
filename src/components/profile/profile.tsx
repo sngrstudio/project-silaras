@@ -8,6 +8,7 @@ import {
 import Card from '../card/card'
 import LoadingCard from '../card/loading'
 import { FormLabel } from '../form/form'
+import Image from '../image/image'
 import { useStore } from '@nanostores/react'
 import { $user, $accessLevels, setUser } from './store'
 import { $showToast, setToastMessage } from '~/components/toast/store'
@@ -136,6 +137,31 @@ const ProfileForm: FC = () => {
           </span>
         )}
       </FormLabel>
+
+      <FormLabel label='Foto Profil'>
+        <input
+          name='profilePhoto'
+          className='file-input file-input-lg w-full'
+          type='file'
+          accept='image/*'
+          disabled={isPending || showToast}
+          onChange={handleFormChange}
+        />
+        {error && error.fields.profilePhoto && (
+          <span className='text-error'>
+            {error.fields.profilePhoto.join(' | ')}
+          </span>
+        )}
+      </FormLabel>
+
+      {user.profilePhoto && (
+        <Image
+          className='h-[180px] w-[180px]'
+          src={user.profilePhoto}
+          width={180}
+          height={180}
+        />
+      )}
 
       <input name='requestedBy' type='hidden' value={user.userName} />
 

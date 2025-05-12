@@ -118,12 +118,14 @@ const ProfileForm: FC = () => {
         )}
       </FormLabel>
 
-      <Image
-        className='h-[180px] w-[180px]'
-        src={site.logo}
-        width={180}
-        height={180}
-      />
+      {site.logo && (
+        <Image
+          className='h-[180px] w-[180px]'
+          src={site.logo}
+          width={180}
+          height={180}
+        />
+      )}
 
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button
