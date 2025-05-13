@@ -1,40 +1,38 @@
 ---
 import DashboardLayout, { type Props as LProps } from '../_dashboard.astro'
-import ProfileRC from '~/components/pages/profile/profile'
+import UsersRC from '~/components/pages/users/users'
 
 if (!Astro.locals.session || !Astro.locals.user) {
   return Astro.redirect('/user/login')
 }
 
 const props = {
-  title: 'Profil Saya',
-  description: 'Edit dan ubah profil pengguna.'
+  title: 'Pengaturan Pengguna',
+  description: 'Edit dan ubah pengaturan pengguna.'
 } satisfies LProps
 ---
 
 <DashboardLayout {...props}>
-  <ProfileRC client:idle />
+  <UsersRC client:idle />
 </DashboardLayout>
 
 <script>
   import { onMount, task } from 'nanostores'
+  import { $allUser, setAllUser } from '~/components/pages/users/store'
   import {
-    $user,
-    setUser,
     $accessLevels,
     setAccessLevels
   } from '~/components/pages/profile/store'
   import { actions } from 'astro:actions'
 
-  onMount($user, () => {
+  onMount($allUser, () => {
     task(async () => {
-      const state = await actions.user.getCurrent.orThrow()
-      console.log(state)
-      setUser(state)
+      const state = await actions.user.getAll.orThrow()
+      setAllUser(state)
     })
 
     return () => {
-      setUser(undefined)
+      setAllUser(undefined)
     }
   })
 

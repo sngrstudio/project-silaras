@@ -17,6 +17,7 @@ import {
   validateSessionToken,
   invalidateSession
 } from '~/auth/api'
+import { getAllUsers } from '~/db/queries/user'
 import { deletePresignedImage } from '~/db/queries/image'
 import { s3 } from '~/lib/s3'
 import { write } from 'bun'
@@ -120,35 +121,32 @@ const user = {
     }
   }),
 
-  getCurrentUser: defineAction({
+  getCurrent: defineAction({
     handler: async (_, ctx) => {
-      try {
-        const localUser = ctx.locals.user
-        if (!localUser) {
-          throw new ActionError({
-            code: 'FORBIDDEN',
-            message: 'Operasi terbatas!'
-          })
-        }
-
-        const [returnedUser] = await getUserSQL.execute({
-          userId: localUser.userId
-        })
-        if (!returnedUser) {
-          throw new ActionError({
-            code: 'NOT_FOUND',
-            message: 'User tidak ditemukan.'
-          })
-        }
-
-        return returnedUser
-      } catch (error) {
-        console.log(error)
+      const localUser = ctx.locals.user
+      if (!localUser) {
         throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Terjadi masalah di server kami.'
+          code: 'FORBIDDEN',
+          message: 'Operasi terbatas!'
         })
       }
+
+      const { userId, ...returnedUser } = localUser
+      return returnedUser
+    }
+  }),
+
+  getAll: defineAction({
+    handler: async (_, ctx) => {
+      const localUser = ctx.locals.user
+      if (!localUser || (localUser && localUser.accessLevel < 3)) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Operasi terbatas!'
+        })
+      }
+
+      return await getAllUsers()
     }
   }),
 

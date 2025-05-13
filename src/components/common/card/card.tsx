@@ -1,6 +1,6 @@
 import type { FC, PropsWithChildren } from 'react'
 
-const Card: FC<PropsWithChildren<{ title?: string | undefined }>> = ({
+const CardTemplate: FC<PropsWithChildren<{ title?: string | undefined }>> = ({
   title,
   children
 }) => {
@@ -14,4 +14,4 @@ const Card: FC<PropsWithChildren<{ title?: string | undefined }>> = ({
   )
 }
 
-export default Card
+export default CardTemplate

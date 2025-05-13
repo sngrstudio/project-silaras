@@ -2,7 +2,7 @@ import { persistentAtom } from '@nanostores/persistent'
 import { atom } from 'nanostores'
 import { actions } from 'astro:actions'
 
-type User = Awaited<ReturnType<typeof actions.user.getCurrentUser.orThrow>>
+type User = Awaited<ReturnType<typeof actions.user.getCurrent.orThrow>>
 
 export const $user = persistentAtom<User | undefined>('user', undefined, {
   encode: JSON.stringify,
