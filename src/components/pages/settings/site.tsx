@@ -5,13 +5,13 @@ import {
   useState,
   useRef
 } from 'react'
-import Card from '../card/card'
-import LoadingCard from '../card/loading'
-import { FormLabel } from '../form/form'
-import Image from '../image/image'
+import Card from '../../common/card/card'
+import LoadingCard from '../../common/card/loading'
+import { FormLabel } from '../../common/form/form'
+import Image from '../../common/image/image'
 import { useStore } from '@nanostores/react'
-import { $site, setSettings } from '../dashboard/store'
-import { $showToast, setToastMessage } from '~/components/toast/store'
+import { $site, setSettings } from '../../layout/dashboard/store'
+import { $showToast, setToastMessage } from '~/components/layout/toast/store'
 import { actions, isInputError } from 'astro:actions'
 import SaveIcon from '~icons/lucide/save'
 

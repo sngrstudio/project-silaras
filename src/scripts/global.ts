@@ -6,8 +6,8 @@ import {
   setMenu,
   $openDrawer,
   setOpenDrawer
-} from '~/components/dashboard/store'
-import { $toastMessage, setToastMessage } from '~/components/toast/store'
+} from '~/components/layout/dashboard/store'
+import { $toastMessage, setToastMessage } from '~/components/layout/toast/store'
 import { actions } from 'astro:actions'
 
 onMount($settings, () => {

@@ -5,7 +5,7 @@ import {
   $toastMessage,
   $showToast,
   setToastMessage
-} from '~/components/toast/store'
+} from '~/components/layout/toast/store'
 import InfoIcon from '~icons/lucide/info'
 import ErrorIcon from '~icons/lucide/circle-x'
 

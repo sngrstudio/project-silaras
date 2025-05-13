@@ -1,6 +1,6 @@
 ---
 import UserLayout, { type Props as LProps } from './_user.astro'
-import SignupRC from '~/components/user/signup'
+import SignupRC from '~/components/pages/user/signup'
 
 if (Astro.locals.session && Astro.locals.user) {
   return Astro.redirect('/')
