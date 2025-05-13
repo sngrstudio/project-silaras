@@ -17,6 +17,7 @@ import {
   validateSessionToken,
   invalidateSession
 } from '~/auth/api'
+import { deletePresignedImage } from '~/db/queries/image'
 import { s3 } from '~/lib/s3'
 import { write } from 'bun'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
@@ -181,9 +182,10 @@ const user = {
         }
 
         let profilePhoto = undefined
-        if (profilePhotoFile) {
+        if (profilePhotoFile && profilePhotoFile.name) {
           if (localUser.profilePhoto) {
             const exFile = s3.file(localUser.profilePhoto)
+            await deletePresignedImage(localUser.profilePhoto)
             await exFile.delete()
           }
 

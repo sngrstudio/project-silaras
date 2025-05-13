@@ -1,5 +1,6 @@
 import { defineAction, ActionError } from 'astro:actions'
 import { getSettings, updateSettings, getMenu } from '~/db/queries/settings'
+import { deletePresignedImage } from '~/db/queries/image'
 import { s3 } from '~/lib/s3'
 import { write } from 'bun'
 import { z } from 'astro:schema'
@@ -30,12 +31,13 @@ const settings = {
       try {
         const existingSettings = await getSettings()
         let logo = undefined
-        if (logoFile) {
+        if (logoFile && logoFile.name) {
           const existingLogo = existingSettings.find(
-            (p) => p.property == 'SITE_LOGO'
+            (p) => p.property === 'SITE_LOGO'
           )
-          if (existingLogo) {
+          if (existingLogo && existingLogo.value) {
             const exFile = s3.file(existingLogo.value)
+            await deletePresignedImage(existingLogo.value)
             await exFile.delete()
           }
 

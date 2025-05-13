@@ -39,6 +39,15 @@ export const insertPresignedImage = async (
   return presignedImage
 }
 
+export const deletePresignedImage = async (fileName: string) => {
+  const deletePresignedImageSQL = db
+    .delete(presignedImageTable)
+    .where(eq(presignedImageTable.fileName, fileName))
+    .prepare()
+
+  await deletePresignedImageSQL.execute()
+}
+
 // Prepared SQLs
 
 const getPresignedImageSQL = db
