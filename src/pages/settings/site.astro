@@ -28,7 +28,7 @@ const props = {
 
   onMount($user, () => {
     task(async () => {
-      const state = await actions.user.getCurrentUser.orThrow()
+      const state = await actions.user.getCurrent.orThrow()
       setUser(state)
     })
 
