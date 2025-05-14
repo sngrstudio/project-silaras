@@ -16,6 +16,7 @@ import {
   getCoreUser,
   getAccessLevels,
   createUser,
+  deleteUser,
   createUserInputSchema
 } from '~/db/queries/user'
 import { deletePresignedImage } from '~/db/queries/image'
@@ -120,6 +121,38 @@ const user = {
       }
 
       return await getAllUsers()
+    }
+  }),
+
+  delete: defineAction({
+    input: z.object({
+      userName: z.string()
+    }),
+    handler: async (input, ctx) => {
+      const localUser = ctx.locals.user
+      if (!localUser || (localUser && localUser.accessLevel < 3)) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Operasi terbatas!'
+        })
+      }
+
+      const user = await getUserByUserName(input.userName)
+      if (!user) {
+        throw new ActionError({
+          code: 'BAD_REQUEST',
+          message: 'User tidak ditemukan!'
+        })
+      }
+
+      if (user.profilePhoto) {
+        const file = s3.file(user.profilePhoto)
+        await deletePresignedImage(user.profilePhoto)
+
+        await file.delete()
+      }
+
+      await deleteUser(user.userName)
     }
   }),
 

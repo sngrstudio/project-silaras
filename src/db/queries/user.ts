@@ -114,4 +114,13 @@ export const createUser = async (
   return await getUserByUserName(userName)
 }
 
+export const deleteUser = async (userName: string) => {
+  const deleteUserSQL = db
+    .delete(userTable)
+    .where(eq(userTable.userName, userName))
+    .prepare()
+
+  await deleteUserSQL.execute()
+}
+
 type User = Awaited<ReturnType<typeof getUserByUserName>>

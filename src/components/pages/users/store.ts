@@ -13,3 +13,8 @@ export const $user = atom<User | undefined>(undefined)
 export const setUser = (state: User | undefined) => $user.set(state)
 
 export const $openDialog = computed($user, (user) => !!user)
+
+export const $createMode = atom<boolean | undefined>(undefined)
+
+export const setCreateMode = (state: boolean | undefined) =>
+  $createMode.set(state)

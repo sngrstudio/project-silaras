@@ -16,10 +16,20 @@ import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
+  type CellContext,
   type ColumnDef
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import { $allUser, $user, setUser, $openDialog, type User } from './store'
+import {
+  $allUser,
+  setAllUser,
+  $user,
+  setUser,
+  $openDialog,
+  $createMode,
+  setCreateMode,
+  type User
+} from './store'
 import { $accessLevels } from '../profile/store'
 import { $showToast, setToastMessage } from '~/components/layout/toast/store'
 import { actions, isInputError } from 'astro:actions'
@@ -39,7 +49,6 @@ export default UsersRC
 
 const UsersTable: FC = () => {
   const data = useStore($allUser)
-  const accessLevels = useStore($accessLevels)
 
   if (!data) {
     return <LoadingCard />
@@ -47,67 +56,19 @@ const UsersTable: FC = () => {
 
   const columnHelper = createColumnHelper<User>()
   const columns = [
-    columnHelper.accessor('profilePhoto', {
-      header: '',
-      cell: (c) => {
-        const src = c.getValue()
-        return (
-          <>
-            {src ? (
-              <div className='avatar'>
-                <div className='h-[35px] w-[35px] rounded-full'>
-                  <Image src={src} width={35} height={35} />
-                </div>
-              </div>
-            ) : null}
-          </>
-        )
-      }
-    }),
     columnHelper.accessor('fullName', {
       header: 'Nama',
-      cell: (c) => {
-        const handleSetUser = () => {
-          setUser(c.row.original)
-        }
-        return (
-          <div
-            className='btn btn-link pl-0'
-            role='button'
-            onClick={handleSetUser}
-          >
-            {c.getValue()}
-          </div>
-        )
-      }
+      cell: (cell) => <TableFullNameCell cell={cell} />
     }),
     columnHelper.accessor('accessLevel', {
       header: 'Hak Akses',
-      cell: (c) => {
-        if (!accessLevels) {
-          return null
-        }
-
-        return (
-          <span className='badge badge-outline badge-info rounded-full font-mono text-sm uppercase'>
-            {accessLevels.find((l) => l.id === c.getValue())?.description}
-          </span>
-        )
+      cell: (cell) => {
+        return <TableAccessLevelCell cell={cell} />
       }
     }),
     columnHelper.accessor('phoneNumber', {
       header: 'No. Telepon',
-      cell: (c) => (
-        <div className='flex items-center gap-1'>
-          <span>{c.getValue()}</span>
-          <span className='btn btn-ghost btn-xs' role='button'>
-            <CopyIcon />
-          </span>
-          <span className='btn btn-ghost btn-xs' role='button'>
-            <WhatsappIcon />
-          </span>
-        </div>
-      )
+      cell: (cell) => <TablePhoneNumCell cell={cell} />
     })
   ]
 
@@ -137,58 +98,70 @@ const UsersTableRenderer: FC<{
 }
 
 const UserDialog: FC = () => {
-  // const ref = useRef<HTMLFormElement>(null)
+  const ref = useRef<HTMLFormElement>(null)
   const [formChanged, setFormChanged] = useState(false)
 
   const updateUser = async (_: unknown, formData: FormData) => {
-    // const { data, error } = await actions.settings.update(formData)
-    // if (error && !data) {
-    //   if (isInputError(error)) {
-    //     return error
-    //   }
+    const { data, error } = await actions.user.create(formData)
+    if (error && !data) {
+      if (isInputError(error)) {
+        return error
+      }
 
-    //   setToastMessage({
-    //     error: true,
-    //     message: error.message
-    //   })
-    //   return undefined
-    // }
+      setToastMessage({
+        error: true,
+        message: error.message
+      })
+      return undefined
+    }
 
-    // setToastMessage({
-    //   message: 'Menyimpan perubahan...'
-    // })
-    // if (!showToast) {
-    //   setSettings(data)
-    //   setFormChanged(false)
-    // }
+    setToastMessage({
+      message: 'Menyimpan perubahan...'
+    })
+    if (!showToast) {
+      const updatedUsersData = await actions.user.getAll.orThrow()
+      setAllUser(updatedUsersData)
+      setCreateMode(undefined)
+      setUser(undefined)
+      setFormChanged(false)
+    }
     return undefined
   }
 
-  const [_error, submitAction, isPending] = useActionState(
-    updateUser,
-    undefined
-  )
+  const [error, submitAction, isPending] = useActionState(updateUser, undefined)
 
   const handleFormChange = () => {
     setFormChanged(true)
   }
 
-  // const handleReset: MouseEventHandler<HTMLButtonElement> = (e) => {
-  //   e.preventDefault()
-  //   ref.current?.reset()
-  //   setFormChanged(false)
-  // }
+  const handleReset: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault()
+    ref.current?.reset()
+    setFormChanged(false)
+  }
 
   const user = useStore($user)
   const accessLevels = useStore($accessLevels)
   const showToast = useStore($showToast)
+  const createMode = useStore($createMode)
 
   if (!user) {
     return <></>
   }
 
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault()
+    await actions.user.delete({ userName: user.userName }).then(async () => {
+      const updatedUsersData = await actions.user.getAll.orThrow()
+      setAllUser(updatedUsersData)
+      setCreateMode(undefined)
+      setUser(undefined)
+      setFormChanged(false)
+    })
+  }
+
   return (
-    <form action={submitAction} className='flex flex-col gap-4'>
+    <form action={submitAction} className='flex flex-col gap-4' ref={ref}>
       <FormLabel label='Nama'>
         <input
           name='fullName'
@@ -198,11 +171,11 @@ const UserDialog: FC = () => {
           disabled={isPending || showToast}
           onChange={handleFormChange}
         />
-        {/* {error && error.fields.fullName && (
+        {error && error.fields.fullName && (
           <span className='text-error'>
             {error.fields.fullName.join(' | ')}
           </span>
-        )} */}
+        )}
       </FormLabel>
 
       <FormLabel label='Username'>
@@ -210,13 +183,35 @@ const UserDialog: FC = () => {
           name='userName'
           className='input input-lg w-full'
           type='text'
-          value={user.userName}
-          disabled={isPending || showToast}
+          defaultValue={user.userName}
+          disabled={isPending || showToast || !createMode}
         />
         <span className='italic'>
           Username bersifat permanen dan tidak dapat diganti.
         </span>
       </FormLabel>
+
+      {createMode && (
+        <>
+          <FormLabel label='Password'>
+            <input
+              name='password'
+              className='input input-lg w-full'
+              type='password'
+              disabled={isPending || showToast || !createMode}
+            />
+          </FormLabel>
+
+          <FormLabel label='Konfirmasi Password'>
+            <input
+              name='confirmPassword'
+              className='input input-lg w-full'
+              type='password'
+              disabled={isPending || showToast || !createMode}
+            />
+          </FormLabel>
+        </>
+      )}
 
       <FormLabel label='Hak Akses'>
         <select
@@ -250,11 +245,11 @@ const UserDialog: FC = () => {
           disabled={isPending || showToast}
           onChange={handleFormChange}
         />
-        {/* {error && error.fields.phoneNumber && (
+        {error && error.fields.phoneNumber && (
           <span className='text-error'>
             {error.fields.phoneNumber.join(' | ')}
           </span>
-        )} */}
+        )}
       </FormLabel>
 
       <FormLabel label='Foto Profil'>
@@ -276,12 +271,56 @@ const UserDialog: FC = () => {
             onChange={handleFormChange}
           />
         </div>
-        {/* {error && error.fields.profilePhoto && (
+        {error && error.fields.profilePhoto && (
           <span className='text-error'>
             {error.fields.profilePhoto.join(' | ')}
           </span>
-        )} */}
+        )}
       </FormLabel>
+
+      {!createMode && (
+        <input name='userName' type='hidden' value={user.userName} />
+      )}
+
+      <div className='mt-6 flex flex-row-reverse gap-4'>
+        <button
+          className='btn btn-primary flex items-center gap-2'
+          type='submit'
+          disabled={isPending || showToast || !formChanged}
+        >
+          <SaveIcon />
+          <span>Simpan</span>
+        </button>
+
+        <button
+          className='btn flex items-center gap-2'
+          disabled={isPending || showToast || !formChanged}
+          onClick={handleReset}
+        >
+          <span>Reset</span>
+        </button>
+
+        {createMode ? (
+          <button
+            className='btn mr-auto flex items-center gap-2'
+            disabled={isPending || showToast}
+            onClick={() => {
+              setCreateMode(undefined)
+              setUser(undefined)
+            }}
+          >
+            <span>Tutup</span>
+          </button>
+        ) : (
+          <button
+            className='btn btn-error mr-auto flex items-center gap-2'
+            disabled={isPending || showToast}
+            onClick={handleDelete}
+          >
+            <span>Hapus</span>
+          </button>
+        )}
+      </div>
     </form>
   )
 }
@@ -291,7 +330,9 @@ const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
 
   const handleDialog = () => {
     if (!openDialog) {
+      setCreateMode(true)
       setUser({
+        userId: '',
         fullName: '',
         userName: '',
         accessLevel: 1,
@@ -299,6 +340,7 @@ const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
         profilePhoto: null
       })
     } else {
+      setCreateMode(undefined)
       setUser(undefined)
     }
   }
@@ -312,10 +354,58 @@ const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className='bg-neutral/20 fixed inset-0 z-[998] cursor-pointer'></Dialog.Overlay>
-        <Dialog.Content className='bg-base-100 card lg:card-lg fixed top-[50%] left-[50%] z-[999] translate-[-50%] shadow'>
+        <Dialog.Content className='bg-base-100 card lg:card-lg fixed top-[50%] left-[50%] z-[999] translate-[-50%] shadow lg:w-[50vw]'>
           <div className='card-body'>{children}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
+  )
+}
+
+const TableFullNameCell: FC<{ cell: CellContext<User, string> }> = ({
+  cell
+}) => {
+  const handleSetUser = () => {
+    setUser(cell.row.original)
+  }
+  return (
+    <div
+      className='btn btn-link pl-0 text-left'
+      role='button'
+      onClick={handleSetUser}
+    >
+      {cell.getValue()}
+    </div>
+  )
+}
+
+const TableAccessLevelCell: FC<{ cell: CellContext<User, number> }> = ({
+  cell
+}) => {
+  const accessLevels = useStore($accessLevels)
+  if (!accessLevels) {
+    return null
+  }
+
+  return (
+    <span className='badge badge-outline badge-info badge-sm rounded-full font-mono uppercase'>
+      {accessLevels.find((l) => l.id === cell.getValue())?.description}
+    </span>
+  )
+}
+
+const TablePhoneNumCell: FC<{ cell: CellContext<User, string | null> }> = ({
+  cell
+}) => {
+  return (
+    <div className='flex items-center gap-1'>
+      <span>{cell.getValue()}</span>
+      <span className='btn btn-ghost btn-xs' role='button'>
+        <CopyIcon />
+      </span>
+      <span className='btn btn-ghost btn-xs' role='button'>
+        <WhatsappIcon />
+      </span>
+    </div>
   )
 }
