@@ -114,6 +114,9 @@ const SignupRC: FC<SignupRCProps> = ({ first }) => {
       {/* by default, access level is 2 = User */}
       <input type='hidden' name='accessLevel' value={first ? 4 : 2} />
 
+      {/* by default, access level is 2 = User */}
+      <input type='hidden' name='createMode' value='true' />
+
       <div className='mt-6 flex flex-col gap-2'>
         <input
           className='btn btn-primary'

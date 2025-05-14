@@ -1,12 +1,14 @@
 import { db } from '../db'
-import { eq } from 'drizzle-orm'
 import { settingsTable, menuTable } from '../schema/site'
+import { eq } from 'drizzle-orm'
 
 export const getSettings = async () => {
+  const getSettingsSQL = db.select().from(settingsTable).prepare()
   return await getSettingsSQL.execute()
 }
 
 export const getMenu = async () => {
+  const getMenuSQL = db.select().from(menuTable).prepare()
   return await getMenuSQL.execute()
 }
 
@@ -45,15 +47,5 @@ export const updateSettings = async ({
       .where(eq(settingsTable.property, 'SITE_LOGO'))
   })
 
-  return await getSettingsSQL.execute()
+  return await getSettings()
 }
-
-// prepared SQLs
-
-const getSettingsSQL = db.select().from(settingsTable).prepare()
-
-const getMenuSQL = db.select().from(menuTable).prepare()
-
-// types
-
-export type UpdateSettingsArgs = Parameters<typeof updateSettings>[number]

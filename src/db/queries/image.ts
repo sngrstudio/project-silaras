@@ -1,8 +1,18 @@
-import { eq, sql } from 'drizzle-orm'
 import { db } from '../db'
 import { presignedImageTable } from '../schema/image'
+import { eq, sql } from 'drizzle-orm'
 
 export const getPresignedImage = async (fileName: string) => {
+  const getPresignedImageSQL = db
+    .select({
+      presignedUrl: presignedImageTable.presignedUrl,
+      expiresAt: presignedImageTable.expiresAt
+    })
+    .from(presignedImageTable)
+    .where(eq(presignedImageTable.fileName, sql.placeholder('fileName')))
+    .limit(1)
+    .prepare()
+
   const [image] = await getPresignedImageSQL.execute({ fileName })
 
   return image
@@ -47,15 +57,3 @@ export const deletePresignedImage = async (fileName: string) => {
 
   await deletePresignedImageSQL.execute()
 }
-
-// Prepared SQLs
-
-const getPresignedImageSQL = db
-  .select({
-    presignedUrl: presignedImageTable.presignedUrl,
-    expiresAt: presignedImageTable.expiresAt
-  })
-  .from(presignedImageTable)
-  .where(eq(presignedImageTable.fileName, sql.placeholder('fileName')))
-  .limit(1)
-  .prepare()

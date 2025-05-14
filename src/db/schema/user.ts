@@ -17,7 +17,7 @@ export const userTable = mysqlTable('user', {
   accessLevel: int('access_level')
     .notNull()
     .references(() => accessLevelMapTable.id),
-  passwordHash: varchar('password_hash', { length: 255 }).notNull()
+  passwordHash: varchar('password_hash', { length: 255 })
 })
 
 export const sessionTable = mysqlTable('session', {

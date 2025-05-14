@@ -30,7 +30,7 @@ const ProfileForm: FC = () => {
   const [formChanged, setFormChanged] = useState(false)
 
   const updateUser = async (_: any, formData: FormData) => {
-    const { data, error } = await actions.user.update(formData)
+    const { data, error } = await actions.user.create(formData)
     if (error && !data) {
       if (isInputError(error)) {
         return error
@@ -93,7 +93,7 @@ const ProfileForm: FC = () => {
 
       <FormLabel label='Username'>
         <input
-          name='userName'
+          name='userNameReadonly'
           className='input input-lg w-full'
           type='text'
           value={user.userName}
@@ -106,7 +106,7 @@ const ProfileForm: FC = () => {
 
       <FormLabel label='Hak Akses'>
         <input
-          name='accessLevel'
+          name='accessLevelReadonly'
           className='input input-lg w-full'
           type='text'
           value={
@@ -163,7 +163,8 @@ const ProfileForm: FC = () => {
         />
       )}
 
-      <input name='requestedBy' type='hidden' value={user.userName} />
+      <input name='userName' type='hidden' value={user.userName} />
+      <input name='accessLevel' type='hidden' value={user.accessLevel} />
 
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button
