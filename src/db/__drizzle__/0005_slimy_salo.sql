@@ -1,0 +1,1 @@
+ALTER TABLE `region_on_watch` MODIFY COLUMN `userId` varchar(255);

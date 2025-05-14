@@ -36,9 +36,7 @@ export const regionOnWatchTable = mysqlTable(
     regionId: varchar({ length: 255 })
       .notNull()
       .references(() => regionTable.id, { onDelete: 'cascade' }),
-    userId: varchar({ length: 255 })
-      .notNull()
-      .references(() => userProfileTable.userId)
+    userId: varchar({ length: 255 }).references(() => userProfileTable.userId)
   },
   (t) => [primaryKey({ columns: [t.regionId] })]
 )
@@ -50,6 +48,8 @@ export const regionOnWatchView = mysqlView('region_on_watch_view').as((qb) =>
       userId: userProfileTable.userId,
       regionName: regionTable.name,
       regionCode: regionTable.code,
+      regionType: regionTable.type,
+      regionParentId: regionTable.parentId,
       handler: userProfileTable.fullName,
       phone: userProfileTable.phoneNumber
     })

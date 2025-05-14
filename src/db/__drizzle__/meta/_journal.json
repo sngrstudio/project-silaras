@@ -36,6 +36,20 @@
       "when": 1747195665119,
       "tag": "0004_silent_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1747236232277,
+      "tag": "0005_slimy_salo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1747236782055,
+      "tag": "0006_gifted_the_stranger",
+      "breakpoints": true
     }
   ]
 }

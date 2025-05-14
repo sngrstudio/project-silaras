@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { regionTable } from '../schema/region'
+import { regionTable, regionOnWatchTable } from '../schema/region'
 import { type InferInsertModel } from 'drizzle-orm'
 import regions from './data/regions.json' assert { type: 'json' }
 import { eq } from 'drizzle-orm'
@@ -44,7 +44,13 @@ export const seedRegions = async () => {
             return region
           })
 
-        await tx.insert(regionTable).values(subdistrictsData)
+        const result = await tx
+          .insert(regionTable)
+          .values(subdistrictsData)
+          .$returningId()
+        await tx
+          .insert(regionOnWatchTable)
+          .values(result.map((r) => ({ regionId: r.id })))
       })
     )
 
@@ -70,7 +76,13 @@ export const seedRegions = async () => {
             return region
           })
 
-        await tx.insert(regionTable).values(villagesData)
+        const result = await tx
+          .insert(regionTable)
+          .values(villagesData)
+          .$returningId()
+        await tx
+          .insert(regionOnWatchTable)
+          .values(result.map((r) => ({ regionId: r.id })))
       })
     )
   })
