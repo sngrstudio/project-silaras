@@ -5,7 +5,7 @@ const CardTemplate: FC<PropsWithChildren<{ title?: string | undefined }>> = ({
   children
 }) => {
   return (
-    <div className='card border-base-300 border shadow'>
+    <div className='card card-sm lg:card-md border-base-300 border shadow'>
       <div className='card-body'>
         {title && <h2 className='card-title mb-6'>{title}</h2>}
         {children}

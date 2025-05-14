@@ -1,16 +1,28 @@
 import {
   type FC,
   type ImgHTMLAttributes,
+  type CSSProperties,
+  useTransition,
   useActionState,
   useEffect
 } from 'react'
 import { actions } from 'astro:actions'
+import clsx from 'clsx/lite'
 
 interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   src: string
 }
 
-const Image: FC<ImageProps> = ({ src, width, height, alt, ...props }) => {
+const Image: FC<ImageProps> = ({
+  src,
+  width,
+  height,
+  alt,
+  className,
+  ...props
+}) => {
+  const [isTransitioning, startTransition] = useTransition()
+
   const handleTransformImage = async (
     _prevState: unknown,
     image: Pick<ImageProps, 'src' | 'width' | 'height'>
@@ -30,10 +42,12 @@ const Image: FC<ImageProps> = ({ src, width, height, alt, ...props }) => {
   )
 
   useEffect(() => {
-    actionDispatch({ src, width, height })
+    startTransition(() => {
+      actionDispatch({ src, width, height })
+    })
   }, [src])
 
-  if (isPending || !image) {
+  if (isPending || isTransitioning || !image) {
     return <></>
   }
 
@@ -44,6 +58,13 @@ const Image: FC<ImageProps> = ({ src, width, height, alt, ...props }) => {
       srcSet={image.srcSet.attribute}
       {...props}
       {...image.attributes}
+      className={clsx('h-(--h) w-(--w)', className)}
+      style={
+        {
+          '--w': `${image.options.width}px`,
+          '--h': `${image.options.height}px`
+        } as CSSProperties
+      }
     />
   )
 }

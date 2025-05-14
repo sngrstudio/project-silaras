@@ -139,29 +139,30 @@ const ProfileForm: FC = () => {
       </FormLabel>
 
       <FormLabel label='Foto Profil'>
-        <input
-          name='profilePhoto'
-          className='file-input file-input-lg w-full'
-          type='file'
-          accept='image/*'
-          disabled={isPending || showToast}
-          onChange={handleFormChange}
-        />
+        <div className='flex w-full flex-col items-center gap-4 md:flex-row'>
+          <div className='avatar'>
+            <div className='mask h-[120px] w-[120px] mask-circle md:h-[80px] md:w-[80px]'>
+              {user.profilePhoto && (
+                <Image src={user.profilePhoto} width={120} height={120} />
+              )}
+            </div>
+          </div>
+          <input
+            name='profilePhoto'
+            className='file-input file-input-lg w-full'
+            type='file'
+            accept='image/*'
+            disabled={isPending || showToast}
+            onChange={handleFormChange}
+          />
+        </div>
+
         {error && error.fields.profilePhoto && (
           <span className='text-error'>
             {error.fields.profilePhoto.join(' | ')}
           </span>
         )}
       </FormLabel>
-
-      {user.profilePhoto && (
-        <Image
-          className='h-[180px] w-[180px]'
-          src={user.profilePhoto}
-          width={180}
-          height={180}
-        />
-      )}
 
       <input name='userName' type='hidden' value={user.userName} />
       <input name='accessLevel' type='hidden' value={user.accessLevel} />

@@ -105,27 +105,26 @@ const ProfileForm: FC = () => {
       </FormLabel>
 
       <FormLabel label='Logo Situs'>
-        <input
-          name='logo'
-          className='file-input file-input-lg w-full'
-          type='file'
-          accept='image/*'
-          disabled={isPending || showToast}
-          onChange={handleFormChange}
-        />
+        <div className='flex w-full flex-col items-center gap-4 md:flex-row'>
+          <div className='avatar'>
+            <div className='mask mask-mask-squircle h-[120px] w-[120px] border md:h-[80px] md:w-[80px]'>
+              {site.logo && <Image src={site.logo} width={120} height={120} />}
+            </div>
+          </div>
+          <input
+            name='logo'
+            className='file-input file-input-lg w-full'
+            type='file'
+            accept='image/*'
+            disabled={isPending || showToast}
+            onChange={handleFormChange}
+          />
+        </div>
+
         {error && error.fields.logo && (
           <span className='text-error'>{error.fields.logo.join(' | ')}</span>
         )}
       </FormLabel>
-
-      {site.logo && (
-        <Image
-          className='h-[180px] w-[180px]'
-          src={site.logo}
-          width={180}
-          height={180}
-        />
-      )}
 
       <div className='mt-6 flex flex-row-reverse gap-4'>
         <button

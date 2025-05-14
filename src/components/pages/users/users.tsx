@@ -4,14 +4,15 @@ import {
   type MouseEventHandler,
   useActionState,
   useState,
-  useRef
+  useRef,
+  useEffect
 } from 'react'
 import CardTemplate from '../../common/card/card'
 import LoadingCard from '../../common/card/loading'
 import TableTemplate from '~/components/common/table/table'
 import { FormLabel } from '../../common/form/form'
 import Image from '../../common/image/image'
-import { Dialog } from 'radix-ui'
+import { Dialog, ScrollArea } from 'radix-ui'
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -55,7 +56,7 @@ const UsersTable: FC = () => {
   }
 
   const columnHelper = createColumnHelper<User>()
-  const columns = [
+  const desktopColumns = [
     columnHelper.accessor('fullName', {
       header: 'Nama',
       cell: (cell) => <TableFullNameCell cell={cell} />
@@ -72,23 +73,47 @@ const UsersTable: FC = () => {
     })
   ]
 
-  return <UsersTableRenderer columns={columns} data={data} />
+  const mobileColumns = [
+    columnHelper.accessor('fullName', {
+      header: () => <></>,
+      cell: (cell) => <TableMobileCell cell={cell} />
+    })
+  ]
+
+  return (
+    <UsersTableRenderer
+      desktopColumns={desktopColumns}
+      mobileColumns={mobileColumns}
+      data={data}
+    />
+  )
 }
 
 const UsersTableRenderer: FC<{
-  columns: Array<ColumnDef<User, any>>
+  desktopColumns: Array<ColumnDef<User, any>>
+  mobileColumns: Array<ColumnDef<User, any>>
   data: Array<User>
-}> = ({ columns, data }) => {
-  const table = useReactTable({
-    columns,
+}> = ({ desktopColumns, mobileColumns, data }) => {
+  const desktopTable = useReactTable({
+    columns: desktopColumns,
+    data,
+    getCoreRowModel: getCoreRowModel()
+  })
+
+  const mobileTable = useReactTable({
+    columns: mobileColumns,
     data,
     getCoreRowModel: getCoreRowModel()
   })
 
   return (
     <>
-      <TableTemplate table={table} className='table-fixed max-lg:hidden' />
-      <div className='mt-6 flex flex-row-reverse'>
+      <TableTemplate table={mobileTable} className='table-auto md:hidden' />
+      <TableTemplate
+        table={desktopTable}
+        className='table-auto max-md:hidden'
+      />
+      <div className='mt-6 flex flex-col-reverse lg:flex-row-reverse'>
         <UserDialogBox>
           <UserDialog />
         </UserDialogBox>
@@ -144,6 +169,20 @@ const UserDialog: FC = () => {
   const accessLevels = useStore($accessLevels)
   const showToast = useStore($showToast)
   const createMode = useStore($createMode)
+  const [isSelf, setIsSelf] = useState<boolean>(false)
+
+  const handleSelf = async () => {
+    const state = user
+      ? await actions.user.checks.isSelf.orThrow({
+          userName: user.userName
+        })
+      : false
+    setIsSelf(state)
+  }
+
+  useEffect(() => {
+    handleSelf()
+  }, [user])
 
   if (!user) {
     return <></>
@@ -157,6 +196,9 @@ const UserDialog: FC = () => {
       setCreateMode(undefined)
       setUser(undefined)
       setFormChanged(false)
+      setToastMessage({
+        message: 'Berhasil menghapus user.'
+      })
     })
   }
 
@@ -217,11 +259,12 @@ const UserDialog: FC = () => {
         <select
           name='accessLevel'
           className='select select-lg w-full'
+          defaultValue={user.accessLevel}
           disabled={isPending || showToast || !accessLevels}
         >
           {accessLevels ? (
             accessLevels.map((lv) => (
-              <option value={lv.id} selected={lv.id === user.accessLevel}>
+              <option value={lv.id} key={lv.id}>
                 {lv.description}
               </option>
             ))
@@ -253,15 +296,20 @@ const UserDialog: FC = () => {
       </FormLabel>
 
       <FormLabel label='Foto Profil'>
-        <div className='flex w-full items-center gap-2'>
-          {user.profilePhoto && (
-            <Image
-              className='h-[120px] w-[120px]'
-              src={user.profilePhoto}
-              width={120}
-              height={120}
-            />
-          )}
+        <div className='flex w-full flex-col items-center gap-4 md:flex-row'>
+          <div className='avatar'>
+            <div className='mask h-[120px] w-[120px] mask-circle md:h-[80px] md:w-[80px]'>
+              {user.profilePhoto && (
+                <Image
+                  className='object-cover'
+                  src={user.profilePhoto}
+                  width={120}
+                  height={120}
+                />
+              )}
+            </div>
+          </div>
+
           <input
             name='profilePhoto'
             className='file-input file-input-lg flex-1'
@@ -282,7 +330,7 @@ const UserDialog: FC = () => {
         <input name='userName' type='hidden' value={user.userName} />
       )}
 
-      <div className='mt-6 flex flex-row-reverse gap-4'>
+      <div className='mt-6 flex flex-col-reverse gap-4 lg:flex-row-reverse'>
         <button
           className='btn btn-primary flex items-center gap-2'
           type='submit'
@@ -302,19 +350,19 @@ const UserDialog: FC = () => {
 
         {createMode ? (
           <button
-            className='btn mr-auto flex items-center gap-2'
+            className='btn flex items-center gap-2 lg:mr-auto'
             disabled={isPending || showToast}
             onClick={() => {
               setCreateMode(undefined)
               setUser(undefined)
             }}
           >
-            <span>Tutup</span>
+            <span>Batalkan</span>
           </button>
         ) : (
           <button
-            className='btn btn-error mr-auto flex items-center gap-2'
-            disabled={isPending || showToast}
+            className='btn btn-link btn-error dark:btn-neutral flex items-center gap-2 lg:mr-auto'
+            disabled={isPending || showToast || isSelf}
             onClick={handleDelete}
           >
             <span>Hapus</span>
@@ -327,6 +375,7 @@ const UserDialog: FC = () => {
 
 const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
   const openDialog = useStore($openDialog)
+  const createMode = useStore($createMode)
 
   const handleDialog = () => {
     if (!openDialog) {
@@ -354,8 +403,18 @@ const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className='bg-neutral/20 fixed inset-0 z-[998] cursor-pointer'></Dialog.Overlay>
-        <Dialog.Content className='bg-base-100 card lg:card-lg fixed top-[50%] left-[50%] z-[999] translate-[-50%] shadow lg:w-[50vw]'>
-          <div className='card-body'>{children}</div>
+        <Dialog.Content className='bg-base-100 card lg:card-lg fixed top-[10%] z-[999] h-[90vh] w-screen md:top-[50%] md:left-[50%] md:w-[80vw] md:translate-[-50%] md:shadow lg:w-[60vw]'>
+          <ScrollArea.Root className='card-body max-h-full max-md:pb-0'>
+            <ScrollArea.Viewport className='h-full px-1 pb-12'>
+              <Dialog.Title className='card-title mb-6'>
+                {createMode ? 'Tambah Pengguna' : 'Edit Pengguna'}
+              </Dialog.Title>
+              {children}
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar>
+              <ScrollArea.Thumb></ScrollArea.Thumb>
+            </ScrollArea.Scrollbar>
+          </ScrollArea.Root>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -369,12 +428,26 @@ const TableFullNameCell: FC<{ cell: CellContext<User, string> }> = ({
     setUser(cell.row.original)
   }
   return (
-    <div
-      className='btn btn-link pl-0 text-left'
-      role='button'
-      onClick={handleSetUser}
-    >
-      {cell.getValue()}
+    <div className='flex items-center gap-2'>
+      <div className='avatar'>
+        <div className='mask h-[25px] w-[25px] mask-circle'>
+          {cell.row.original.profilePhoto && (
+            <Image
+              src={cell.row.original.profilePhoto}
+              width={25}
+              height={25}
+            />
+          )}
+        </div>
+      </div>
+
+      <span
+        className='btn btn-link pl-0 text-left'
+        role='button'
+        onClick={handleSetUser}
+      >
+        {cell.getValue()}
+      </span>
     </div>
   )
 }
@@ -397,15 +470,75 @@ const TableAccessLevelCell: FC<{ cell: CellContext<User, number> }> = ({
 const TablePhoneNumCell: FC<{ cell: CellContext<User, string | null> }> = ({
   cell
 }) => {
+  const phoneNumber = cell.getValue()
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(phoneNumber || '')
+    setToastMessage({ message: 'Nomor telepon sudah dicopy!' })
+  }
+
+  const handleWhatsApp = () => {
+    if (phoneNumber) {
+      let whatsAppNumber
+      if (phoneNumber.startsWith('0')) {
+        whatsAppNumber = '62' + phoneNumber.slice(1)
+      }
+      const whatsappUrl = `https://wa.me/${whatsAppNumber}`
+      window.open(whatsappUrl, '_blank')
+    }
+  }
+
   return (
     <div className='flex items-center gap-1'>
-      <span>{cell.getValue()}</span>
-      <span className='btn btn-ghost btn-xs' role='button'>
+      <span>{phoneNumber}</span>
+      <span className='btn btn-ghost btn-xs' role='button' onClick={handleCopy}>
         <CopyIcon />
       </span>
-      <span className='btn btn-ghost btn-xs' role='button'>
+      <span
+        className='btn btn-ghost btn-xs'
+        role='button'
+        onClick={handleWhatsApp}
+      >
         <WhatsappIcon />
       </span>
+    </div>
+  )
+}
+
+const TableMobileCell: FC<{ cell: CellContext<User, string> }> = ({ cell }) => {
+  const accessLevels = useStore($accessLevels)
+
+  const handleSetUser = () => {
+    setUser(cell.row.original)
+  }
+
+  return (
+    <div
+      className='flex cursor-pointer items-start gap-3'
+      role='button'
+      onClick={handleSetUser}
+    >
+      <div className='avatar'>
+        <div className='mask h-[65px] w-[65px] mask-circle'>
+          {cell.row.original.profilePhoto && (
+            <Image
+              src={cell.row.original.profilePhoto}
+              width={65}
+              height={65}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className='flex flex-col items-start gap-1'>
+        <span className='text-lg font-bold'>{cell.getValue()}</span>
+        <span className='badge badge-outline badge-info badge-sm rounded-full font-mono uppercase'>
+          {accessLevels &&
+            accessLevels.find((l) => l.id === cell.row.original.accessLevel)
+              ?.description}
+        </span>
+        <span className='text-sm'>{cell.row.original.phoneNumber}</span>
+      </div>
     </div>
   )
 }

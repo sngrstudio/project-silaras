@@ -229,6 +229,21 @@ const user = {
           return false
         }
       }
+    }),
+
+    isSelf: defineAction({
+      input: z.object({
+        userName: z.string()
+      }),
+      handler: async (input, ctx) => {
+        const localUser = ctx.locals.user
+
+        if (localUser && localUser.userName === input.userName) {
+          return true
+        } else {
+          return false
+        }
+      }
     })
   }
 }
