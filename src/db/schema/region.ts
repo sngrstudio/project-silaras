@@ -8,7 +8,7 @@ import {
   mysqlEnum
 } from 'drizzle-orm/mysql-core'
 import { userProfileTable } from './user'
-import { eq } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 
 export const regionTable = mysqlTable(
   'region',
@@ -59,4 +59,5 @@ export const regionOnWatchView = mysqlView('region_on_watch_view').as((qb) =>
       userProfileTable,
       eq(userProfileTable.userId, regionOnWatchTable.userId)
     )
+    .orderBy(regionTable.type, regionTable.name)
 )

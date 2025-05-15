@@ -71,6 +71,13 @@
       "when": 1747287153908,
       "tag": "0009_cuddly_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1747297651842,
+      "tag": "0010_noisy_roland_deschain",
+      "breakpoints": true
     }
   ]
 }
