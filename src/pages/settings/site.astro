@@ -6,6 +6,10 @@ if (!Astro.locals.session || !Astro.locals.user) {
   return Astro.redirect('/user/login')
 }
 
+if (Astro.locals.user.accessLevel < 4) {
+  return Astro.redirect('/')
+}
+
 const props = {
   title: 'Pengaturan Situs',
   description: 'Edit dan ubah pengaturan situs.'
@@ -13,7 +17,7 @@ const props = {
 ---
 
 <DashboardLayout {...props}>
-  <SettingsSiteRC client:idle />
+  <SettingsSiteRC client:idle transition-name='settings' />
 </DashboardLayout>
 
 <script>

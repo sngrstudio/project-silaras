@@ -1,4 +1,5 @@
 import { mysqlTable, varchar, text, int } from 'drizzle-orm/mysql-core'
+import { accessLevelMapTable } from './user'
 
 export const settingsTable = mysqlTable('settings', {
   property: varchar({
@@ -12,5 +13,6 @@ export const menuTable = mysqlTable('menu', {
   id: int().autoincrement().primaryKey(),
   label: text().notNull(),
   path: text().notNull(),
-  category: text({ enum: ['Administrasi', 'Pengguna'] })
+  category: text({ enum: ['Administrasi', 'Pengguna'] }),
+  accessLevel: int('access_level').references(() => accessLevelMapTable.id)
 })

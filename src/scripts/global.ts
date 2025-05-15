@@ -1,13 +1,7 @@
 import { onMount, task } from 'nanostores'
-import {
-  $settings,
-  setSettings,
-  $menu,
-  setMenu,
-  $openDrawer,
-  setOpenDrawer
-} from '~/components/layout/dashboard/store'
+import { $settings, setSettings } from '~/components/layout/dashboard/store'
 import { $toastMessage, setToastMessage } from '~/components/layout/toast/store'
+import { $user, setUser } from '~/components/pages/profile/store'
 import { actions } from 'astro:actions'
 
 onMount($settings, () => {
@@ -21,25 +15,20 @@ onMount($settings, () => {
   }
 })
 
-onMount($menu, () => {
-  task(async () => {
-    const state = await actions.settings.menu.get.orThrow()
-    setMenu(state)
-  })
-
-  return () => {
-    setMenu(undefined)
-  }
-})
-
 onMount($toastMessage, () => {
   return () => {
     setToastMessage(undefined)
   }
 })
 
-onMount($openDrawer, () => {
+onMount($user, () => {
+  task(async () => {
+    const state = await actions.user.getCurrent.orThrow()
+    console.log(state)
+    setUser(state)
+  })
+
   return () => {
-    setOpenDrawer(undefined)
+    setUser(undefined)
   }
 })

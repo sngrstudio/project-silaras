@@ -34,6 +34,7 @@ import {
 import { $accessLevels } from '../profile/store'
 import { $showToast, setToastMessage } from '~/components/layout/toast/store'
 import { actions, isInputError } from 'astro:actions'
+import { clsx } from 'clsx/lite'
 import CopyIcon from '~icons/lucide/copy'
 import WhatsappIcon from '~icons/simple-icons/whatsapp'
 import SaveIcon from '~icons/lucide/save'
@@ -69,7 +70,8 @@ const UsersTable: FC = () => {
     }),
     columnHelper.accessor('phoneNumber', {
       header: 'No. Telepon',
-      cell: (cell) => <TablePhoneNumCell cell={cell} />
+      cell: (cell) =>
+        cell.getValue() ? <TablePhoneNumCell cell={cell} /> : null
     })
   ]
 
@@ -252,6 +254,8 @@ const UserDialog: FC = () => {
               disabled={isPending || showToast || !createMode}
             />
           </FormLabel>
+
+          <input type='hidden' name='createMode' value='true' />
         </>
       )}
 
@@ -330,7 +334,7 @@ const UserDialog: FC = () => {
         <input name='userName' type='hidden' value={user.userName} />
       )}
 
-      <div className='mt-6 flex flex-col-reverse gap-4 lg:flex-row-reverse'>
+      <div className='mt-6 flex flex-col-reverse gap-4 md:mt-auto md:flex-row-reverse'>
         <button
           className='btn btn-primary flex items-center gap-2'
           type='submit'
@@ -424,19 +428,29 @@ const UserDialogBox: FC<PropsWithChildren> = ({ children }) => {
 const TableFullNameCell: FC<{ cell: CellContext<User, string> }> = ({
   cell
 }) => {
+  const name = cell.getValue()
   const handleSetUser = () => {
     setUser(cell.row.original)
   }
   return (
     <div className='flex items-center gap-2'>
-      <div className='avatar'>
-        <div className='mask h-[25px] w-[25px] mask-circle'>
-          {cell.row.original.profilePhoto && (
+      <div
+        className={clsx(
+          'avatar',
+          !cell.row.original.profilePhoto && 'avatar-placeholder'
+        )}
+      >
+        <div className='mask bg-secondary h-[25px] w-[25px] mask-circle'>
+          {cell.row.original.profilePhoto ? (
             <Image
               src={cell.row.original.profilePhoto}
               width={25}
               height={25}
             />
+          ) : (
+            <span className='text-secondary-content text-xs uppercase'>
+              {name.slice(0, 2)}
+            </span>
           )}
         </div>
       </div>
@@ -446,7 +460,7 @@ const TableFullNameCell: FC<{ cell: CellContext<User, string> }> = ({
         role='button'
         onClick={handleSetUser}
       >
-        {cell.getValue()}
+        {name}
       </span>
     </div>
   )
@@ -461,7 +475,7 @@ const TableAccessLevelCell: FC<{ cell: CellContext<User, number> }> = ({
   }
 
   return (
-    <span className='badge badge-outline badge-info badge-sm rounded-full font-mono uppercase'>
+    <span className='badge badge-outline badge-primary badge-sm rounded-full font-mono uppercase'>
       {accessLevels.find((l) => l.id === cell.getValue())?.description}
     </span>
   )
@@ -532,7 +546,7 @@ const TableMobileCell: FC<{ cell: CellContext<User, string> }> = ({ cell }) => {
 
       <div className='flex flex-col items-start gap-1'>
         <span className='text-lg font-bold'>{cell.getValue()}</span>
-        <span className='badge badge-outline badge-info badge-sm rounded-full font-mono uppercase'>
+        <span className='badge badge-outline badge-primary badge-sm rounded-full font-mono uppercase'>
           {accessLevels &&
             accessLevels.find((l) => l.id === cell.row.original.accessLevel)
               ?.description}

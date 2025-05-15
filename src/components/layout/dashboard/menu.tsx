@@ -4,13 +4,15 @@ import { useStore } from '@nanostores/react'
 import { $menu } from './store'
 import { actions } from 'astro:actions'
 import { $showToast, setToastMessage } from '../toast/store'
+import { $user } from '~/components/pages/profile/store'
 import { navigate } from 'astro:transitions/client'
 
 const MainMenuRC: FC = () => {
   const menu = useStore($menu)
   const showToast = useStore($showToast)
+  const user = useStore($user)
 
-  if (!menu) {
+  if (!menu || !user) {
     return (
       <div className='bg-base-200 grid h-[calc(100vh-4rem)] w-[320px] place-content-center p-4 lg:w-[240px]'>
         <div className='loading loading-dots text-base-content/20'></div>
@@ -50,20 +52,38 @@ const MainMenuRC: FC = () => {
           </Nav.Item>
         ))}
 
-        <Nav.Item className='menu-title mt-4 uppercase'>
-          Menu Administrasi
-        </Nav.Item>
+        {adminMenu.some(
+          (item) => (item.accessLevel || 1) <= user.accessLevel
+        ) && (
+          <Nav.Item className='menu-title mt-4 uppercase'>
+            Menu Administrasi
+          </Nav.Item>
+        )}
         {adminMenu.map((item) => (
-          <Nav.Item key={item.id}>
+          <Nav.Item
+            className='data-[hidden=true]:hidden'
+            key={item.id}
+            data-hidden={(item.accessLevel || 1) > user.accessLevel}
+          >
             <Nav.Link asChild>
               <a href={item.path}>{item.label}</a>
             </Nav.Link>
           </Nav.Item>
         ))}
 
-        <Nav.Item className='menu-title mt-4 uppercase'>Menu Pengguna</Nav.Item>
+        {userMenu.some(
+          (item) => (item.accessLevel || 1) <= user.accessLevel
+        ) && (
+          <Nav.Item className='menu-title mt-auto uppercase'>
+            Menu Pengguna
+          </Nav.Item>
+        )}
         {userMenu.map((item) => (
-          <Nav.Item key={item.id}>
+          <Nav.Item
+            className='data-[hidden=true]:hidden'
+            key={item.id}
+            data-hidden={(item.accessLevel || 1) > user.accessLevel}
+          >
             <Nav.Link asChild>
               <a href={item.path}>{item.label}</a>
             </Nav.Link>

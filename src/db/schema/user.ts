@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm'
 import {
   mysqlTable,
   mysqlView,
@@ -8,6 +7,7 @@ import {
   datetime,
   text
 } from 'drizzle-orm/mysql-core'
+import { eq, desc } from 'drizzle-orm'
 
 export const userTable = mysqlTable('user', {
   id: varchar({ length: 255 })
@@ -64,4 +64,5 @@ export const userView = mysqlView('user_view').as((qb) => {
     })
     .from(userTable)
     .innerJoin(userProfileTable, eq(userProfileTable.userId, userTable.id))
+    .orderBy(desc(userTable.accessLevel), userProfileTable.fullName)
 })

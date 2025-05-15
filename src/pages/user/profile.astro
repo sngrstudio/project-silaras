@@ -13,30 +13,16 @@ const props = {
 ---
 
 <DashboardLayout {...props}>
-  <ProfileRC client:idle />
+  <ProfileRC client:idle transition-name='profile' />
 </DashboardLayout>
 
 <script>
   import { onMount, task } from 'nanostores'
   import {
-    $user,
-    setUser,
     $accessLevels,
     setAccessLevels
   } from '~/components/pages/profile/store'
   import { actions } from 'astro:actions'
-
-  onMount($user, () => {
-    task(async () => {
-      const state = await actions.user.getCurrent.orThrow()
-      console.log(state)
-      setUser(state)
-    })
-
-    return () => {
-      setUser(undefined)
-    }
-  })
 
   onMount($accessLevels, () => {
     task(async () => {

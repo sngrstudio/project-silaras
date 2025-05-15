@@ -85,7 +85,7 @@ const LoginRC: FC<LoginRCProps> = ({ username }) => {
           value='Login'
           disabled={isPending}
         />
-        <a className='btn btn-link' href='/user/login'>
+        <a className='btn btn-link' href='/user/signup'>
           Buat akun
         </a>
       </div>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './_base.astro'
 import Meta, { type Props as MProps } from './_meta.astro'
+import { ClientRouter } from 'astro:transitions'
 import '~/styles/global.css'
 
 export interface Props extends MProps {}
@@ -16,8 +17,11 @@ const { title, description } = Astro.props
   <Fragment slot='head'>
     <Meta title={title} description={description} />
     <slot name='head' />
+    <ClientRouter />
   </Fragment>
 </BaseLayout>
+
+{import.meta.env.DEV && <script>import '~/scripts/react-scan'</script>}
 
 <script>
   import '~/scripts/global'

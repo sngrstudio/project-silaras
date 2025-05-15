@@ -12,7 +12,7 @@ const { ...props } = Astro.props
 <Layout {...props}>
   {/* <body /> */}
   <ToastRC client:idle>
-    <NavbarRC client:load />
+    <NavbarRC client:load transition:persist='navbar' />
     <DrawerRC client:load>
       {
         props.title && (
@@ -31,3 +31,31 @@ const { ...props } = Astro.props
     <slot name='head' />
   </Fragment>
 </Layout>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $menu,
+    setMenu,
+    $openDrawer,
+    setOpenDrawer
+  } from '~/components/layout/dashboard/store'
+  import { actions } from 'astro:actions'
+
+  onMount($menu, () => {
+    task(async () => {
+      const state = await actions.settings.menu.get.orThrow()
+      setMenu(state)
+    })
+
+    return () => {
+      setMenu(undefined)
+    }
+  })
+
+  onMount($openDrawer, () => {
+    return () => {
+      setOpenDrawer(undefined)
+    }
+  })
+</script>

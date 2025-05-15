@@ -20,5 +20,5 @@ const username = Astro.url.searchParams.get('user') ?? undefined
 ---
 
 <UserLayout {...props}>
-  <LoginRC username={username} client:load />
+  <LoginRC username={username} client:load transition:persist='login' />
 </UserLayout>

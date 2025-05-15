@@ -15,5 +15,5 @@ const first = !!Astro.url.searchParams.get('first')
 ---
 
 <UserLayout {...props}>
-  <SignupRC first={first} client:load />
+  <SignupRC first={first} client:load transition:persist='signup' />
 </UserLayout>

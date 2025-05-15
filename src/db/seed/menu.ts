@@ -1,38 +1,11 @@
 import { db } from '../db'
 import { menuTable } from '../schema/site'
-import { type InferInsertModel } from 'drizzle-orm'
+import initialMenu from './data/menu.json' assert { type: 'json' }
 
-type InsertMenu = InferInsertModel<typeof menuTable>
-
-const initialMenu = [
-  {
-    label: 'Beranda',
-    path: '/'
-  },
-  {
-    label: 'Profil Pengguna',
-    path: '/user/profile',
-    category: 'Pengguna'
-  },
-  {
-    label: 'Pengaturan Situs',
-    path: '/settings/site',
-    category: 'Administrasi'
-  },
-  {
-    label: 'Pengaturan Pengguna',
-    path: '/settings/users',
-    category: 'Administrasi'
-  },
-  {
-    label: 'Pengaturan Daerah',
-    path: '/settings/regions',
-    category: 'Administrasi'
-  }
-] satisfies Array<InsertMenu>
+type InsertMenuTable = Array<typeof menuTable.$inferInsert>
 
 const seedMenu = async () => {
-  await db.insert(menuTable).values(initialMenu)
+  await db.insert(menuTable).values(initialMenu as InsertMenuTable)
   console.log('Seeding menu completed!')
 }
 
