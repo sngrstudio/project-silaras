@@ -92,7 +92,7 @@ const RegionsTableRenderer: FC<{
 
   return (
     <>
-      <ListTemplate list={mobileTable} className='md:hidden -mx-4' />
+      <ListTemplate list={mobileTable} className='-mx-4 md:hidden' />
       <TableTemplate
         table={desktopTable}
         className='table-auto max-md:hidden'
