@@ -1,52 +1,43 @@
 services:
   db:
-    name: MariaDB
-    commands:
-      start: docker compose up db
-    triggeredBy:
-      - postEnvironmentStart
-
-  phpmyadmin:
-    name: phpMyAdmin
-    dependsOn:
-      - db
+    name: Database (MariaDB & PHPMyAdmin)
     commands:
       start: docker compose up phpmyadmin
+      stop: docker compose stop phpmyadmin
     triggeredBy:
       - postEnvironmentStart
-      - manual
 
   minio:
-    name: MinIO
+    name: Storage (MinIO)
     commands:
       start: docker compose up minio
+      stop: docker compose stop minio
     triggeredBy:
       - postEnvironmentStart
 
   server:
     name: Astro Dev Server
-    dependsOn:
-      - db
-      - minio
     commands:
       start: bun run dev --host=0.0.0.0
     triggeredBy:
-      - postEnvironmentStart
       - manual
 
   studio:
     name: Drizzle Studio
-    dependsOn:
-      - db
     commands:
       start: bun db:studio
     triggeredBy:
-      - postEnvironmentStart
       - manual
 
 tasks:
+  migrate:
+    name: Run DB migration
+    command: bun db:migrate
+    triggeredBy:
+      - manual
+
   seed:
-    name: Bun DB Seed
+    name: Run DB Seed
     command: bun db:seed
     triggeredBy:
       - manual
