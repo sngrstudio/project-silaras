@@ -10,11 +10,12 @@ export const seedRegions = async () => {
   await db.transaction(async (tx) => {
     const districtsData = regions
       .filter((reg) => reg.type === 'DISTRICT')
-      .map(({ name, code }) => {
+      .map(({ name, code, slug }) => {
         const region: InsertRegion = {
           type: 'DISTRICT',
           name,
-          code
+          code,
+          slug
         }
 
         return region
@@ -33,12 +34,13 @@ export const seedRegions = async () => {
             (reg) =>
               reg.type === 'SUBDISTRICT' && reg.parentCode === district.code
           )
-          .map(({ name, code }) => {
+          .map(({ name, code, slug }) => {
             const region: InsertRegion = {
               type: 'SUBDISTRICT',
               parentId: district.id,
               name,
-              code
+              code,
+              slug
             }
 
             return region
@@ -65,12 +67,13 @@ export const seedRegions = async () => {
             (reg) =>
               reg.type === 'VILLAGE' && reg.parentCode === subdistrict.code
           )
-          .map(({ name, code }) => {
+          .map(({ name, code, slug }) => {
             const region: InsertRegion = {
               type: 'VILLAGE',
               parentId: subdistrict.id,
               name,
-              code
+              code,
+              slug
             }
 
             return region

@@ -1,0 +1,3 @@
+CREATE OR REPLACE ALGORITHM = undefined
+SQL SECURITY definer
+VIEW `region_on_watch_view` AS (select `region`.`id`, `user_profile`.`user_id`, `region`.`name`, `region`.`code`, `region`.`slug`, `region`.`type`, `region`.`parentId`, `user_profile`.`full_name`, `user_profile`.`phone_number` from `region_on_watch` left join `region` on `region`.`id` = `region_on_watch`.`regionId` left join `user_profile` on `user_profile`.`user_id` = `region_on_watch`.`userId` order by `region`.`type`, `region`.`name`);

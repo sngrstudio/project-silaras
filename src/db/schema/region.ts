@@ -8,7 +8,7 @@ import {
   mysqlEnum
 } from 'drizzle-orm/mysql-core'
 import { userProfileTable } from './user'
-import { eq, desc } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 export const regionTable = mysqlTable(
   'region',
@@ -16,7 +16,8 @@ export const regionTable = mysqlTable(
     id: varchar({ length: 255 })
       .primaryKey()
       .$defaultFn(() => Bun.randomUUIDv7()),
-    code: varchar({ length: 255 }).unique(),
+    code: varchar({ length: 255 }).notNull().unique(),
+    slug: varchar({ length: 255 }).notNull(),
     name: text(),
     type: mysqlEnum(['DISTRICT', 'SUBDISTRICT', 'VILLAGE']).notNull(),
     parentId: varchar({ length: 255 })
@@ -48,6 +49,7 @@ export const regionOnWatchView = mysqlView('region_on_watch_view').as((qb) =>
       userId: userProfileTable.userId,
       regionName: regionTable.name,
       regionCode: regionTable.code,
+      regionSlug: regionTable.slug,
       regionType: regionTable.type,
       regionParentId: regionTable.parentId,
       handler: userProfileTable.fullName,

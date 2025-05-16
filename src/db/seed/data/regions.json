@@ -2,1217 +2,1420 @@
   {
     "code": "6202",
     "name": "Kotawaringin Timur",
+    "slug": "kotawaringin-timur-6202",
     "type": "DISTRICT"
   },
   {
     "code": "620201",
     "name": "Kota Besi",
+    "slug": "kota-besi-620201",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202012003",
     "name": "Palangan",
+    "slug": "palangan-6202012003",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012004",
     "name": "Hanjalipan",
+    "slug": "hanjalipan-6202012004",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012005",
     "name": "Simpur",
+    "slug": "simpur-6202012005",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012006",
     "name": "Pamalian",
+    "slug": "pamalian-6202012006",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012007",
     "name": "Camba",
+    "slug": "camba-6202012007",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012008",
     "name": "Kandan",
+    "slug": "kandan-6202012008",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202011009",
     "name": "Kota Besi Hulu",
+    "slug": "kota-besi-hulu-6202011009",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202011010",
     "name": "Kota Besi Hilir",
+    "slug": "kota-besi-hilir-6202011010",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012012",
     "name": "Bajarum",
+    "slug": "bajarum-6202012012",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012015",
     "name": "Rasau Tumbuh",
+    "slug": "rasau-tumbuh-6202012015",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "6202012017",
     "name": "Soren",
+    "slug": "soren-6202012017",
     "type": "VILLAGE",
     "parentCode": "620201"
   },
   {
     "code": "620202",
     "name": "Cempaga",
+    "slug": "cempaga-620202",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202022004",
     "name": "Rubung Buyung",
+    "slug": "rubung-buyung-6202022004",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022005",
     "name": "Patai",
+    "slug": "patai-6202022005",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022006",
     "name": "Luwuk Ranggan",
+    "slug": "luwuk-ranggan-6202022006",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022007",
     "name": "Jemaras",
+    "slug": "jemaras-6202022007",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022008",
     "name": "Cempaka Mulia Timur",
+    "slug": "cempaka-mulia-timur-6202022008",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022009",
     "name": "Cempaka Mulia Barat",
+    "slug": "cempaka-mulia-barat-6202022009",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022010",
     "name": "Luwuk Bunter",
+    "slug": "luwuk-bunter-6202022010",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "6202022011",
     "name": "Sungai Paring",
+    "slug": "sungai-paring-6202022011",
     "type": "VILLAGE",
     "parentCode": "620202"
   },
   {
     "code": "620203",
     "name": "Mentaya Hulu",
+    "slug": "mentaya-hulu-620203",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202032001",
     "name": "Tangar",
+    "slug": "tangar-6202032001",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032002",
     "name": "Baampah",
+    "slug": "baampah-6202032002",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032003",
     "name": "Kawan Batu",
+    "slug": "kawan-batu-6202032003",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032004",
     "name": "Tanjung Bantur",
+    "slug": "tanjung-bantur-6202032004",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032005",
     "name": "Penda Durian",
+    "slug": "penda-durian-6202032005",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032006",
     "name": "Pahirangan",
+    "slug": "pahirangan-6202032006",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032007",
     "name": "Satiung",
+    "slug": "satiung-6202032007",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032008",
     "name": "Santilik",
+    "slug": "santilik-6202032008",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032009",
     "name": "Tangka Robah",
+    "slug": "tangka-robah-6202032009",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032010",
     "name": "Pemantang",
+    "slug": "pemantang-6202032010",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032011",
     "name": "Tumbang Sapiri",
+    "slug": "tumbang-sapiri-6202032011",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202031012",
     "name": "Kuala Kuayan",
+    "slug": "kuala-kuayan-6202031012",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032014",
     "name": "Bawan",
+    "slug": "bawan-6202032014",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032015",
     "name": "Tanjung Jariangau",
+    "slug": "tanjung-jariangau-6202032015",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032031",
     "name": "Kapuk",
+    "slug": "kapuk-6202032031",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "6202032032",
     "name": "Pantap",
+    "slug": "pantap-6202032032",
     "type": "VILLAGE",
     "parentCode": "620203"
   },
   {
     "code": "620204",
     "name": "Parenggean",
+    "slug": "parenggean-620204",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202042001",
     "name": "Tehang",
+    "slug": "tehang-6202042001",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042002",
     "name": "Kabuau",
+    "slug": "kabuau-6202042002",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202041004",
     "name": "Parenggean",
+    "slug": "parenggean-6202041004",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042007",
     "name": "Barunang Miri",
+    "slug": "barunang-miri-6202042007",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042009",
     "name": "Sumber Makmur",
+    "slug": "sumber-makmur-6202042009",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042010",
     "name": "Mekar Jaya",
+    "slug": "mekar-jaya-6202042010",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042011",
     "name": "Karang Tunggal",
+    "slug": "karang-tunggal-6202042011",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042012",
     "name": "Bandar Agung",
+    "slug": "bandar-agung-6202042012",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042013",
     "name": "Beringin Tunggal Jaya",
+    "slug": "beringin-tunggal-jaya-6202042013",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042015",
     "name": "Sari Harapan",
+    "slug": "sari-harapan-6202042015",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042016",
     "name": "Karang Sari",
+    "slug": "karang-sari-6202042016",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042019",
     "name": "Bajarau",
+    "slug": "bajarau-6202042019",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042023",
     "name": "Bukit Harapan",
+    "slug": "bukit-harapan-6202042023",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042024",
     "name": "Manjalin",
+    "slug": "manjalin-6202042024",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "6202042025",
     "name": "Karya Bersama",
+    "slug": "karya-bersama-6202042025",
     "type": "VILLAGE",
     "parentCode": "620204"
   },
   {
     "code": "620205",
     "name": "Baamang",
+    "slug": "baamang-620205",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202051001",
     "name": "Baamang Hilir",
+    "slug": "baamang-hilir-6202051001",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "6202051002",
     "name": "Baamang Tengah",
+    "slug": "baamang-tengah-6202051002",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "6202051003",
     "name": "Baamang Hulu",
+    "slug": "baamang-hulu-6202051003",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "6202052006",
     "name": "Tinduk",
+    "slug": "tinduk-6202052006",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "6202051007",
     "name": "Tanah Mas",
+    "slug": "tanah-mas-6202051007",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "6202051008",
     "name": "Baamang Barat",
+    "slug": "baamang-barat-6202051008",
     "type": "VILLAGE",
     "parentCode": "620205"
   },
   {
     "code": "620206",
     "name": "Mentawa Baru Ketapang",
+    "slug": "mentawa-baru-ketapang-620206",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202061001",
     "name": "Mentawa Baru Hulu",
+    "slug": "mentawa-baru-hulu-6202061001",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202061002",
     "name": "Mentawa Baru Hilir",
+    "slug": "mentawa-baru-hilir-6202061002",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202061003",
     "name": "Ketapang",
+    "slug": "ketapang-6202061003",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062005",
     "name": "Pelangsian",
+    "slug": "pelangsian-6202062005",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062006",
     "name": "Bapeang",
+    "slug": "bapeang-6202062006",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062007",
     "name": "Sawahan",
+    "slug": "sawahan-6202062007",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062008",
     "name": "Eka Bahurui",
+    "slug": "eka-bahurui-6202062008",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202061009",
     "name": "Pasir Putih",
+    "slug": "pasir-putih-6202061009",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062010",
     "name": "Telaga Baru",
+    "slug": "telaga-baru-6202062010",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062011",
     "name": "Bangkuang Makmur",
+    "slug": "bangkuang-makmur-6202062011",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "6202062012",
     "name": "Bapanggang Raya",
+    "slug": "bapanggang-raya-6202062012",
     "type": "VILLAGE",
     "parentCode": "620206"
   },
   {
     "code": "620207",
     "name": "Mentaya Hilir Utara",
+    "slug": "mentaya-hilir-utara-620207",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202072001",
     "name": "Pondok Damar",
+    "slug": "pondok-damar-6202072001",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072002",
     "name": "Bagendang Hilir",
+    "slug": "bagendang-hilir-6202072002",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072003",
     "name": "Bagendang Tengah",
+    "slug": "bagendang-tengah-6202072003",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072004",
     "name": "Natai Baru",
+    "slug": "natai-baru-6202072004",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072005",
     "name": "Bagendang Hulu",
+    "slug": "bagendang-hulu-6202072005",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072006",
     "name": "Sumber Makmur",
+    "slug": "sumber-makmur-6202072006",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "6202072007",
     "name": "Bagendang Permai",
+    "slug": "bagendang-permai-6202072007",
     "type": "VILLAGE",
     "parentCode": "620207"
   },
   {
     "code": "620208",
     "name": "Mentaya Hilir Selatan",
+    "slug": "mentaya-hilir-selatan-620208",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202082005",
     "name": "Sebamban",
+    "slug": "sebamban-6202082005",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082006",
     "name": "Samuda Besar",
+    "slug": "samuda-besar-6202082006",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082007",
     "name": "Samuda Kecil",
+    "slug": "samuda-kecil-6202082007",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202081008",
     "name": "Samuda Kota",
+    "slug": "samuda-kota-6202081008",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202081009",
     "name": "Basirih Hilir",
+    "slug": "basirih-hilir-6202081009",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082010",
     "name": "Jaya Kelapa",
+    "slug": "jaya-kelapa-6202082010",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082011",
     "name": "Basirih Hulu",
+    "slug": "basirih-hulu-6202082011",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082012",
     "name": "Jaya Karet",
+    "slug": "jaya-karet-6202082012",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082013",
     "name": "Handil Sohor",
+    "slug": "handil-sohor-6202082013",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "6202082014",
     "name": "Sei Ijum Raya",
+    "slug": "sei-ijum-raya-6202082014",
     "type": "VILLAGE",
     "parentCode": "620208"
   },
   {
     "code": "620209",
     "name": "Pulau Hanaut",
+    "slug": "pulau-hanaut-620209",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202092001",
     "name": "Bapinang Hulu",
+    "slug": "bapinang-hulu-6202092001",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092002",
     "name": "Bapinang Hilir",
+    "slug": "bapinang-hilir-6202092002",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092003",
     "name": "Bapinang Hilir Laut",
+    "slug": "bapinang-hilir-laut-6202092003",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092004",
     "name": "Satiruk",
+    "slug": "satiruk-6202092004",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092005",
     "name": "Mekarti Jaya",
+    "slug": "mekarti-jaya-6202092005",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092006",
     "name": "Rawa Sari",
+    "slug": "rawa-sari-6202092006",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092007",
     "name": "Hanaut",
+    "slug": "hanaut-6202092007",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092008",
     "name": "Babirah",
+    "slug": "babirah-6202092008",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092009",
     "name": "Serambut",
+    "slug": "serambut-6202092009",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092010",
     "name": "Babaung",
+    "slug": "babaung-6202092010",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092011",
     "name": "Bamadu",
+    "slug": "bamadu-6202092011",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092012",
     "name": "Penyaguan",
+    "slug": "penyaguan-6202092012",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092013",
     "name": "Hantipan",
+    "slug": "hantipan-6202092013",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "6202092014",
     "name": "Bantian",
+    "slug": "bantian-6202092014",
     "type": "VILLAGE",
     "parentCode": "620209"
   },
   {
     "code": "620210",
     "name": "Antang Kalang",
+    "slug": "antang-kalang-620210",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202102001",
     "name": "Tumbang Kalang",
+    "slug": "tumbang-kalang-6202102001",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102002",
     "name": "Kuluk Telawang",
+    "slug": "kuluk-telawang-6202102002",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102003",
     "name": "Sungai Puring",
+    "slug": "sungai-puring-6202102003",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102004",
     "name": "Tumbang Ngahan",
+    "slug": "tumbang-ngahan-6202102004",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102005",
     "name": "Tumbang Ramei",
+    "slug": "tumbang-ramei-6202102005",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102006",
     "name": "Tumbang Hejan",
+    "slug": "tumbang-hejan-6202102006",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102007",
     "name": "Sungai Hanya",
+    "slug": "sungai-hanya-6202102007",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102008",
     "name": "Tumbang Sepayang",
+    "slug": "tumbang-sepayang-6202102008",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102016",
     "name": "Buntut Nusa",
+    "slug": "buntut-nusa-6202102016",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102017",
     "name": "Tumbang Gagu",
+    "slug": "tumbang-gagu-6202102017",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102021",
     "name": "Tumbang Manya",
+    "slug": "tumbang-manya-6202102021",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102025",
     "name": "Gunung Makmur",
+    "slug": "gunung-makmur-6202102025",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102027",
     "name": "Mulya Agung",
+    "slug": "mulya-agung-6202102027",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102028",
     "name": "Bhakti Karya",
+    "slug": "bhakti-karya-6202102028",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "6202102029",
     "name": "Waringin Agung",
+    "slug": "waringin-agung-6202102029",
     "type": "VILLAGE",
     "parentCode": "620210"
   },
   {
     "code": "620211",
     "name": "Teluk Sampit",
+    "slug": "teluk-sampit-620211",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202112001",
     "name": "Parebok",
+    "slug": "parebok-6202112001",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "6202112002",
     "name": "Basawang",
+    "slug": "basawang-6202112002",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "6202112003",
     "name": "Lampuyang",
+    "slug": "lampuyang-6202112003",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "6202112004",
     "name": "Ujung Pandaran",
+    "slug": "ujung-pandaran-6202112004",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "6202112005",
     "name": "Regei Lestari",
+    "slug": "regei-lestari-6202112005",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "6202112006",
     "name": "Kuin Permai",
+    "slug": "kuin-permai-6202112006",
     "type": "VILLAGE",
     "parentCode": "620211"
   },
   {
     "code": "620212",
     "name": "Seranau",
+    "slug": "seranau-620212",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202121001",
     "name": "Mentaya Seberang",
+    "slug": "mentaya-seberang-6202121001",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "6202122002",
     "name": "Terantang",
+    "slug": "terantang-6202122002",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "6202122003",
     "name": "Batuah",
+    "slug": "batuah-6202122003",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "6202122004",
     "name": "Terantang Hilir",
+    "slug": "terantang-hilir-6202122004",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "6202122005",
     "name": "Ganepo",
+    "slug": "ganepo-6202122005",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "6202122006",
     "name": "Seragam Jaya",
+    "slug": "seragam-jaya-6202122006",
     "type": "VILLAGE",
     "parentCode": "620212"
   },
   {
     "code": "620213",
     "name": "Cempaga Hulu",
+    "slug": "cempaga-hulu-620213",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202132001",
     "name": "Pundu",
+    "slug": "pundu-6202132001",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132002",
     "name": "Keruing",
+    "slug": "keruing-6202132002",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132003",
     "name": "Parit",
+    "slug": "parit-6202132003",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132004",
     "name": "Pantai Harapan",
+    "slug": "pantai-harapan-6202132004",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132005",
     "name": "Pelantaran",
+    "slug": "pelantaran-6202132005",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132006",
     "name": "Tumbang Koling",
+    "slug": "tumbang-koling-6202132006",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132007",
     "name": "Sudan",
+    "slug": "sudan-6202132007",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132008",
     "name": "Bukit Batu",
+    "slug": "bukit-batu-6202132008",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132009",
     "name": "Bukit Raya",
+    "slug": "bukit-raya-6202132009",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132010",
     "name": "Selucing",
+    "slug": "selucing-6202132010",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "6202132011",
     "name": "Sungai Ubar Mandiri",
+    "slug": "sungai-ubar-mandiri-6202132011",
     "type": "VILLAGE",
     "parentCode": "620213"
   },
   {
     "code": "620214",
     "name": "Telawang",
+    "slug": "telawang-620214",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202142001",
     "name": "Sebabi",
+    "slug": "sebabi-6202142001",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "6202142002",
     "name": "Tanah Putih",
+    "slug": "tanah-putih-6202142002",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "6202142003",
     "name": "Sumber Makmur",
+    "slug": "sumber-makmur-6202142003",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "6202142004",
     "name": "Kenyala",
+    "slug": "kenyala-6202142004",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "6202142005",
     "name": "Penyang",
+    "slug": "penyang-6202142005",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "6202142006",
     "name": "Biru Maju",
+    "slug": "biru-maju-6202142006",
     "type": "VILLAGE",
     "parentCode": "620214"
   },
   {
     "code": "620215",
     "name": "Bukit Santuai",
+    "slug": "bukit-santuai-620215",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202152001",
     "name": "Tumbang Tilap",
+    "slug": "tumbang-tilap-6202152001",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152002",
     "name": "Tumbang Kaminting",
+    "slug": "tumbang-kaminting-6202152002",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152003",
     "name": "Tanah Haluan",
+    "slug": "tanah-haluan-6202152003",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152004",
     "name": "Tumbang Penyahuan",
+    "slug": "tumbang-penyahuan-6202152004",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152005",
     "name": "Tumbang Sapia",
+    "slug": "tumbang-sapia-6202152005",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152006",
     "name": "Tumbang Getas",
+    "slug": "tumbang-getas-6202152006",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152007",
     "name": "Tewai Hara",
+    "slug": "tewai-hara-6202152007",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152008",
     "name": "Tumbang Payang",
+    "slug": "tumbang-payang-6202152008",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152009",
     "name": "Tumbang Kania",
+    "slug": "tumbang-kania-6202152009",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152010",
     "name": "Tumbang Tawan",
+    "slug": "tumbang-tawan-6202152010",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152011",
     "name": "Lunuk Bagantung",
+    "slug": "lunuk-bagantung-6202152011",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152012",
     "name": "Tumbang Torung",
+    "slug": "tumbang-torung-6202152012",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152013",
     "name": "Tumbang Batu",
+    "slug": "tumbang-batu-6202152013",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "6202152014",
     "name": "Tumbang Saluang",
+    "slug": "tumbang-saluang-6202152014",
     "type": "VILLAGE",
     "parentCode": "620215"
   },
   {
     "code": "620216",
     "name": "Tualan Hulu",
+    "slug": "tualan-hulu-620216",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202162001",
     "name": "Luwuk Sampun",
+    "slug": "luwuk-sampun-6202162001",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162002",
     "name": "Tumbang Mujam",
+    "slug": "tumbang-mujam-6202162002",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162003",
     "name": "Merah",
+    "slug": "merah-6202162003",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162004",
     "name": "Tanjung Jorong",
+    "slug": "tanjung-jorong-6202162004",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162005",
     "name": "Sebungsu",
+    "slug": "sebungsu-6202162005",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162006",
     "name": "Bukit Makmur",
+    "slug": "bukit-makmur-6202162006",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162007",
     "name": "Wonosari",
+    "slug": "wonosari-6202162007",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162008",
     "name": "Mekar Sari",
+    "slug": "mekar-sari-6202162008",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162009",
     "name": "Damar Makmur",
+    "slug": "damar-makmur-6202162009",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162010",
     "name": "Cempaka Putih",
+    "slug": "cempaka-putih-6202162010",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "6202162011",
     "name": "Jati Waringin",
+    "slug": "jati-waringin-6202162011",
     "type": "VILLAGE",
     "parentCode": "620216"
   },
   {
     "code": "620217",
     "name": "Telaga Antang",
+    "slug": "telaga-antang-620217",
     "type": "SUBDISTRICT",
     "parentCode": "6202"
   },
   {
     "code": "6202172001",
     "name": "Tumbang Boloi",
+    "slug": "tumbang-boloi-6202172001",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172002",
     "name": "Luwuk Kowan",
+    "slug": "luwuk-kowan-6202172002",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172003",
     "name": "Rantau Tampang",
+    "slug": "rantau-tampang-6202172003",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172004",
     "name": "Tumbang Mangkup",
+    "slug": "tumbang-mangkup-6202172004",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172005",
     "name": "Rantau Katang",
+    "slug": "rantau-katang-6202172005",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172006",
     "name": "Tumbang Sangai",
+    "slug": "tumbang-sangai-6202172006",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172007",
     "name": "Tukang Langit",
+    "slug": "tukang-langit-6202172007",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172008",
     "name": "Beringin Agung",
+    "slug": "beringin-agung-6202172008",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172009",
     "name": "Agung Mulya",
+    "slug": "agung-mulya-6202172009",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172010",
     "name": "Batu Agung",
+    "slug": "batu-agung-6202172010",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172011",
     "name": "Bukit Indah",
+    "slug": "bukit-indah-6202172011",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172012",
     "name": "Tumbang Puan",
+    "slug": "tumbang-puan-6202172012",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172013",
     "name": "Rantau Suang",
+    "slug": "rantau-suang-6202172013",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172014",
     "name": "Rantau Sawang",
+    "slug": "rantau-sawang-6202172014",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172015",
     "name": "Tanjung Harapan",
+    "slug": "tanjung-harapan-6202172015",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172016",
     "name": "Buana Mustika",
+    "slug": "buana-mustika-6202172016",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172017",
     "name": "Tri Buana",
+    "slug": "tri-buana-6202172017",
     "type": "VILLAGE",
     "parentCode": "620217"
   },
   {
     "code": "6202172018",
     "name": "Tumbang Bajanei",
+    "slug": "tumbang-bajanei-6202172018",
     "type": "VILLAGE",
     "parentCode": "620217"
   }

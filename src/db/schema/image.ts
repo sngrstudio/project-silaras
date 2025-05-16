@@ -5,7 +5,7 @@ export const presignedImageTable = mysqlTable('presigned_image_url', {
     length: 255
   }).primaryKey(),
   presignedUrl: varchar('presigned_url', {
-    length: 1023
+    length: 511
   }).notNull(),
   expiresAt: datetime('expires_at').notNull()
 })

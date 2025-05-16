@@ -1,7 +1,7 @@
 import { atom } from 'nanostores'
 import { actions } from 'astro:actions'
 
-type Regions = Awaited<ReturnType<typeof actions.region.get.orThrow>>
+type Regions = Awaited<ReturnType<typeof actions.region.getAll.orThrow>>
 export type Region = Regions[number]
 
 export const $regions = atom<Regions | undefined>(undefined)

@@ -2,12 +2,13 @@ import { db } from '../db'
 import { regionOnWatchView } from '../schema/region'
 import { eq } from 'drizzle-orm'
 
-type Regions = typeof regionOnWatchView.$inferSelect
+type Region = typeof regionOnWatchView.$inferSelect
 type GetRegionsOptions = {
   page?: number | undefined
   size?: number | undefined
 }
-type RegionType = NonNullable<Regions['regionType']>
+type RegionType = NonNullable<Region['regionType']>
+type RegionSlug = NonNullable<Region['regionSlug']>
 
 export const getRegions = async (
   type: RegionType,
@@ -16,6 +17,7 @@ export const getRegions = async (
   const getRegionsSQL = db
     .select({
       name: regionOnWatchView.regionName,
+      slug: regionOnWatchView.regionSlug,
       type: regionOnWatchView.regionType,
       handler: regionOnWatchView.handler,
       phoneNumber: regionOnWatchView.phone
@@ -27,6 +29,24 @@ export const getRegions = async (
     .prepare()
 
   return await getRegionsSQL.execute()
+}
+
+export const getSpecificRegion = async (slug: RegionSlug) => {
+  const getSpecificRegionSQL = db
+    .select({
+      name: regionOnWatchView.regionName,
+      slug: regionOnWatchView.regionSlug,
+      type: regionOnWatchView.regionType,
+      handler: regionOnWatchView.handler,
+      phoneNumber: regionOnWatchView.phone
+    })
+    .from(regionOnWatchView)
+    .where(eq(regionOnWatchView.regionSlug, slug))
+    .limit(1)
+    .prepare()
+
+  const [result] = await getSpecificRegionSQL.execute()
+  return result
 }
 
 // export const updateSettings = async ({

@@ -78,6 +78,27 @@
       "when": 1747297651842,
       "tag": "0010_noisy_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1747360267572,
+      "tag": "0011_glossy_boomerang",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1747360457517,
+      "tag": "0012_motionless_slyde",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1747361707291,
+      "tag": "0013_goofy_slipstream",
+      "breakpoints": true
     }
   ]
 }
