@@ -1,25 +1,14 @@
 ---
 import DashboardLayout, { type Props as LProps } from '../_dashboard.astro'
 // import RegionsRC from '~/components/pages/regions/regions'
-import { actions } from 'astro:actions'
 
 if (!Astro.locals.session || !Astro.locals.user) {
   return Astro.redirect('/user/login')
 }
 
-const { slug } = Astro.params
-if (!slug) {
-  return Astro.rewrite('/region/overview')
-}
-
-const region = await Astro.callAction(actions.region.get.orThrow, { slug })
-if (!region) {
-  return Astro.rewrite('/404')
-}
-
 const props = {
-  title: region.name as string,
-  description: 'Daftar & pengaturan Kecamatan'
+  title: 'Selayang Pandang',
+  description: 'Tinjauan Umum'
 } satisfies LProps
 ---
 
