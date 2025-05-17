@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "c4eec7c5-3d79-440b-9db2-ceb020d37f60",
+  "id": "758b9f19-8e75-4ef3-a581-26e49c95e6fa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "presigned_image_url": {
@@ -163,8 +163,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "region": {
-          "name": "region",
+        "region_id": {
+          "name": "region_id",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
@@ -199,12 +199,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "patient_region_region_on_watch_regionId_fk": {
-          "name": "patient_region_region_on_watch_regionId_fk",
+        "patient_region_id_region_on_watch_regionId_fk": {
+          "name": "patient_region_id_region_on_watch_regionId_fk",
           "tableFrom": "patient",
           "tableTo": "region_on_watch",
           "columnsFrom": [
-            "region"
+            "region_id"
           ],
           "columnsTo": [
             "regionId"
@@ -683,57 +683,6 @@
     }
   },
   "views": {
-    "patient_view": {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "mother_name": {
-          "name": "mother_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "birth_date": {
-          "name": "birth_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "address": {
-          "name": "address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "phone_number": {
-          "name": "phone_number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "name": "patient_view",
-      "isExisting": false,
-      "definition": "select `patient`.`id`, `patient`.`name`, `patient`.`mother_name`, `patient`.`birth_date`, `patient`.`address`, `patient`.`phone_number`, `patient_description`.`description` as `patient_description`, `patient_status`.`description` as `patient_status` from `patient` inner join `patient_description` on `patient_description`.`id` = `patient`.`description` inner join `patient_status` on `patient_status`.`id` = `patient`.`status`",
-      "algorithm": "undefined",
-      "sqlSecurity": "definer"
-    },
     "region_on_watch_view": {
       "columns": {
         "id": {
