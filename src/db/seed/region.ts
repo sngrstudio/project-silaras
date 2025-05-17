@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm'
 
 type InsertRegion = InferInsertModel<typeof regionTable>
 
-export const seedRegions = async () => {
+const seedRegions = async () => {
   await db.transaction(async (tx) => {
     const districtsData = regions
       .filter((reg) => reg.type === 'DISTRICT')
@@ -92,3 +92,5 @@ export const seedRegions = async () => {
 
   console.log('Seeding regions completed!')
 }
+
+export default seedRegions

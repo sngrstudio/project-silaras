@@ -1,2 +1,0 @@
-ALTER TABLE `menu` ADD `access_level` int;--> statement-breakpoint
-ALTER TABLE `menu` ADD CONSTRAINT `menu_access_level_access_level_map_id_fk` FOREIGN KEY (`access_level`) REFERENCES `access_level_map`(`id`) ON DELETE no action ON UPDATE no action;

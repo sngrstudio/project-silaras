@@ -1,16 +1,15 @@
-import { db } from '../db'
 import seedSettings from './settings'
 import seedMenu from './menu'
 import seedALM from './access-level-map'
-import { seedRegions } from './region'
+import seedRegions from './region'
+import seedPatientProperties from './patient'
 
 const main = async () => {
-  await db.transaction(async () => {
-    await seedSettings()
-    await seedALM()
-    await seedMenu()
-    await seedRegions()
-  })
+  await seedSettings()
+  await seedALM()
+  await seedMenu()
+  await seedRegions()
+  await seedPatientProperties()
 }
 
 main()

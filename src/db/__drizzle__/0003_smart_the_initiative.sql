@@ -1,1 +1,0 @@
-ALTER TABLE `presigned_image_url` MODIFY COLUMN `presigned_url` varchar(1023) NOT NULL;

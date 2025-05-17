@@ -1,9 +1,374 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ca8ec3fd-ed41-4a11-b0ac-c86f7e5f909d",
+  "id": "c4eec7c5-3d79-440b-9db2-ceb020d37f60",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "presigned_image_url": {
+      "name": "presigned_image_url",
+      "columns": {
+        "file_name": {
+          "name": "file_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "presigned_url": {
+          "name": "presigned_url",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "presigned_image_url_file_name": {
+          "name": "presigned_image_url_file_name",
+          "columns": [
+            "file_name"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient_description": {
+      "name": "patient_description",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "patient_description_id": {
+          "name": "patient_description_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient_status": {
+      "name": "patient_status",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "patient_status_id": {
+          "name": "patient_status_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient": {
+      "name": "patient",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mother_name": {
+          "name": "mother_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "region": {
+          "name": "region",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "patient_description_patient_description_id_fk": {
+          "name": "patient_description_patient_description_id_fk",
+          "tableFrom": "patient",
+          "tableTo": "patient_description",
+          "columnsFrom": [
+            "description"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "patient_status_patient_status_id_fk": {
+          "name": "patient_status_patient_status_id_fk",
+          "tableFrom": "patient",
+          "tableTo": "patient_status",
+          "columnsFrom": [
+            "status"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "patient_region_region_on_watch_regionId_fk": {
+          "name": "patient_region_region_on_watch_regionId_fk",
+          "tableFrom": "patient",
+          "tableTo": "region_on_watch",
+          "columnsFrom": [
+            "region"
+          ],
+          "columnsTo": [
+            "regionId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "patient_id": {
+          "name": "patient_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "patient_phone_number_unique": {
+          "name": "patient_phone_number_unique",
+          "columns": [
+            "phone_number"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "region_on_watch": {
+      "name": "region_on_watch",
+      "columns": {
+        "regionId": {
+          "name": "regionId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "region_on_watch_regionId_region_id_fk": {
+          "name": "region_on_watch_regionId_region_id_fk",
+          "tableFrom": "region_on_watch",
+          "tableTo": "region",
+          "columnsFrom": [
+            "regionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "region_on_watch_userId_user_profile_user_id_fk": {
+          "name": "region_on_watch_userId_user_profile_user_id_fk",
+          "tableFrom": "region_on_watch",
+          "tableTo": "user_profile",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "region_on_watch_regionId_pk": {
+          "name": "region_on_watch_regionId_pk",
+          "columns": [
+            "regionId"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "region": {
+      "name": "region",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('DISTRICT','SUBDISTRICT','VILLAGE')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parentId": {
+          "name": "parentId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "region_parent_id_id_fk": {
+          "name": "region_parent_id_id_fk",
+          "tableFrom": "region",
+          "tableTo": "region",
+          "columnsFrom": [
+            "parentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "region_id": {
+          "name": "region_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "region_code_unique": {
+          "name": "region_code_unique",
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
     "menu": {
       "name": "menu",
       "columns": {
@@ -34,10 +399,31 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "access_level": {
+          "name": "access_level",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "menu_access_level_access_level_map_id_fk": {
+          "name": "menu_access_level_access_level_map_id_fk",
+          "tableFrom": "menu",
+          "tableTo": "access_level_map",
+          "columnsFrom": [
+            "access_level"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "menu_id": {
           "name": "menu_id",
@@ -257,7 +643,7 @@
           "name": "password_hash",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         }
       },
@@ -297,6 +683,129 @@
     }
   },
   "views": {
+    "patient_view": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mother_name": {
+          "name": "mother_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "name": "patient_view",
+      "isExisting": false,
+      "definition": "select `patient`.`id`, `patient`.`name`, `patient`.`mother_name`, `patient`.`birth_date`, `patient`.`address`, `patient`.`phone_number`, `patient_description`.`description` as `patient_description`, `patient_status`.`description` as `patient_status` from `patient` inner join `patient_description` on `patient_description`.`id` = `patient`.`description` inner join `patient_status` on `patient_status`.`id` = `patient`.`status`",
+      "algorithm": "undefined",
+      "sqlSecurity": "definer"
+    },
+    "region_on_watch_view": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('DISTRICT','SUBDISTRICT','VILLAGE')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parentId": {
+          "name": "parentId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "name": "region_on_watch_view",
+      "isExisting": false,
+      "definition": "select `region`.`id`, `user_profile`.`user_id`, `region`.`name`, `region`.`code`, `region`.`slug`, `region`.`type`, `region`.`parentId`, `user_profile`.`full_name`, `user_profile`.`phone_number` from `region_on_watch` left join `region` on `region`.`id` = `region_on_watch`.`regionId` left join `user_profile` on `user_profile`.`user_id` = `region_on_watch`.`userId` order by `region`.`type`, `region`.`name`",
+      "algorithm": "undefined",
+      "sqlSecurity": "definer"
+    },
     "user_view": {
       "columns": {
         "id": {
@@ -309,6 +818,13 @@
         "user_name": {
           "name": "user_name",
           "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "access_level": {
+          "name": "access_level",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -333,18 +849,11 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "access_level": {
-          "name": "access_level",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         }
       },
       "name": "user_view",
       "isExisting": false,
-      "definition": "select `user`.`id`, `user`.`user_name`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo`, `user`.`access_level` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id`",
+      "definition": "select `user`.`id`, `user`.`user_name`, `user`.`access_level`, `user_profile`.`full_name`, `user_profile`.`phone_number`, `user_profile`.`profile_photo` from `user` inner join `user_profile` on `user_profile`.`user_id` = `user`.`id` order by `user`.`access_level` desc, `user_profile`.`full_name`",
       "algorithm": "undefined",
       "sqlSecurity": "definer"
     }
