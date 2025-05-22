@@ -1,5 +1,8 @@
 ---
+import type { HTMLAttributes } from 'astro/types'
 
+export interface Props extends Omit<HTMLAttributes<'body'>, 'title'> {}
+const props = Astro.props
 ---
 
 <html lang='id' transition:animate='none'>
@@ -8,7 +11,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <slot name='head' />
   </head>
-  <body>
+  <body {...props}>
     <slot />
   </body>
 </html>

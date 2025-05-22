@@ -1,14 +1,15 @@
 ---
-import BaseLayout from './_base.astro'
+import BaseLayout, { type Props as BaseLayoutProps } from './_base.astro'
 import Head, { type Props as HeadProps } from './_head.astro'
 import { ClientRouter } from 'astro:transitions'
+import Devtools from '~/components/common/devtools.astro'
 import '~/styles/global.css'
 
-export interface Props extends HeadProps {}
-const { title, description } = Astro.props
+export interface Props extends HeadProps, BaseLayoutProps {}
+const { title, description, class: className, ...props } = Astro.props
 ---
 
-<BaseLayout>
+<BaseLayout class:list={['h-screen overflow-hidden', className]} {...props}>
   {/* <body /> */}
   <slot />
 
@@ -16,6 +17,7 @@ const { title, description } = Astro.props
   <Fragment slot='head'>
     <Head title={title} description={description} />
     <ClientRouter />
+    {import.meta.env.DEV && <Devtools />}
     <slot name='head' />
   </Fragment>
 </BaseLayout>

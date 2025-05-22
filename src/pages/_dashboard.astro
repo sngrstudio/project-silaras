@@ -1,13 +1,18 @@
 ---
 import Layout, { type Props as LayoutProps } from './_layout.astro'
+import Navigation from '~/components/layout/navigation/navigation.astro'
+import Drawer from '~/components/layout/drawer/drawer.astro'
 
 export interface Props extends LayoutProps {}
-const { ...props } = Astro.props
+const { class: className, ...props } = Astro.props
 ---
 
-<Layout {...props}>
+<Layout class:list={['', className]} {...props}>
   {/* <body /> */}
-  <slot />
+  <Navigation />
+  <Drawer>
+    <slot />
+  </Drawer>
 
   {/* <head /> */}
   <Fragment slot='head'>
