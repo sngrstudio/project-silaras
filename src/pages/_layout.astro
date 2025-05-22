@@ -1,0 +1,21 @@
+---
+import BaseLayout from './_base.astro'
+import Head, { type Props as HeadProps } from './_head.astro'
+import { ClientRouter } from 'astro:transitions'
+import '~/styles/global.css'
+
+export interface Props extends HeadProps {}
+const { title, description } = Astro.props
+---
+
+<BaseLayout>
+  {/* <body /> */}
+  <slot />
+
+  {/* <head /> */}
+  <Fragment slot='head'>
+    <Head title={title} description={description} />
+    <ClientRouter />
+    <slot name='head' />
+  </Fragment>
+</BaseLayout>

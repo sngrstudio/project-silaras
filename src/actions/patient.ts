@@ -3,7 +3,8 @@ import {
   upsertPatient,
   getPatientById,
   getAllPatients,
-  deletePatient
+  deletePatient,
+  getPatientBySlug
 } from '../db/queries/patient'
 import { z } from 'astro:schema'
 
@@ -49,6 +50,16 @@ const patient = {
   getById: defineAction({
     input: z.object({ id: z.string() }),
     handler: async ({ id }) => getPatientById(id)
+  }),
+
+  /**
+   * Get a patient by its slug.
+   * @param slug Patient slug
+   * @returns Patient object or null if not found
+   */
+  getBySlug: defineAction({
+    input: z.object({ slug: z.string() }),
+    handler: async ({ slug }) => getPatientBySlug(slug)
   }),
 
   /**

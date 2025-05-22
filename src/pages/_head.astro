@@ -1,0 +1,16 @@
+---
+export interface Props {
+  title?: string | undefined
+  description?: string | undefined
+}
+
+const { title, description } = Astro.props
+
+const site = {
+  title: 'SILARAS',
+  description: 'Untuk Kotim yang Bebas Stunting'
+} satisfies Props
+---
+
+<title>{title ? `${title} | ${site.title}` : site.title}</title>
+<meta name='description' content={description || site.description} />

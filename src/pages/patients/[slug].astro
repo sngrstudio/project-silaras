@@ -1,0 +1,35 @@
+---
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import { actions } from 'astro:actions'
+
+const { slug } = Astro.params
+if (!slug) {
+  return Astro.redirect('/')
+}
+
+const patient = await Astro.callAction(actions.patient.getBySlug.orThrow, {
+  slug
+})
+if (!patient) {
+  return Astro.redirect('/404')
+}
+
+const props = {
+  title: patient.name,
+  description: `Halaman pasien untuk ${patient.name}`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  <h1>{props.title}</h1>
+  <ul>
+    <li><strong>Mother's Name:</strong> {patient.motherName}</li>
+    <li><strong>Birth Date:</strong> {patient.birthDate}</li>
+    <li><strong>Status:</strong> {patient.status}</li>
+    <li>
+      <strong>Location:</strong>
+      {patient.location?.latitude}, {patient.location?.longitude}
+    </li>
+    <li><strong>Region ID:</strong> {patient.regionId}</li>
+  </ul>
+</DLayout>
