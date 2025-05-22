@@ -1,7 +1,0 @@
----
-if (!Astro.locals.session || !Astro.locals.user) {
-  return Astro.redirect('/user/login')
-}
-
-return Astro.rewrite('/region/overview')
----
