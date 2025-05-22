@@ -1,0 +1,15 @@
+---
+import { actions } from 'astro:actions'
+
+const { slug } = Astro.params
+if (!slug) {
+  return Astro.redirect('/')
+}
+
+const page = await Astro.callAction(actions.region.getBySlug.orThrow, { slug })
+if (!page) {
+  return Astro.redirect('/404')
+}
+---
+
+<h1>{page.name}</h1>

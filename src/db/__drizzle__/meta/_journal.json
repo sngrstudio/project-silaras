@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1747892682935,
+      "tag": "0000_silky_nick_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1747899091231,
+      "tag": "0001_glorious_the_order",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1747899556348,
+      "tag": "0002_wandering_rockslide",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1747900740949,
+      "tag": "0003_pretty_nomad",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1747904130838,
+      "tag": "0004_lush_wolf_cub",
+      "breakpoints": true
+    }
+  ]
+}
