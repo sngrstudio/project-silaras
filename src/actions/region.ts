@@ -67,9 +67,11 @@ const region = {
   getAll: defineAction({
     input: z.object({
       page: z.number().optional(),
-      size: z.number().optional()
+      size: z.number().optional(),
+      parentId: z.string().nullable().optional()
     }),
-    handler: async ({ page, size }) => getAllRegions(page, size)
+    handler: async ({ page, size, parentId }) =>
+      getAllRegions(page, size, parentId)
   }),
 
   /**

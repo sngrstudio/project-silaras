@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { region } from '../schemas/region'
-import { eq } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 
 /**
  * Region table query functions.
@@ -62,12 +62,28 @@ export const getRegionById = async (id: string) => {
  * Get a paginated list of regions.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
+ * @param parentId Optional parent id to filter regions by (null for top-level regions)
  * @returns Array of regions for the page
  */
-export const getAllRegions = async (page?: number, size: number = 10) => {
+export const getAllRegions = async (
+  page?: number,
+  size: number = 10,
+  parentId?: string | null
+) => {
   const pageNumber = page && page > 0 ? page : 1
   const offset = (pageNumber - 1) * size
-  return db.select().from(region).limit(size).offset(offset)
+  let whereClause
+  if (parentId !== undefined) {
+    if (parentId === null) {
+      whereClause = isNull(region.parentId)
+    } else {
+      whereClause = eq(region.parentId, parentId)
+    }
+  }
+  const query = whereClause
+    ? db.select().from(region).where(whereClause)
+    : db.select().from(region)
+  return query.limit(size).offset(offset)
 }
 
 /**

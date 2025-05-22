@@ -1,7 +1,7 @@
 import type { FC, PropsWithChildren } from 'react'
 import DrawerMenuRC from './menu'
 import { useStore } from '@nanostores/react'
-import { $openDrawer, setOpenDrawer } from './store'
+import { $openDrawer, setOpenDrawer } from './drawer.store'
 import MenuIcon from '~icons/lucide/menu'
 
 const DrawerRC: FC<PropsWithChildren> = ({ children }) => {

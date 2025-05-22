@@ -1,0 +1,21 @@
+---
+import RegionRC from './region'
+---
+
+<RegionRC client:idle />
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $regions, setRegions } from './region.store'
+  import { actions } from 'astro:actions'
+
+  onMount($regions, () => {
+    task(async () => {
+      const state = await actions.region.getAll.orThrow({})
+      setRegions(state)
+    })
+    return () => {
+      setRegions([])
+    }
+  })
+</script>
