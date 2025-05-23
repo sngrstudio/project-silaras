@@ -43,9 +43,9 @@ const Navigation: FC = () => {
         >
           <PreviousIcon />
         </button>
-        <button className='btn max-md:flex-1' disabled>
+        <div className='btn max-md:flex-1'>
           {`Halaman ${regions.pageProps.page} dari ${regions.pageProps.total}`}
-        </button>
+        </div>
         <button
           className='btn'
           aria-label='halaman selanjutnya'
