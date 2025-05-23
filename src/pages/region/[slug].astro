@@ -1,6 +1,7 @@
 ---
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import Region from '~/components/region/region.astro'
+import Patient from '~/components/patient/patient.astro'
 import { actions } from 'astro:actions'
 
 const { slug } = Astro.params
@@ -23,6 +24,11 @@ const props = {
   {
     page.type !== 'DESA' && (
       <Region transition:name={page.slug} transition:animate='none' />
+    )
+  }
+  {
+    page.type === 'DESA' && (
+      <Patient transition:name={page.slug} transition:animate='none' />
     )
   }
 </DLayout>

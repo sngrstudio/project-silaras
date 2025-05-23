@@ -98,12 +98,33 @@ export const getPatientBySlug = async (slug: string) => {
  * Get a paginated list of patients.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
+ * @param regionSlug Optional region slug to filter patients by region
  * @returns Array of patients for the page
  */
-export const getAllPatients = async (page?: number, size: number = 10) => {
+export const getAllPatients = async (
+  page?: number,
+  size: number = 10,
+  regionSlug?: string
+) => {
   const pageNumber = page && page > 0 ? page : 1
   const offset = (pageNumber - 1) * size
-  return db.select().from(patient).limit(size).offset(offset)
+
+  let regionId: string | undefined = undefined
+  if (regionSlug) {
+    regionId = await db
+      .select({ id: patient.regionId })
+      .from(patient)
+      .where(eq(patient.slug, regionSlug))
+      .limit(1)
+      .then((rows) => rows[0]?.id)
+  }
+
+  return db
+    .select()
+    .from(patient)
+    .where(regionId ? eq(patient.regionId, regionId) : undefined)
+    .limit(size)
+    .offset(offset)
 }
 
 /**

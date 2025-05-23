@@ -1,0 +1,36 @@
+---
+import PatientRC from './patient'
+import CardTemplateRC from '../common/card/card'
+---
+
+<CardTemplateRC>
+  <PatientRC client:idle />
+</CardTemplateRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $patients, setPatients } from './patient.store'
+  import { actions } from 'astro:actions'
+
+  const regionSlug = window.location.pathname.split('/').at(-1) ?? ''
+
+  onMount($patients, () => {
+    task(async () => {
+      const state = await actions.patient.getAll.orThrow({
+        regionSlug
+      })
+      setPatients(state)
+    })
+    return () => {
+      setPatients(undefined)
+    }
+  })
+
+  document.addEventListener('astro:page-load', async () => {
+    const newRegionSlug = window.location.pathname.split('/').at(-1) ?? ''
+    const state = await actions.patient.getAll.orThrow({
+      regionSlug: newRegionSlug
+    })
+    setPatients(state)
+  })
+</script>

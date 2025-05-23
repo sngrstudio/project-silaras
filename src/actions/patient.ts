@@ -71,9 +71,11 @@ const patient = {
   getAll: defineAction({
     input: z.object({
       page: z.number().optional(),
-      size: z.number().optional()
+      size: z.number().optional(),
+      regionSlug: z.string().optional()
     }),
-    handler: async ({ page, size }) => getAllPatients(page, size)
+    handler: async ({ page, size, regionSlug }) =>
+      getAllPatients(page, size, regionSlug)
   }),
 
   /**
