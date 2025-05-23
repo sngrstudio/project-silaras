@@ -1,9 +1,4 @@
-import {
-  Fragment,
-  type FC,
-  type OlHTMLAttributes,
-  type TableHTMLAttributes
-} from 'react'
+import { type FC, type TableHTMLAttributes } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { clsx } from 'clsx/lite'
 
@@ -12,7 +7,20 @@ export interface TableTemplateProps
   table: Table<any>
 }
 
-export const TableTemplate: FC<TableTemplateProps> = ({
+/**
+ * TableTemplate (Desktop)
+ *
+ * A reusable table component for rendering Tanstack Table data in a desktop/tablet layout.
+ *
+ * Props:
+ * - table: Table<any> — The Tanstack Table instance to render.
+ * - className: string (optional) — Additional class names for the table element.
+ * - ...props: TableHTMLAttributes<HTMLTableElement> — Any other standard table element props.
+ *
+ * Usage:
+ * `<TableTemplate table={tableInstance} className="my-table" />`
+ */
+const TableTemplate: FC<TableTemplateProps> = ({
   table,
   className,
   ...props
@@ -48,27 +56,4 @@ export const TableTemplate: FC<TableTemplateProps> = ({
   )
 }
 
-export interface MobileTableTemplateProps
-  extends OlHTMLAttributes<HTMLOListElement> {
-  table: Table<any>
-}
-
-export const MobileTableTemplate: FC<MobileTableTemplateProps> = ({
-  table,
-  className,
-  ...props
-}) => {
-  return (
-    <ol className={clsx('list', className)} {...props}>
-      {table.getRowModel().rows.map((row) => (
-        <li className='list-row' key={row.id}>
-          {row.getVisibleCells().map((cell) => (
-            <Fragment key={cell.id}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </Fragment>
-          ))}
-        </li>
-      ))}
-    </ol>
-  )
-}
+export default TableTemplate

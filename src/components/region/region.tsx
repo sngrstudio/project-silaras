@@ -1,5 +1,8 @@
-import { Fragment, type FC } from 'react'
-import { TableTemplate, MobileTableTemplate } from '../common/table'
+import { type FC } from 'react'
+import TableTemplate from '../common/table/desktop'
+import ListTemplate from '../common/table/mobile'
+import MobileList from './mobile-list'
+import Navigation from './navigation'
 import {
   useReactTable,
   createColumnHelper,
@@ -8,7 +11,7 @@ import {
 import { useStore } from '@nanostores/react'
 import { $regions, type Regions } from './region.store'
 
-const columnHelper = createColumnHelper<Regions[number]>()
+const columnHelper = createColumnHelper<Regions['data'][number]>()
 const dColumns = [
   columnHelper.accessor('name', {
     header: '',
@@ -16,44 +19,46 @@ const dColumns = [
   })
 ]
 const mColumns = [
-  columnHelper.accessor('name', {
-    header: '',
-    cell: (cell) => {
-      const path = `/region/${cell.row.original.slug}`
-      return (
-        <Fragment>
-          <div className='list-col-grow'>
-            <a className='link' href={path}>
-              {cell.getValue()}
-            </a>
-          </div>
-        </Fragment>
-      )
-    }
+  columnHelper.display({
+    id: 'mobile',
+    cell: (cell) => <MobileList cell={cell} />
   })
 ]
 
 const RegionRC: FC = () => {
   const regions = useStore($regions)
 
-  const dTable = useReactTable({
-    columns: dColumns,
-    data: regions,
-    getCoreRowModel: getCoreRowModel()
-  })
-
-  const mTable = useReactTable({
-    columns: mColumns,
-    data: regions,
-    getCoreRowModel: getCoreRowModel()
-  })
+  if (!regions) {
+    return <></>
+  }
 
   return (
     <>
-      <MobileTableTemplate table={mTable} className='md:hidden' />
-      <TableTemplate table={dTable} className='max-md:hidden' />
+      <RegionTableRenderer regions={regions} />
+      <Navigation />
     </>
   )
 }
 
 export default RegionRC
+
+const RegionTableRenderer: FC<{ regions: Regions }> = ({ regions }) => {
+  const dTable = useReactTable({
+    columns: dColumns,
+    data: regions.data,
+    getCoreRowModel: getCoreRowModel()
+  })
+
+  const mTable = useReactTable({
+    columns: mColumns,
+    data: regions.data,
+    getCoreRowModel: getCoreRowModel()
+  })
+
+  return (
+    <>
+      <ListTemplate table={mTable} className='-mx-6 md:hidden' />
+      <TableTemplate table={dTable} className='max-md:hidden' />
+    </>
+  )
+}

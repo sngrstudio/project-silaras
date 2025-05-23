@@ -1,8 +1,11 @@
 ---
 import RegionRC from './region'
+import CardTemplateRC from '../common/card/card'
 ---
 
-<RegionRC client:idle />
+<CardTemplateRC>
+  <RegionRC client:idle />
+</CardTemplateRC>
 
 <script>
   import { onMount, task } from 'nanostores'
@@ -11,11 +14,13 @@ import RegionRC from './region'
 
   onMount($regions, () => {
     task(async () => {
-      const state = await actions.region.getAll.orThrow({})
+      const state = await actions.region.getAll.orThrow({
+        parentId: '0196f800-ff2c-7000-a88b-570020a1feb8' // temporary
+      })
       setRegions(state)
     })
     return () => {
-      setRegions([])
+      setRegions(undefined)
     }
   })
 </script>

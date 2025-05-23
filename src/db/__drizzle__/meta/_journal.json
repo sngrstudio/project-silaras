@@ -36,6 +36,20 @@
       "when": 1747904130838,
       "tag": "0004_lush_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1747981830161,
+      "tag": "0005_petite_hemingway",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1747982425153,
+      "tag": "0006_broken_wild_pack",
+      "breakpoints": true
     }
   ]
 }

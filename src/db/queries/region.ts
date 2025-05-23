@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { region } from '../schemas/region'
-import { eq, isNull } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 /**
  * Region table query functions.
@@ -66,24 +66,32 @@ export const getRegionById = async (id: string) => {
  * @returns Array of regions for the page
  */
 export const getAllRegions = async (
-  page?: number,
+  page: number = 1,
   size: number = 10,
-  parentId?: string | null
+  parentId?: string
 ) => {
-  const pageNumber = page && page > 0 ? page : 1
-  const offset = (pageNumber - 1) * size
-  let whereClause
-  if (parentId !== undefined) {
-    if (parentId === null) {
-      whereClause = isNull(region.parentId)
-    } else {
-      whereClause = eq(region.parentId, parentId)
+  const offset = (page - 1) * size
+  const totalRegions = await db.$count(
+    region,
+    eq(region.parentId, parentId || '')
+  )
+
+  const data = await db
+    .select()
+    .from(region)
+    .where(eq(region.parentId, parentId || ''))
+    .limit(size)
+    .offset(offset)
+    .orderBy(region.name)
+
+  return {
+    data,
+    pageProps: {
+      page,
+      size,
+      total: Math.ceil(totalRegions / size)
     }
   }
-  const query = whereClause
-    ? db.select().from(region).where(whereClause)
-    : db.select().from(region)
-  return query.limit(size).offset(offset)
 }
 
 /**

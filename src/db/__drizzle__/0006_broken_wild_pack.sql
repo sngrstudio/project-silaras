@@ -1,0 +1,1 @@
+DROP VIEW `region_with_counts`;

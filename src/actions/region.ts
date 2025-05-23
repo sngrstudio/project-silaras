@@ -68,7 +68,7 @@ const region = {
     input: z.object({
       page: z.number().optional(),
       size: z.number().optional(),
-      parentId: z.string().nullable().optional()
+      parentId: z.string().optional()
     }),
     handler: async ({ page, size, parentId }) =>
       getAllRegions(page, size, parentId)

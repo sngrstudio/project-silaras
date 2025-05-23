@@ -1,4 +1,4 @@
-import type { CSSProperties, FC, PropsWithChildren } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import DrawerMenuRC from './menu'
 import { useStore } from '@nanostores/react'
 import { $openDrawer, setOpenDrawer } from './drawer.store'
@@ -19,7 +19,9 @@ const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
         checked={openDrawer}
         onChange={handleOpenDrawer}
       />
-      <div className='drawer-content h-[calc(100vh-4rem)] p-4'>{children}</div>
+      <div className='drawer-content h-[calc(100vh-4rem)] overflow-auto p-4 md:p-8'>
+        {children}
+      </div>
       <div className='drawer-side'>
         <label
           htmlFor='drawer'
