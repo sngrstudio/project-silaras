@@ -2,7 +2,7 @@ import type { FC, PropsWithChildren } from 'react'
 
 const NavigationRC: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <nav className='navbar'>
+    <nav className='navbar z-[99]'>
       <div className=''>{children}</div>
       <div className='flex-1'>
         <a className='btn btn-ghost text-lg' href='/'>

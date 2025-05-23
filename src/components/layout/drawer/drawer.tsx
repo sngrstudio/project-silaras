@@ -1,8 +1,7 @@
-import type { FC, PropsWithChildren } from 'react'
+import type { CSSProperties, FC, PropsWithChildren } from 'react'
 import DrawerMenuRC from './menu'
 import { useStore } from '@nanostores/react'
 import { $openDrawer, setOpenDrawer } from './drawer.store'
-import MenuIcon from '~icons/lucide/menu'
 
 const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
   const openDrawer = useStore($openDrawer)
@@ -20,7 +19,7 @@ const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
         checked={openDrawer}
         onChange={handleOpenDrawer}
       />
-      <div className='drawer-content p-4'>{children}</div>
+      <div className='drawer-content h-[calc(100vh-4rem)] p-4'>{children}</div>
       <div className='drawer-side'>
         <label
           htmlFor='drawer'
@@ -34,11 +33,3 @@ const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
 }
 
 export default DrawerRC
-
-export const DrawerButtonRC: FC = () => {
-  return (
-    <button className='btn btn-ghost btn-square' aria-label='open sidebar'>
-      <MenuIcon />
-    </button>
-  )
-}

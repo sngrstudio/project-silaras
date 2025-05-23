@@ -1,66 +1,74 @@
+import {
+  Fragment,
+  type FC,
+  type OlHTMLAttributes,
+  type TableHTMLAttributes
+} from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
+import { clsx } from 'clsx/lite'
 
-export interface TableTemplateProps<T> {
-  table: Table<T>
-  title?: string
+export interface TableTemplateProps
+  extends TableHTMLAttributes<HTMLTableElement> {
+  table: Table<any>
 }
 
-export const TableTemplate = <T,>({ table, title }: TableTemplateProps<T>) => {
+export const TableTemplate: FC<TableTemplateProps> = ({
+  table,
+  className,
+  ...props
+}) => {
   return (
-    <div>
-      {title && <h3>{title}</h3>}
-      <table className='table'>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <table className={clsx('table', className)} {...props}>
+      <thead>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <tr key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <th key={header.id}>
+                {flexRender(
+                  header.column.columnDef.header,
+                  header.getContext()
+                )}
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody>
+        {table.getRowModel().rows.map((row) => (
+          <tr key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <td key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
-export const MobileTableTemplate = <T,>({
+export interface MobileTableTemplateProps
+  extends OlHTMLAttributes<HTMLOListElement> {
+  table: Table<any>
+}
+
+export const MobileTableTemplate: FC<MobileTableTemplateProps> = ({
   table,
-  title
-}: TableTemplateProps<T>) => {
+  className,
+  ...props
+}) => {
   return (
-    <div>
-      {title && <h3>{title}</h3>}
-      <ol>
-        {table.getRowModel().rows.map((row) => (
-          <li key={row.id} style={{ marginBottom: '1em' }}>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-              {row.getVisibleCells().map((cell) => (
-                <li key={cell.id}>
-                  <strong>{cell.column.columnDef.header as string}:</strong>{' '}
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ol>
-    </div>
+    <ol className={clsx('list', className)} {...props}>
+      {table.getRowModel().rows.map((row) => (
+        <li className='list-row' key={row.id}>
+          {row.getVisibleCells().map((cell) => (
+            <Fragment key={cell.id}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Fragment>
+          ))}
+        </li>
+      ))}
+    </ol>
   )
 }
