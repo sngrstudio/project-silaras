@@ -1,6 +1,6 @@
 import { type FC } from 'react'
-import TableTemplate from '../common/table/desktop'
-import ListTemplate from '../common/table/mobile'
+import TableTemplate from '~/components/common/table/desktop'
+import ListTemplate from '~/components/common/table/mobile'
 import MobileList from './mobile-list'
 import {
   useReactTable,

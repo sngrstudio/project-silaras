@@ -21,15 +21,5 @@ const props = {
 ---
 
 <DLayout {...props}>
-  <h1>{props.title}</h1>
-  <ul>
-    <li><strong>Mother's Name:</strong> {patient.motherName}</li>
-    <li><strong>Birth Date:</strong> {patient.birthDate}</li>
-    <li><strong>Status:</strong> {patient.status}</li>
-    <li>
-      <strong>Location:</strong>
-      {patient.location?.latitude}, {patient.location?.longitude}
-    </li>
-    <li><strong>Region ID:</strong> {patient.regionId}</li>
-  </ul>
+  <p>{patient.motherName}</p>
 </DLayout>

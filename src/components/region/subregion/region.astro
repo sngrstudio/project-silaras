@@ -1,6 +1,6 @@
 ---
 import RegionRC from './region'
-import CardTemplateRC from '../common/card/card'
+import CardTemplateRC from '~/components/common/card/card'
 ---
 
 <CardTemplateRC>
@@ -12,8 +12,7 @@ import CardTemplateRC from '../common/card/card'
   import { $regions, setRegions } from './region.store'
   import { actions } from 'astro:actions'
 
-  const parentSlug =
-    window.location.pathname.split('/').at(-1) ?? 'kotawaringin-timur-6202'
+  const parentSlug = window.location.pathname.split('/').at(-1) ?? ''
 
   onMount($regions, () => {
     task(async () => {
@@ -28,8 +27,7 @@ import CardTemplateRC from '../common/card/card'
   })
 
   document.addEventListener('astro:page-load', async () => {
-    const newParentSlug =
-      window.location.pathname.split('/').at(-1) ?? 'kotawaringin-timur-6202'
+    const newParentSlug = window.location.pathname.split('/').at(-1) ?? ''
     const state = await actions.region.getAll.orThrow({
       parentSlug: newParentSlug
     })

@@ -1,15 +1,15 @@
 import { type FC } from 'react'
-import TableTemplate from '../common/table/desktop'
-import ListTemplate from '../common/table/mobile'
-import MobileList from './subregion/mobile-list'
-import Navigation from './subregion/navigation'
+import TableTemplate from '../../common/table/desktop'
+import ListTemplate from '../../common/table/mobile'
+import MobileList from './mobile-list'
+import Navigation from './navigation'
 import {
   useReactTable,
   createColumnHelper,
   getCoreRowModel
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import { $regions, type Regions } from './subregion/region.store'
+import { $regions, type Regions } from './region.store'
 
 const columnHelper = createColumnHelper<Regions['data'][number]>()
 const dColumns = [
