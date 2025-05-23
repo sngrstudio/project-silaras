@@ -15,10 +15,10 @@ if (!page) {
 
 const props = {
   title: page.name,
-  description: `Halaman daftar untuk ${page.type.toLowerCase()} ${page.name}`
+  description: `Selayang Pandang untuk ${page.type.toLowerCase()} ${page.name}`
 } satisfies DLayoutProps
 ---
 
 <DLayout {...props}>
-  {page.type !== 'DESA' && <Region />}
+  {page.type !== 'DESA' && <Region transition:name={page.slug} />}
 </DLayout>

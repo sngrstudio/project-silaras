@@ -12,15 +12,27 @@ import CardTemplateRC from '../common/card/card'
   import { $regions, setRegions } from './region.store'
   import { actions } from 'astro:actions'
 
+  const parentSlug =
+    window.location.pathname.split('/').at(-1) ?? 'kotawaringin-timur-6202'
+
   onMount($regions, () => {
     task(async () => {
       const state = await actions.region.getAll.orThrow({
-        parentId: '0196f800-ff2c-7000-a88b-570020a1feb8' // temporary
+        parentSlug
       })
       setRegions(state)
     })
     return () => {
       setRegions(undefined)
     }
+  })
+
+  document.addEventListener('astro:page-load', async () => {
+    const newParentSlug =
+      window.location.pathname.split('/').at(-1) ?? 'kotawaringin-timur-6202'
+    const state = await actions.region.getAll.orThrow({
+      parentSlug: newParentSlug
+    })
+    setRegions(state)
   })
 </script>

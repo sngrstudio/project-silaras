@@ -7,6 +7,8 @@ import NextIcon from '~icons/lucide/chevron-right'
 
 const Navigation: FC = () => {
   const regions = useStore($regions)
+  const parentSlug =
+    window.location.pathname.split('/').at(-1) ?? 'kotawaringin-timur-6202'
 
   if (!regions) {
     return <></>
@@ -14,7 +16,7 @@ const Navigation: FC = () => {
 
   const handlePrevPage = async () => {
     const prevPage = await actions.region.getAll.orThrow({
-      parentId: '0196f800-ff2c-7000-a88b-570020a1feb8', // temporary
+      parentSlug,
       page: regions.pageProps.page - 1
     })
 
@@ -23,7 +25,7 @@ const Navigation: FC = () => {
 
   const handleNextPage = async () => {
     const nextPage = await actions.region.getAll.orThrow({
-      parentId: '0196f800-ff2c-7000-a88b-570020a1feb8', // temporary
+      parentSlug,
       page: regions.pageProps.page + 1
     })
 

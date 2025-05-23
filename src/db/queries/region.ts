@@ -62,15 +62,27 @@ export const getRegionById = async (id: string) => {
  * Get a paginated list of regions.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
- * @param parentId Optional parent id to filter regions by (null for top-level regions)
+ * @param parentSlug Optional parent slug to filter regions by (null for top-level regions)
  * @returns Array of regions for the page
  */
 export const getAllRegions = async (
   page: number = 1,
-  size: number = 10,
-  parentId?: string
+  size: number = 8,
+  parentSlug?: string
 ) => {
   const offset = (page - 1) * size
+
+  // If parentSlug is provided, look up the parent region's ID
+  let parentId: string | undefined = undefined
+  if (parentSlug) {
+    parentId = await db
+      .select({ id: region.id })
+      .from(region)
+      .where(eq(region.slug, parentSlug))
+      .limit(1)
+      .then((rows) => rows[0]?.id)
+  }
+
   const totalRegions = await db.$count(
     region,
     eq(region.parentId, parentId || '')

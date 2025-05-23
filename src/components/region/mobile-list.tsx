@@ -14,7 +14,9 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
   return (
     <>
       <div className='list-col-grow flex flex-col justify-center'>
-        <span className='text-lg font-bold'>{name}</span>
+        <a className='link text-lg font-bold' href={path}>
+          {name}
+        </a>
       </div>
       <div>
         <a
