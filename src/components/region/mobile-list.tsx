@@ -4,7 +4,7 @@ import { type Regions } from './region.store'
 import LinkIcon from '~icons/lucide/external-link'
 
 interface MobileListProps {
-  cell: CellContext<Regions[number], unknown>
+  cell: CellContext<Regions['data'][number], unknown>
 }
 
 const MobileList: FC<MobileListProps> = ({ cell }) => {
