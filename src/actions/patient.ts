@@ -11,12 +11,18 @@ import { z } from 'astro:schema'
 /**
  * Astro Actions for Patient table
  * Each action corresponds to a query function for patient data operations.
+ *
+ * - upsert: Insert or update a patient (requires name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight; id and slug optional)
+ * - getById: Get a patient by its id
+ * - getBySlug: Get a patient by its slug
+ * - getAll: Get a paginated list of patients (optionally filtered by regionSlug)
+ * - delete: Delete a patient by id
  */
 
 const patient = {
   /**
    * Upsert (insert or update) a patient.
-   * @param data Patient data (name, motherName, birthDate, status, location, regionId, id?)
+   * @param data Patient data (name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight, id?, slug?)
    * @returns The newly created or updated patient object
    */
   upsert: defineAction({
@@ -27,13 +33,17 @@ const patient = {
       status: z.enum(['HAMIL', 'MENYUSUI', 'ANAK-ANAK']),
       location: z.object({ latitude: z.number(), longitude: z.number() }),
       regionId: z.string(),
+      initialWeight: z.number(),
+      initialHeight: z.number(),
+      slug: z.string().optional(),
       id: z.string().optional().nullable()
     }),
     handler: async (input) => {
-      const { id, ...rest } = input
+      const { id, slug, ...rest } = input
       return await upsertPatient({
         ...rest,
         ...(id ? { id } : {}),
+        ...(slug ? { slug } : {}),
         birthDate:
           typeof input.birthDate === 'string'
             ? new Date(input.birthDate)

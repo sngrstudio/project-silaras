@@ -1,5 +1,7 @@
 import { db } from '../db'
 import { patient } from '../schemas/patient'
+import { monthlyAssesment, MONTHS } from '../schemas/monthly-assesment'
+import { dailyAssesment } from '../schemas/daily-assesment'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -14,7 +16,7 @@ import { eq } from 'drizzle-orm'
 /**
  * Insert or update a patient (upsert). The id is auto-generated if not provided.
  * If a patient with the same id exists, it will be updated.
- * @param data Patient data (must include name, motherName, birthDate, status, location, regionId, id optional)
+ * @param data Patient data (must include name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight, id optional)
  * @returns The newly created or updated patient object
  */
 export const upsertPatient = async (data: {
@@ -24,6 +26,8 @@ export const upsertPatient = async (data: {
   status: 'HAMIL' | 'MENYUSUI' | 'ANAK-ANAK'
   location: { latitude: number; longitude: number }
   regionId: string
+  initialWeight: number
+  initialHeight: number
   slug?: string
   id?: string
 }) => {
@@ -32,36 +36,81 @@ export const upsertPatient = async (data: {
   if (!slug) {
     slug = generatePatientSlug(data.name)
   }
-  const preparedData = {
-    ...data,
-    slug,
-    location: data.location,
-    birthDate:
-      data.birthDate instanceof Date ? data.birthDate : new Date(data.birthDate)
-  }
-  const [res] = await db
-    .insert(patient)
-    .values(preparedData)
-    .onDuplicateKeyUpdate({
-      set: {
-        name: data.name,
-        motherName: data.motherName,
-        birthDate:
-          data.birthDate instanceof Date
-            ? data.birthDate
-            : new Date(data.birthDate),
-        status: data.status,
-        location: data.location,
-        regionId: data.regionId,
-        slug
+  // Transactional logic
+  return await db.transaction(async (tx) => {
+    const preparedData = {
+      ...data,
+      slug,
+      location: data.location,
+      birthDate:
+        data.birthDate instanceof Date
+          ? data.birthDate
+          : new Date(data.birthDate),
+      initialWeight: data.initialWeight,
+      initialHeight: data.initialHeight
+    }
+    const [res] = await tx
+      .insert(patient)
+      .values(preparedData)
+      .onDuplicateKeyUpdate({
+        set: {
+          name: data.name,
+          motherName: data.motherName,
+          birthDate:
+            data.birthDate instanceof Date
+              ? data.birthDate
+              : new Date(data.birthDate),
+          status: data.status,
+          location: data.location,
+          regionId: data.regionId,
+          slug,
+          initialWeight: data.initialWeight,
+          initialHeight: data.initialHeight
+        }
+      })
+      .$returningId()
+    const id = data.id ?? res?.id
+    if (!id) {
+      throw new Error('A problem occurred when upserting patient.')
+    }
+    // Only create assessments if this is a new patient (no id provided)
+    if (!data.id) {
+      // Generate monthly assessments for June–October this year
+      const months = ['JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER'] as const
+      const year = new Date().getFullYear()
+      for (const month of months) {
+        // Type assertion to satisfy Drizzle's enum-like type
+        const [monthly] = await tx
+          .insert(monthlyAssesment)
+          .values({
+            patientId: id,
+            month: month as (typeof MONTHS)[number],
+            weight: data.initialWeight,
+            height: data.initialHeight
+          })
+          .$returningId()
+        if (!monthly?.id) {
+          throw new Error(
+            'A problem occurred when creating monthly assessment.'
+          )
+        }
+        // Generate daily assessments for each day in the month
+        const monthIndex = MONTHS.indexOf(month)
+        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
+        const dailyRows = []
+        for (let day = 1; day <= daysInMonth; day++) {
+          dailyRows.push({
+            monthId: monthly.id,
+            date: new Date(year, monthIndex, day)
+          })
+        }
+        if (dailyRows.length > 0) {
+          await tx.insert(dailyAssesment).values(dailyRows)
+        }
       }
-    })
-    .$returningId()
-  const id = data.id ?? res?.id
-  if (!id) {
-    throw new Error('A problem occurred when upserting patient.')
-  }
-  return await getPatientById(id)
+    }
+    return await getPatientById(id)
+  })
 }
 
 /**
