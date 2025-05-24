@@ -3,7 +3,8 @@ import {
   mysqlEnum,
   varchar,
   json,
-  date
+  date,
+  double
 } from 'drizzle-orm/mysql-core'
 import { region } from './region'
 
@@ -31,5 +32,7 @@ export const patient = mysqlTable('patient', {
   regionId: varchar('region_id', { length: 36 })
     .notNull()
     .references(() => region.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  slug: varchar('slug', { length: 255 }).notNull().unique()
+  slug: varchar('slug', { length: 255 }).notNull().unique(),
+  initialWeight: double('initial_weight').notNull().default(0),
+  initialHeight: double('initial_height').notNull().default(0)
 })

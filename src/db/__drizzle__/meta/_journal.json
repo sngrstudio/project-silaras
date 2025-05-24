@@ -50,6 +50,13 @@
       "when": 1747982425153,
       "tag": "0006_broken_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1748057477098,
+      "tag": "0007_small_jackpot",
+      "breakpoints": true
     }
   ]
 }
