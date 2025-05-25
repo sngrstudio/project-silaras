@@ -1,7 +1,15 @@
 import { db } from '../db'
 import { patient } from '../schemas/patient'
-import { monthlyAssesment, MONTHS } from '../schemas/monthly-assesment'
-import { dailyAssesment } from '../schemas/daily-assesment'
+import {
+  patientMonthlyAssesment,
+  patientDailyAssesment
+} from '../schemas/assesment'
+import {
+  upsertMonthlyAssesment,
+  upsertDailyAssesment,
+  MONTHS
+} from './assesment'
+import type { Month } from './assesment'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -76,36 +84,43 @@ export const upsertPatient = async (data: {
     // Only create assessments if this is a new patient (no id provided)
     if (!data.id) {
       // Generate monthly assessments for June–October this year
-      const months = ['JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER'] as const
+      const months: Month[] = ['JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER']
       const year = new Date().getFullYear()
       for (const month of months) {
-        // Type assertion to satisfy Drizzle's enum-like type
-        const [monthly] = await tx
-          .insert(monthlyAssesment)
-          .values({
-            patientId: id,
-            month: month as (typeof MONTHS)[number],
-            weight: data.initialWeight,
-            height: data.initialHeight
-          })
-          .$returningId()
-        if (!monthly?.id) {
-          throw new Error(
-            'A problem occurred when creating monthly assessment.'
-          )
-        }
+        // Upsert monthly assessment definition
+        const monthly = await upsertMonthlyAssesment(month)
+        if (!monthly || !monthly.id)
+          throw new Error('Failed to upsert monthly assessment')
+        // Insert patient-monthly join row
+        await tx.insert(patientMonthlyAssesment).values({
+          patientId: id,
+          monthlyAssesmentId: monthly.id,
+          weight: data.initialWeight,
+          height: data.initialHeight
+        })
         // Generate daily assessments for each day in the month
         const monthIndex = MONTHS.indexOf(month)
         const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
-        const dailyRows = []
         for (let day = 1; day <= daysInMonth; day++) {
-          dailyRows.push({
-            monthId: monthly.id,
-            date: new Date(year, monthIndex, day)
+          // Upsert daily assessment definition
+          const daily = await upsertDailyAssesment({
+            monthlyAssesmentId: monthly.id,
+            date: new Date(year, monthIndex, day),
+            menu1: `Menu 1 for ${month} ${day}`,
+            menu2: `Menu 2 for ${month} ${day}`
           })
-        }
-        if (dailyRows.length > 0) {
-          await tx.insert(dailyAssesment).values(dailyRows)
+          if (!daily || !daily.id)
+            throw new Error('Failed to upsert daily assessment')
+          // Insert patient-daily join row (default booleans)
+          await tx.insert(patientDailyAssesment).values({
+            patientId: id,
+            dailyAssesmentId: daily.id,
+            containsStapleFood: false,
+            containsSideDish: false,
+            containsVegetables: false,
+            containsFruits: false,
+            isFollowingRecipe: false
+          })
         }
       }
     }

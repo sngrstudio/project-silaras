@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1747892682935,
-      "tag": "0000_silky_nick_fury",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1747899091231,
-      "tag": "0001_glorious_the_order",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1747899556348,
-      "tag": "0002_wandering_rockslide",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1747900740949,
-      "tag": "0003_pretty_nomad",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1747904130838,
-      "tag": "0004_lush_wolf_cub",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1747981830161,
-      "tag": "0005_petite_hemingway",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1747982425153,
-      "tag": "0006_broken_wild_pack",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1748057477098,
-      "tag": "0007_small_jackpot",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1748058189384,
-      "tag": "0008_early_vampiro",
+      "when": 1748065707087,
+      "tag": "0000_tired_nicolaos",
       "breakpoints": true
     }
   ]
