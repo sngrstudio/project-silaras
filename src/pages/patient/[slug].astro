@@ -1,5 +1,6 @@
 ---
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import Assesment from '~/components/assesments/assesment.astro'
 import { actions } from 'astro:actions'
 
 const { slug } = Astro.params
@@ -21,5 +22,5 @@ const props = {
 ---
 
 <DLayout {...props}>
-  <p>{patient.motherName}</p>
+  <Assesment />
 </DLayout>

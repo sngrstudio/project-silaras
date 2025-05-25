@@ -1,0 +1,57 @@
+---
+import AssesmentRC from './assesment'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<CardTemplateRC>
+  <AssesmentRC client:idle />
+</CardTemplateRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $dailyAssesments, setDailyAssesments } from './assesment.store'
+  import { actions } from 'astro:actions'
+
+  // Use plain JS array for monthsEnum
+  // const monthsEnum = [
+  //   'JANUARY',
+  //   'FEBRUARY',
+  //   'MARCH',
+  //   'APRIL',
+  //   'MAY',
+  //   'JUNE',
+  //   'JULY',
+  //   'AUGUST',
+  //   'SEPTEMBER',
+  //   'OCTOBER',
+  //   'NOVEMBER',
+  //   'DECEMBER'
+  // ]
+  // const now = new Date(Date.now())
+  const currentMonthEnum = 'JUNE' //monthsEnum[now.getMonth()]
+  const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+
+  onMount($dailyAssesments, () => {
+    task(async () => {
+      const state = await actions.assesment.daily.getAll.orThrow({
+        patientSlug: getPatientSlug(),
+        month: currentMonthEnum
+      })
+      console.log(state)
+      setDailyAssesments(state)
+    })
+
+    return () => {
+      setDailyAssesments([])
+    }
+  })
+
+  // Refetch on page navigation
+  document.addEventListener('astro:page-load', async () => {
+    const newState = await actions.assesment.daily.getAll.orThrow({
+      patientSlug: getPatientSlug(),
+      month: currentMonthEnum
+    })
+    setDailyAssesments(newState)
+  })
+</script>
