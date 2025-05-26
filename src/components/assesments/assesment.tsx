@@ -2,6 +2,7 @@ import { type FC } from 'react'
 import TableTemplate from '~/components/common/table/desktop'
 import ListTemplate from '~/components/common/table/mobile'
 import MobileList from './mobile-list'
+import Navigation from './navigation'
 import {
   useReactTable,
   createColumnHelper,
@@ -28,7 +29,12 @@ const AssesmentRC: FC = () => {
   const dailyAssesments = useStore($dailyAssesments)
   if (!dailyAssesments) return <></>
 
-  return <AssesmentTableRenderer data={dailyAssesments} />
+  return (
+    <>
+      <Navigation />
+      <AssesmentTableRenderer data={dailyAssesments} />
+    </>
+  )
 }
 
 export default AssesmentRC

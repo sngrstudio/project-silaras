@@ -1,8 +1,8 @@
 import { useActionState, useRef, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
-import { type DailyAssesments } from './assesment.store'
+import { useStore } from '@nanostores/react'
+import { type DailyAssesments, setDailyAssesments, $currentMonthIndex } from './assesment.store'
 import { actions, isInputError } from 'astro:actions'
-import { setDailyAssesments } from './assesment.store'
 
 interface MobileListProps {
   cell: CellContext<DailyAssesments[number], unknown>
@@ -31,7 +31,7 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
 
       <div>
         <div className='stats'>
-          <div className='stat p-0'>
+          <div className='stat'>
             <div className='stat-value'>{cell.row.original.score}</div>
           </div>
         </div>
@@ -45,6 +45,7 @@ export default MobileList
 interface MobileListFormProps extends Pick<MobileListProps, 'cell'> {}
 
 const MobileListForm: FC<MobileListFormProps> = ({ cell }) => {
+  const currentMonthIndex = useStore($currentMonthIndex)
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleForm = async (_prev: unknown, data: FormData) => {
@@ -60,7 +61,7 @@ const MobileListForm: FC<MobileListFormProps> = ({ cell }) => {
 
     const updatedState = await actions.assesment.daily.getAll.orThrow({
       patientSlug: window.location.pathname.split('/').at(-1) || '',
-      month: 'JUNE' // temporary
+      monthIndex: currentMonthIndex
     })
     setDailyAssesments(updatedState)
 

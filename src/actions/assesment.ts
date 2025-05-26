@@ -9,8 +9,7 @@ import {
 } from '../db/queries/assesment'
 import { db } from '../db/db'
 import {
-  patientMonthlyAssesment,
-  patientDailyAssesment
+  patientMonthlyAssesment
 } from '../db/schemas/assesment'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'astro:schema'
@@ -112,27 +111,6 @@ const assesment = {
   },
   daily: {
     /**
-     * Get a patient's daily assessment result.
-     * @param patientId Patient ID
-     * @param dailyAssesmentId Daily assessment definition ID
-     * @returns The patient's daily assessment result or null
-     */
-    get: defineAction({
-      input: z.object({ patientId: z.string(), dailyAssesmentId: z.string() }),
-      handler: async ({ patientId, dailyAssesmentId }) => {
-        return db
-          .select()
-          .from(patientDailyAssesment)
-          .where(
-            and(
-              eq(patientDailyAssesment.patientId, patientId),
-              eq(patientDailyAssesment.dailyAssesmentId, dailyAssesmentId)
-            )
-          )
-          .then((rows) => rows[0] ?? null)
-      }
-    }),
-    /**
      * Upsert (insert or update) a patient's daily assessment result.
      *
      * This action will insert a new row into the patientDailyAssesment table if one does not exist for the given
@@ -178,17 +156,20 @@ const assesment = {
     /**
      * Get all daily assessment results for a patient, paginated by month.
      * @param patientSlug Patient slug
-     * @param month Month name (enum, e.g. 'JUNE')
-     * @param year Year (number, optional, defaults to current year)
+     * @param monthIndex Month index (1 = January, 12 = December)
      * @returns Array of daily assessment results for the given month
+     *
+     * Example usage:
+     *   await actions.assesment.daily.getAll({ patientSlug: 'slug', monthIndex: 6 }) // June
      */
     getAll: defineAction({
       input: z.object({
         patientSlug: z.string(),
-        month: z.enum([...MONTHS])
+        monthIndex: z.number().int().min(1).max(12) // 1 = January, 12 = December
       }),
-      handler: async ({ patientSlug, month }) => {
-        // Use the new query function for daily assessments by patient and month
+      handler: async ({ patientSlug, monthIndex }) => {
+        const month = MONTHS[monthIndex - 1]
+        if (!month) throw new Error('Invalid month index')
         return await getAllDailyAssesmentsByPatientAndMonth({
           patientSlug,
           month
