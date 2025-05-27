@@ -1,10 +1,12 @@
 ---
 import PatientRC from './patient'
 import CardTemplateRC from '../../common/card/card'
+import PatientDialogRC from './patient-dialog'
 ---
 
 <CardTemplateRC>
   <PatientRC client:idle />
+  <PatientDialogRC client:only='react' />
 </CardTemplateRC>
 
 <script>
@@ -12,12 +14,12 @@ import CardTemplateRC from '../../common/card/card'
   import { $patients, setPatients } from './patient.store'
   import { actions } from 'astro:actions'
 
-  const regionSlug = window.location.pathname.split('/').at(-1) ?? ''
+  const getRegionSlug = () => window.location.pathname.split('/').at(-1) ?? ''
 
   onMount($patients, () => {
     task(async () => {
       const state = await actions.patient.getAll.orThrow({
-        regionSlug
+        regionSlug: getRegionSlug()
       })
       setPatients(state)
     })
@@ -27,9 +29,8 @@ import CardTemplateRC from '../../common/card/card'
   })
 
   document.addEventListener('astro:page-load', async () => {
-    const newRegionSlug = window.location.pathname.split('/').at(-1) ?? ''
     const state = await actions.patient.getAll.orThrow({
-      regionSlug: newRegionSlug
+      regionSlug: getRegionSlug()
     })
     setPatients(state)
   })

@@ -31,12 +31,14 @@
     "drizzle-orm": "^0.43.1",
     "drizzle-zod": "^0.7.1",
     "express": "^5.1.0",
+    "leaflet": "^1.9.4",
     "morgan": "^1.10.0",
     "mysql2": "^3.14.1",
     "nanostores": "^1.0.1",
     "radix-ui": "^1.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0",
     "tailwindcss": "^4.1.6"
   },
   "devDependencies": {
@@ -46,6 +48,7 @@
     "@svgr/plugin-jsx": "^8.1.0",
     "@types/bun": "^1.2.13",
     "@types/express": "^5.0.1",
+    "@types/leaflet": "^1.9.18",
     "@types/morgan": "^1.9.9",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.4",

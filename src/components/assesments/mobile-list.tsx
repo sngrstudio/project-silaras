@@ -1,7 +1,11 @@
 import { useActionState, useRef, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import { type DailyAssesments, setDailyAssesments, $currentMonthIndex } from './assesment.store'
+import {
+  type DailyAssesments,
+  setDailyAssesments,
+  $currentMonthIndex
+} from './assesment.store'
 import { actions, isInputError } from 'astro:actions'
 
 interface MobileListProps {

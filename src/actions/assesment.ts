@@ -8,9 +8,7 @@ import {
   upsertPatientDailyAssesment
 } from '../db/queries/assesment'
 import { db } from '../db/db'
-import {
-  patientMonthlyAssesment
-} from '../db/schemas/assesment'
+import { patientMonthlyAssesment } from '../db/schemas/assesment'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'astro:schema'
 

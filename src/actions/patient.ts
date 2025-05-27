@@ -12,7 +12,7 @@ import { z } from 'astro:schema'
  * Astro Actions for Patient table
  * Each action corresponds to a query function for patient data operations.
  *
- * - upsert: Insert or update a patient (requires name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight; id and slug optional)
+ * - upsert: Insert or update a patient (requires name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight; id and slug optional)
  * - getById: Get a patient by its id
  * - getBySlug: Get a patient by its slug
  * - getAll: Get a paginated list of patients (optionally filtered by regionSlug)
@@ -22,16 +22,18 @@ import { z } from 'astro:schema'
 const patient = {
   /**
    * Upsert (insert or update) a patient.
-   * @param data Patient data (name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight, id?, slug?)
+   * @param data Patient data (name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight, id?, slug?)
    * @returns The newly created or updated patient object
    */
   upsert: defineAction({
+    accept: 'form',
     input: z.object({
       name: z.string(),
       motherName: z.string(),
       birthDate: z.union([z.string(), z.date()]),
       status: z.enum(['HAMIL', 'MENYUSUI', 'ANAK-ANAK']),
-      location: z.object({ latitude: z.number(), longitude: z.number() }),
+      latitude: z.number(),
+      longitude: z.number(),
       regionId: z.string(),
       initialWeight: z.number(),
       initialHeight: z.number(),
@@ -39,7 +41,7 @@ const patient = {
       id: z.string().optional().nullable()
     }),
     handler: async (input) => {
-      const { id, slug, ...rest } = input
+      const { id, slug, ...rest } = input as any
       return await upsertPatient({
         ...rest,
         ...(id ? { id } : {}),
@@ -76,13 +78,14 @@ const patient = {
    * Get a paginated list of patients.
    * @param page Page number (1-based, defaults to 1)
    * @param size Page size (defaults to 10)
+   * @param regionSlug Region slug to filter patients by region (required)
    * @returns Array of patients for the page
    */
   getAll: defineAction({
     input: z.object({
       page: z.number().optional(),
       size: z.number().optional(),
-      regionSlug: z.string().optional()
+      regionSlug: z.string() // now required
     }),
     handler: async ({ page, size, regionSlug }) =>
       getAllPatients(page, size, regionSlug)

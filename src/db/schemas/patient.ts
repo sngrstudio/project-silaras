@@ -2,7 +2,6 @@ import {
   mysqlTable,
   mysqlEnum,
   varchar,
-  json,
   date,
   double
 } from 'drizzle-orm/mysql-core'
@@ -26,9 +25,8 @@ export const patient = mysqlTable('patient', {
   motherName: varchar('mother_name', { length: 255 }).notNull(),
   birthDate: date('birth_date').notNull(),
   status: mysqlEnum('status', ['HAMIL', 'MENYUSUI', 'ANAK-ANAK']).notNull(),
-  location: json('location')
-    .$type<{ latitude: number; longitude: number }>()
-    .notNull(), // { latitude: double, longitude: double }
+  latitude: double('latitude').notNull(),
+  longitude: double('longitude').notNull(),
   regionId: varchar('region_id', { length: 36 })
     .notNull()
     .references(() => region.id, { onDelete: 'cascade', onUpdate: 'cascade' }),

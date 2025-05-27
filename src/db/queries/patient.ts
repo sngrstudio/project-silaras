@@ -1,5 +1,6 @@
 import { db } from '../db'
 import { patient } from '../schemas/patient'
+import { region } from '../schemas/region'
 import {
   patientMonthlyAssesment,
   patientDailyAssesment
@@ -7,9 +8,9 @@ import {
 import {
   upsertMonthlyAssesment,
   upsertDailyAssesment,
-  MONTHS
+  MONTHS,
+  type Month
 } from './assesment'
-import type { Month } from './assesment'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -32,7 +33,8 @@ export const upsertPatient = async (data: {
   motherName: string
   birthDate: Date
   status: 'HAMIL' | 'MENYUSUI' | 'ANAK-ANAK'
-  location: { latitude: number; longitude: number }
+  latitude: number
+  longitude: number
   regionId: string
   initialWeight: number
   initialHeight: number
@@ -49,7 +51,8 @@ export const upsertPatient = async (data: {
     const preparedData = {
       ...data,
       slug,
-      location: data.location,
+      latitude: data.latitude,
+      longitude: data.longitude,
       birthDate:
         data.birthDate instanceof Date
           ? data.birthDate
@@ -69,7 +72,8 @@ export const upsertPatient = async (data: {
               ? data.birthDate
               : new Date(data.birthDate),
           status: data.status,
-          location: data.location,
+          latitude: data.latitude,
+          longitude: data.longitude,
           regionId: data.regionId,
           slug,
           initialWeight: data.initialWeight,
@@ -162,31 +166,31 @@ export const getPatientBySlug = async (slug: string) => {
  * Get a paginated list of patients.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
- * @param regionSlug Optional region slug to filter patients by region
+ * @param regionSlug Region slug to filter patients by region (required)
  * @returns Array of patients for the page
  */
 export const getAllPatients = async (
-  page?: number,
+  page: number = 1,
   size: number = 10,
-  regionSlug?: string
+  regionSlug: string // now mandatory and first
 ) => {
-  const pageNumber = page && page > 0 ? page : 1
-  const offset = (pageNumber - 1) * size
+  const offset = (page - 1) * size
 
-  let regionId: string | undefined = undefined
-  if (regionSlug) {
-    regionId = await db
-      .select({ id: patient.regionId })
-      .from(patient)
-      .where(eq(patient.slug, regionSlug))
-      .limit(1)
-      .then((rows) => rows[0]?.id)
-  }
+  // regionSlug is now required, so always resolve regionId from the region table
+  const regionRow = await db
+    .select({ id: region.id })
+    .from(region)
+    .where(eq(region.slug, regionSlug))
+    .limit(1)
+    .then((rows) => rows[0])
+  const regionId = regionRow?.id
+
+  if (!regionId) throw new Error('Region not found for provided slug')
 
   return db
     .select()
     .from(patient)
-    .where(regionId ? eq(patient.regionId, regionId) : undefined)
+    .where(eq(patient.regionId, regionId))
     .limit(size)
     .offset(offset)
 }

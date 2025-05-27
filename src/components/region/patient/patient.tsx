@@ -8,9 +8,17 @@ import {
   getCoreRowModel
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import { $patients, type Patients } from './patient.store'
+import {
+  $patients,
+  setCurrentPatient,
+  setCurrentRegion,
+  type Patients
+} from './patient.store'
+import { actions } from 'astro:actions'
 
-const columnHelper = createColumnHelper<Patients[number]>()
+type Patient = Patients[number]
+
+const columnHelper = createColumnHelper<Patient>()
 const dColumns = [
   columnHelper.accessor('name', {
     header: 'Nama',
@@ -45,8 +53,37 @@ const PatientTableRenderer: FC<{ data: Patients }> = ({ data }) => {
   })
   return (
     <>
+      <div className='card-actions'>
+        <PatientAddButton />
+      </div>
       <ListTemplate table={mTable} className='-mx-6 md:hidden' />
       <TableTemplate table={dTable} className='max-md:hidden' />
     </>
+  )
+}
+
+export const PatientAddButton: FC = () => {
+  const handleClick = async () => {
+    const regionSlug = window.location.pathname.split('/').at(-1) ?? ''
+    const region = await actions.region.getBySlug.orThrow({ slug: regionSlug })
+    setCurrentRegion(region!)
+
+    setCurrentPatient({
+      name: '',
+      motherName: '',
+      birthDate: new Date(Date.now()),
+      initialHeight: 0,
+      initialWeight: 0,
+      status: 'ANAK-ANAK',
+      latitude: 0,
+      longitude: 0,
+      regionId: region?.id!
+    })
+  }
+
+  return (
+    <button className='btn btn-primary max-md:w-full' onClick={handleClick}>
+      <span>Tambah Pasien</span>
+    </button>
   )
 }
