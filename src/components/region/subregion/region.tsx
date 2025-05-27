@@ -14,8 +14,15 @@ import { $regions, type Regions } from './region.store'
 const columnHelper = createColumnHelper<Regions['data'][number]>()
 const dColumns = [
   columnHelper.accessor('name', {
-    header: '',
-    cell: (cell) => cell.getValue()
+    header: 'Daerah',
+    cell: (cell) => {
+      const url = `/region/${cell.row.original.slug}`
+      return (
+        <a className='link font-bold' href={url}>
+          {cell.getValue()}
+        </a>
+      )
+    }
   })
 ]
 const mColumns = [

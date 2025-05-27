@@ -1,0 +1,16 @@
+{
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "driver": "MariaDB",
+      "name": "test",
+      "group": "test",
+      "connectString": "mysql://test:test@localhost:3306/test"
+    }
+  ]
+}

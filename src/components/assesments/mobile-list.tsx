@@ -1,12 +1,7 @@
-import { useActionState, useRef, type FC } from 'react'
+import { type FC } from 'react'
+import AssesmentForm from './assesment-form'
 import { type CellContext } from '@tanstack/react-table'
-import { useStore } from '@nanostores/react'
-import {
-  type DailyAssesments,
-  setDailyAssesments,
-  $currentMonthIndex
-} from './assesment.store'
-import { actions, isInputError } from 'astro:actions'
+import { type DailyAssesments } from './assesment.store'
 
 interface MobileListProps {
   cell: CellContext<DailyAssesments[number], unknown>
@@ -18,7 +13,7 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
       <div className='list-col-grow flex flex-col justify-start gap-y-1'>
         <div className='mb-2 text-lg font-bold'>
           {cell.row.original.date?.toLocaleDateString('id-ID', {
-            dateStyle: 'long'
+            dateStyle: 'full'
           })}
         </div>
         <div className='badge badge-soft badge-sm badge-primary rounded-full'>
@@ -30,7 +25,7 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
       </div>
 
       <div className='list-col-wrap'>
-        <MobileListForm cell={cell} />
+        <AssesmentForm cell={cell} />
       </div>
 
       <div>
@@ -45,118 +40,3 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
 }
 
 export default MobileList
-
-interface MobileListFormProps extends Pick<MobileListProps, 'cell'> {}
-
-const MobileListForm: FC<MobileListFormProps> = ({ cell }) => {
-  const currentMonthIndex = useStore($currentMonthIndex)
-  const formRef = useRef<HTMLFormElement>(null)
-
-  const handleForm = async (_prev: unknown, data: FormData) => {
-    const { error } = await actions.assesment.daily.set(data)
-    if (error) {
-      if (isInputError(error)) {
-        return error
-      }
-
-      console.log(error)
-      return undefined
-    }
-
-    const updatedState = await actions.assesment.daily.getAll.orThrow({
-      patientSlug: window.location.pathname.split('/').at(-1) || '',
-      monthIndex: currentMonthIndex
-    })
-    setDailyAssesments(updatedState)
-
-    console.log('success')
-    return undefined
-  }
-
-  const [_error, action, isPending] = useActionState(handleForm, undefined)
-
-  const handleCheckboxBlur = () => {
-    if (formRef.current && !isPending) {
-      formRef.current.requestSubmit()
-    }
-  }
-
-  return (
-    <form
-      ref={formRef}
-      className='flex w-full flex-col gap-y-1'
-      action={action}
-    >
-      <label className='label'>
-        <input
-          className='checkbox'
-          type='checkbox'
-          name='containsStapleFood'
-          id='containsStapleFood'
-          disabled={isPending}
-          defaultChecked={!!cell.row.original.containsStapleFood}
-          onBlur={handleCheckboxBlur}
-        />
-        <span>Makanan pokok?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox'
-          type='checkbox'
-          name='containsSideDish'
-          id='containsSideDish'
-          disabled={isPending}
-          defaultChecked={!!cell.row.original.containsSideDish}
-          onBlur={handleCheckboxBlur}
-        />
-        <span>Mengandung lauk-pauk?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox'
-          type='checkbox'
-          name='containsVegetables'
-          id='containsVegetables'
-          disabled={isPending}
-          defaultChecked={!!cell.row.original.containsVegetables}
-          onBlur={handleCheckboxBlur}
-        />
-        <span>Mengandung sayuran?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox'
-          type='checkbox'
-          name='containsFruits'
-          id='containsFruits'
-          disabled={isPending}
-          defaultChecked={!!cell.row.original.containsFruits}
-          onBlur={handleCheckboxBlur}
-        />
-        <span>Mengandung buah-buahan?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox'
-          type='checkbox'
-          name='isFollowingRecipe'
-          id='isFollowingRecipe'
-          disabled={isPending}
-          defaultChecked={!!cell.row.original.isFollowingRecipe}
-          onBlur={handleCheckboxBlur}
-        />
-        <span>Sesuai dengan resep?</span>
-      </label>
-      <input
-        type='hidden'
-        name='patientId'
-        value={cell.row.original.patientId}
-      />
-      <input
-        type='hidden'
-        name='dailyAssesmentId'
-        value={cell.row.original.dailyAssesmentId}
-      />
-    </form>
-  )
-}

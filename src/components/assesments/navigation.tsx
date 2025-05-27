@@ -31,28 +31,26 @@ const Navigation: FC = () => {
   }
 
   return (
-    <div className='card-actions mt-8'>
-      <div className='join w-full'>
-        <button
-          className='btn'
-          aria-label='bulan sebelumnya'
-          onClick={handlePrevPage}
-          disabled={currentMonthIndex <= 6}
-        >
-          <PreviousIcon />
-        </button>
-        <div className='btn max-md:flex-1'>
-          {`Bulan ${MONTHS[currentMonthIndex - 1]}`}
-        </div>
-        <button
-          className='btn'
-          aria-label='bulan selanjutnya'
-          onClick={handleNextPage}
-          disabled={currentMonthIndex >= 10}
-        >
-          <NextIcon />
-        </button>
+    <div className='join max-md:w-full'>
+      <button
+        className='btn'
+        aria-label='bulan sebelumnya'
+        onClick={handlePrevPage}
+        disabled={currentMonthIndex <= 6}
+      >
+        <PreviousIcon />
+      </button>
+      <div className='btn max-md:flex-1'>
+        {`Bulan ${MONTHS[currentMonthIndex - 1]}`}
       </div>
+      <button
+        className='btn'
+        aria-label='bulan selanjutnya'
+        onClick={handleNextPage}
+        disabled={currentMonthIndex >= 10}
+      >
+        <NextIcon />
+      </button>
     </div>
   )
 }

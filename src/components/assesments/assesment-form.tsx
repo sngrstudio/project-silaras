@@ -1,0 +1,122 @@
+import { useActionState, useRef, type FC } from 'react'
+import { type CellContext } from '@tanstack/react-table'
+import { useStore } from '@nanostores/react'
+import {
+  type DailyAssesments,
+  setDailyAssesments,
+  $currentMonthIndex
+} from './assesment.store'
+import { actions, isInputError } from 'astro:actions'
+
+interface AssesmentFormProps {
+  cell: CellContext<DailyAssesments[number], unknown>
+}
+
+const AssesmentForm: FC<AssesmentFormProps> = ({ cell }) => {
+  const currentMonthIndex = useStore($currentMonthIndex)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const handleForm = async (_prev: unknown, data: FormData) => {
+    const { error } = await actions.assesment.daily.set(data)
+    if (error) {
+      if (isInputError(error)) {
+        return error
+      }
+
+      console.log(error)
+      return undefined
+    }
+
+    const updatedState = await actions.assesment.daily.getAll.orThrow({
+      patientSlug: window.location.pathname.split('/').at(-1) || '',
+      monthIndex: currentMonthIndex
+    })
+    setDailyAssesments(updatedState)
+    return undefined
+  }
+
+  const [_error, action, isPending] = useActionState(handleForm, undefined)
+
+  const handleSave = () => {
+    if (formRef.current && !isPending) {
+      formRef.current.requestSubmit()
+    }
+  }
+
+  return (
+    <form
+      ref={formRef}
+      className='flex w-full flex-col gap-y-1 md:grid lg:grid-cols-2'
+      action={action}
+      onChange={handleSave}
+    >
+      <label className='label'>
+        <input
+          className='checkbox checkbox-lg md:checkbox-xs'
+          type='checkbox'
+          name='containsStapleFood'
+          id='containsStapleFood'
+          disabled={isPending}
+          defaultChecked={!!cell.row.original.containsStapleFood}
+        />
+        <span>Makanan pokok?</span>
+      </label>
+      <label className='label'>
+        <input
+          className='checkbox checkbox-lg md:checkbox-xs'
+          type='checkbox'
+          name='containsSideDish'
+          id='containsSideDish'
+          disabled={isPending}
+          defaultChecked={!!cell.row.original.containsSideDish}
+        />
+        <span>Mengandung lauk-pauk?</span>
+      </label>
+      <label className='label'>
+        <input
+          className='checkbox checkbox-lg md:checkbox-xs'
+          type='checkbox'
+          name='containsVegetables'
+          id='containsVegetables'
+          disabled={isPending}
+          defaultChecked={!!cell.row.original.containsVegetables}
+        />
+        <span>Mengandung sayuran?</span>
+      </label>
+      <label className='label'>
+        <input
+          className='checkbox checkbox-lg md:checkbox-xs'
+          type='checkbox'
+          name='containsFruits'
+          id='containsFruits'
+          disabled={isPending}
+          defaultChecked={!!cell.row.original.containsFruits}
+        />
+        <span>Mengandung buah-buahan?</span>
+      </label>
+      <label className='label'>
+        <input
+          className='checkbox checkbox-lg md:checkbox-xs'
+          type='checkbox'
+          name='isFollowingRecipe'
+          id='isFollowingRecipe'
+          disabled={isPending}
+          defaultChecked={!!cell.row.original.isFollowingRecipe}
+        />
+        <span>Sesuai dengan resep?</span>
+      </label>
+      <input
+        type='hidden'
+        name='patientId'
+        value={cell.row.original.patientId}
+      />
+      <input
+        type='hidden'
+        name='dailyAssesmentId'
+        value={cell.row.original.dailyAssesmentId}
+      />
+    </form>
+  )
+}
+
+export default AssesmentForm

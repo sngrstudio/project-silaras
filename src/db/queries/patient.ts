@@ -3,14 +3,10 @@ import { patient } from '../schemas/patient'
 import { region } from '../schemas/region'
 import {
   patientMonthlyAssesment,
-  patientDailyAssesment
+  patientDailyAssesment,
+  monthlyAssesment,
+  dailyAssesment
 } from '../schemas/assesment'
-import {
-  upsertMonthlyAssesment,
-  upsertDailyAssesment,
-  MONTHS,
-  type Month
-} from './assesment'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -38,21 +34,31 @@ export const upsertPatient = async (data: {
   regionId: string
   initialWeight: number
   initialHeight: number
-  slug?: string
   id?: string
 }) => {
-  // Generate slug if not provided
-  let slug = data.slug
-  if (!slug) {
+  // Always set id: use provided or generate new
+  const id = data.id ?? Bun.randomUUIDv7()
+  // If no id, generate slug for new patient
+  let slug: string
+  if (!data.id) {
     slug = generatePatientSlug(data.name)
+  } else {
+    // update: fetch existing slug
+    const existing = await db
+      .select({ slug: patient.slug })
+      .from(patient)
+      .where(eq(patient.id, data.id))
+      .limit(1)
+      .then((rows) => rows[0])
+    if (!existing?.slug) throw new Error('Patient not found for update')
+    slug = existing.slug
   }
   // Transactional logic
   return await db.transaction(async (tx) => {
     const preparedData = {
       ...data,
+      id,
       slug,
-      latitude: data.latitude,
-      longitude: data.longitude,
       birthDate:
         data.birthDate instanceof Date
           ? data.birthDate
@@ -60,7 +66,7 @@ export const upsertPatient = async (data: {
       initialWeight: data.initialWeight,
       initialHeight: data.initialHeight
     }
-    const [res] = await tx
+    await tx
       .insert(patient)
       .values(preparedData)
       .onDuplicateKeyUpdate({
@@ -80,42 +86,23 @@ export const upsertPatient = async (data: {
           initialHeight: data.initialHeight
         }
       })
-      .$returningId()
-    const id = data.id ?? res?.id
-    if (!id) {
-      throw new Error('A problem occurred when upserting patient.')
-    }
-    // Only create assessments if this is a new patient (no id provided)
+    // Only create patientMonthlyAssesment and patientDailyAssesment join rows for new patient
     if (!data.id) {
-      // Generate monthly assessments for June–October this year
-      const months: Month[] = ['JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER']
-      const year = new Date().getFullYear()
-      for (const month of months) {
-        // Upsert monthly assessment definition
-        const monthly = await upsertMonthlyAssesment(month)
-        if (!monthly || !monthly.id)
-          throw new Error('Failed to upsert monthly assessment')
-        // Insert patient-monthly join row
+      // For each available monthly assessment, create join row for this patient
+      const monthlyAssesments = await tx.select().from(monthlyAssesment)
+      for (const monthly of monthlyAssesments) {
         await tx.insert(patientMonthlyAssesment).values({
           patientId: id,
           monthlyAssesmentId: monthly.id,
           weight: data.initialWeight,
           height: data.initialHeight
         })
-        // Generate daily assessments for each day in the month
-        const monthIndex = MONTHS.indexOf(month)
-        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
-        for (let day = 1; day <= daysInMonth; day++) {
-          // Upsert daily assessment definition
-          const daily = await upsertDailyAssesment({
-            monthlyAssesmentId: monthly.id,
-            date: new Date(year, monthIndex, day),
-            menu1: `Menu 1 for ${month} ${day}`,
-            menu2: `Menu 2 for ${month} ${day}`
-          })
-          if (!daily || !daily.id)
-            throw new Error('Failed to upsert daily assessment')
-          // Insert patient-daily join row (default booleans)
+        // For each available daily assessment for this monthly, create join row for this patient
+        const dailyAssesments = await tx
+          .select()
+          .from(dailyAssesment)
+          .where(eq(dailyAssesment.monthlyAssesmentId, monthly.id))
+        for (const daily of dailyAssesments) {
           await tx.insert(patientDailyAssesment).values({
             patientId: id,
             dailyAssesmentId: daily.id,
@@ -176,21 +163,19 @@ export const getAllPatients = async (
 ) => {
   const offset = (page - 1) * size
 
-  // regionSlug is now required, so always resolve regionId from the region table
-  const regionRow = await db
-    .select({ id: region.id })
-    .from(region)
-    .where(eq(region.slug, regionSlug))
-    .limit(1)
-    .then((rows) => rows[0])
-  const regionId = regionRow?.id
-
-  if (!regionId) throw new Error('Region not found for provided slug')
-
   return db
     .select()
     .from(patient)
-    .where(eq(patient.regionId, regionId))
+    .where(
+      eq(
+        patient.regionId,
+        db
+          .select({ id: region.id })
+          .from(region)
+          .where(eq(region.slug, regionSlug))
+          .limit(1)
+      )
+    )
     .limit(size)
     .offset(offset)
 }

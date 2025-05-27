@@ -11,12 +11,14 @@ export interface DialogTemplateProps
   extends DialogHTMLAttributes<HTMLDialogElement> {
   title?: string | undefined
   open: boolean
+  closeAction?: () => void
 }
 
 export const DialogTemplate: FC<PropsWithChildren<DialogTemplateProps>> = ({
   children,
   title,
   open = false,
+  closeAction,
   className,
   ...props
 }) => {
@@ -38,10 +40,13 @@ export const DialogTemplate: FC<PropsWithChildren<DialogTemplateProps>> = ({
       ref={ref}
       {...props}
     >
-      <div className='modal-box md:max-w-[75vh]'>
+      <div className='modal-box md:max-h-[90vh] md:w-[75vh]'>
         {title && <h3 className='mb-4 text-lg font-bold'>{title}</h3>}
         {children}
       </div>
+      <form className='modal-backdrop' method='dialog' onSubmit={closeAction}>
+        <button>close</button>
+      </form>
     </dialog>
   )
 }

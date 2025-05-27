@@ -15,6 +15,20 @@
       "when": 1748318891628,
       "tag": "0001_productive_pete_wisdom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1748331329683,
+      "tag": "0002_needy_pyro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1748333048070,
+      "tag": "0003_small_valkyrie",
+      "breakpoints": true
     }
   ]
 }

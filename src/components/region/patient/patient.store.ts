@@ -8,7 +8,7 @@ export type Patients = Awaited<
 export const $patients = atom<Patients | undefined>(undefined)
 export const setPatients = (state: Patients | undefined) => $patients.set(state)
 
-export type Patient = Omit<Patients[number], 'id' | 'slug'>
+export type Patient = Omit<Patients[number], 'slug' | 'age'>
 
 export const $currentPatient = atom<Patient | undefined>(undefined)
 export const setCurrentPatient = (state: Patient | undefined) =>

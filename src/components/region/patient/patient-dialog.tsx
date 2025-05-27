@@ -1,5 +1,6 @@
 import {
   useActionState,
+  useEffect,
   useState,
   type Dispatch,
   type FC,
@@ -28,6 +29,12 @@ const PatientDialog: FC = () => {
     lng: currentPatient?.longitude ?? 0
   } as L.LatLng)
 
+  useEffect(() => {
+    document.addEventListener('astro:page-load', () => {
+      setCurrentPatient(undefined)
+    })
+  })
+
   const handleSubmit = async (_prev: unknown, formData: FormData) => {
     const { data, error } = await actions.patient.upsert(formData)
     if (error && !data) {
@@ -55,7 +62,11 @@ const PatientDialog: FC = () => {
   }
 
   return (
-    <DialogTemplate open={openPatientModal}>
+    <DialogTemplate
+      title='Tambah atau Ubah Pasien'
+      open={openPatientModal}
+      closeAction={() => setCurrentPatient(undefined)}
+    >
       <form className='flex flex-col gap-2' action={action}>
         {/* Nama */}
         <div>
@@ -191,14 +202,30 @@ const PatientDialog: FC = () => {
           </label>
           <MapContainer
             className='aspect-[4/3] w-full'
-            center={[-2.537956, 112.940995]}
+            center={[
+              currentPatient.latitude || -2.537956,
+              currentPatient.longitude || 112.940995
+            ]}
             zoom={15}
           >
             <TileLayer
               url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
               attribution='© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
             />
-            <LocationMarker setLatLng={setLatLng} />
+            <LocationMarker
+              setLatLng={setLatLng}
+              initialLatLng={
+                currentPatient
+                  ? ({
+                      lat: currentPatient.latitude,
+                      lng: currentPatient.longitude
+                    } as L.LatLng)
+                  : ({
+                      lat: -2.537956,
+                      lng: 112.940995
+                    } as L.LatLng)
+              }
+            />
           </MapContainer>
           <input type='hidden' name='latitude' value={latLng.lat} />
           <input type='hidden' name='longitude' value={latLng.lng} />
@@ -212,6 +239,10 @@ const PatientDialog: FC = () => {
           )}
         </div>
 
+        {/* hidden mandatory fields */}
+        {currentPatient.id && (
+          <input type='hidden' name='id' value={currentPatient.id} />
+        )}
         <input type='hidden' name='regionId' value={currentRegion.id} />
 
         <div className='mt-4 flex w-full flex-col-reverse max-md:*:w-full md:flex-row-reverse'>
@@ -238,9 +269,10 @@ const PatientDialog: FC = () => {
 export default PatientDialog
 
 export const LocationMarker: FC<{
+  initialLatLng?: L.LatLng | undefined
   setLatLng: Dispatch<SetStateAction<L.LatLng>>
-}> = ({ setLatLng }) => {
-  const [position, setPosition] = useState<L.LatLng | undefined>(undefined)
+}> = ({ initialLatLng = undefined, setLatLng }) => {
+  const [position, setPosition] = useState<L.LatLng | undefined>(initialLatLng)
 
   useMapEvents({
     click: (e) => {

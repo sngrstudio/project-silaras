@@ -37,15 +37,13 @@ const patient = {
       regionId: z.string(),
       initialWeight: z.number(),
       initialHeight: z.number(),
-      slug: z.string().optional(),
       id: z.string().optional().nullable()
     }),
     handler: async (input) => {
-      const { id, slug, ...rest } = input as any
+      const { id, ...rest } = input as any
       return await upsertPatient({
         ...rest,
         ...(id ? { id } : {}),
-        ...(slug ? { slug } : {}),
         birthDate:
           typeof input.birthDate === 'string'
             ? new Date(input.birthDate)

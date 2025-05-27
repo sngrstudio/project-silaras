@@ -9,12 +9,14 @@ import {
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import {
+  $currentRegion,
   $patients,
   setCurrentPatient,
-  setCurrentRegion,
   type Patients
 } from './patient.store'
-import { actions } from 'astro:actions'
+import AddPatientIcon from '~icons/lucide/user-plus'
+import EditIcon from '~icons/lucide/pen'
+import DeleteIcon from '~icons/lucide/trash-2'
 
 type Patient = Patients[number]
 
@@ -22,7 +24,70 @@ const columnHelper = createColumnHelper<Patient>()
 const dColumns = [
   columnHelper.accessor('name', {
     header: 'Nama',
-    cell: (cell) => cell.getValue()
+    cell: (cell) => {
+      const url = `/patient/${cell.row.original.slug}`
+      return (
+        <a className='link font-bold' href={url}>
+          {cell.getValue()}
+        </a>
+      )
+    }
+  }),
+  columnHelper.accessor('age', {
+    header: 'Umur',
+    cell: (cell) => {
+      const age = cell.getValue()
+      if (!age) {
+        return <></>
+      }
+
+      return (
+        <span>
+          {age <= 36
+            ? `${age} bulan`
+            : `${Math.floor(age / 12)} tahun ${age % 12} bulan`}
+        </span>
+      )
+    }
+  }),
+  columnHelper.accessor('status', {
+    header: 'Status',
+    cell: (cell) => {
+      return (
+        <span className='badge badge-soft badge-primary badge-sm'>
+          {cell.getValue()}
+        </span>
+      )
+    }
+  }),
+  columnHelper.display({
+    id: 'd-actions',
+    header: 'Aksi',
+    cell: (cell) => {
+      const handleEditBtn = () => {
+        setCurrentPatient(cell.row.original)
+      }
+
+      return (
+        <div className='flex gap-2'>
+          <button
+            className='btn btn-soft btn-primary btn-xs'
+            onClick={handleEditBtn}
+          >
+            <EditIcon />
+            <span>Edit</span>
+          </button>
+
+          <button
+            className='btn btn-soft btn-error btn-xs'
+            onClick={handleEditBtn}
+          >
+            <DeleteIcon />
+            <span>Hapus</span>
+          </button>
+        </div>
+      )
+    }
   })
 ]
 const mColumns = [
@@ -53,7 +118,7 @@ const PatientTableRenderer: FC<{ data: Patients }> = ({ data }) => {
   })
   return (
     <>
-      <div className='card-actions'>
+      <div className='card-actions flex-row-reverse'>
         <PatientAddButton />
       </div>
       <ListTemplate table={mTable} className='-mx-6 md:hidden' />
@@ -63,11 +128,9 @@ const PatientTableRenderer: FC<{ data: Patients }> = ({ data }) => {
 }
 
 export const PatientAddButton: FC = () => {
-  const handleClick = async () => {
-    const regionSlug = window.location.pathname.split('/').at(-1) ?? ''
-    const region = await actions.region.getBySlug.orThrow({ slug: regionSlug })
-    setCurrentRegion(region!)
+  const currentRegion = useStore($currentRegion)
 
+  const handleClick = async () => {
     setCurrentPatient({
       name: '',
       motherName: '',
@@ -77,12 +140,14 @@ export const PatientAddButton: FC = () => {
       status: 'ANAK-ANAK',
       latitude: 0,
       longitude: 0,
-      regionId: region?.id!
+      regionId: currentRegion?.id!,
+      id: ''
     })
   }
 
   return (
     <button className='btn btn-primary max-md:w-full' onClick={handleClick}>
+      <AddPatientIcon />
       <span>Tambah Pasien</span>
     </button>
   )

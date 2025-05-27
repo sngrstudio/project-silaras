@@ -11,10 +11,27 @@ import PatientDialogRC from './patient-dialog'
 
 <script>
   import { onMount, task } from 'nanostores'
-  import { $patients, setPatients } from './patient.store'
+  import {
+    $patients,
+    setPatients,
+    $currentRegion,
+    setCurrentRegion
+  } from './patient.store'
   import { actions } from 'astro:actions'
 
   const getRegionSlug = () => window.location.pathname.split('/').at(-1) ?? ''
+
+  onMount($currentRegion, () => {
+    task(async () => {
+      const state = await actions.region.getBySlug.orThrow({
+        slug: getRegionSlug()
+      })
+      setCurrentRegion(state!)
+    })
+    return () => {
+      setCurrentRegion(undefined)
+    }
+  })
 
   onMount($patients, () => {
     task(async () => {
@@ -29,9 +46,14 @@ import PatientDialogRC from './patient-dialog'
   })
 
   document.addEventListener('astro:page-load', async () => {
-    const state = await actions.patient.getAll.orThrow({
+    const currentRegionState = await actions.region.getBySlug.orThrow({
+      slug: getRegionSlug()
+    })
+    setCurrentRegion(currentRegionState!)
+
+    const patientsState = await actions.patient.getAll.orThrow({
       regionSlug: getRegionSlug()
     })
-    setPatients(state)
+    setPatients(patientsState)
   })
 </script>

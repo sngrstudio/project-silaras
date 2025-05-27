@@ -120,7 +120,7 @@ export const patientDailyAssesment = mysqlTable(
     containsVegetables: boolean('contains_vegetables').default(false),
     containsFruits: boolean('contains_fruits').default(false),
     isFollowingRecipe: boolean('is_following_recipe').default(false),
-    score: tinyint('score').generatedAlwaysAs(
+    score: tinyint('score', { unsigned: true }).generatedAlwaysAs(
       (): SQL =>
         sql<number>`${patientDailyAssesment.containsStapleFood} + ${patientDailyAssesment.containsSideDish} + ${patientDailyAssesment.containsVegetables} + ${patientDailyAssesment.containsFruits} + ${patientDailyAssesment.isFollowingRecipe}`,
       { mode: 'stored' }

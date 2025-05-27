@@ -3,9 +3,11 @@ import {
   mysqlEnum,
   varchar,
   date,
+  tinyint,
   double
 } from 'drizzle-orm/mysql-core'
 import { region } from './region'
+import { sql, type SQL } from 'drizzle-orm'
 
 /**
  * Patient table schema definition.
@@ -24,6 +26,11 @@ export const patient = mysqlTable('patient', {
   name: varchar('name', { length: 255 }).notNull(),
   motherName: varchar('mother_name', { length: 255 }).notNull(),
   birthDate: date('birth_date').notNull(),
+  age: tinyint('age', { unsigned: true }).generatedAlwaysAs(
+    (): SQL =>
+      sql<number>`timestampdiff(month, ${patient.birthDate}, curdate())`,
+    { mode: 'virtual' }
+  ),
   status: mysqlEnum('status', ['HAMIL', 'MENYUSUI', 'ANAK-ANAK']).notNull(),
   latitude: double('latitude').notNull(),
   longitude: double('longitude').notNull(),

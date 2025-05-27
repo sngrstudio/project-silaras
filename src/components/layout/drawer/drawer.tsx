@@ -11,7 +11,7 @@ const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
   }
 
   return (
-    <main className='drawer md:drawer-open'>
+    <main className='drawer xl:drawer-open'>
       <input
         id='drawer'
         type='checkbox'
