@@ -49,7 +49,9 @@ const dColumns = [
     id: 'd-assesment',
     header: 'Penilaian',
     cell: (cell) => {
-      return <AssesmentForm cell={cell} />
+      return (
+        <AssesmentForm cell={cell} key={cell.row.original.dailyAssesmentId} />
+      )
     }
   }),
   columnHelper.accessor('score', {

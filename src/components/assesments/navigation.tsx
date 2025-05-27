@@ -1,6 +1,11 @@
-import { type FC } from 'react'
+import { useEffect, type FC } from 'react'
 import { useStore } from '@nanostores/react'
-import { $currentMonthIndex, setCurrentMonthIndex } from './assesment.store'
+import {
+  $currentMonthIndex,
+  setCurrentMonthIndex,
+  setDailyAssesments
+} from './assesment.store'
+import { actions } from 'astro:actions'
 import PreviousIcon from '~icons/lucide/chevron-left'
 import NextIcon from '~icons/lucide/chevron-right'
 
@@ -21,6 +26,19 @@ const MONTHS = [
 
 const Navigation: FC = () => {
   const currentMonthIndex = useStore($currentMonthIndex)
+
+  const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+
+  useEffect(() => {
+    actions.assesment.daily.getAll
+      .orThrow({
+        patientSlug: getPatientSlug(),
+        monthIndex: currentMonthIndex
+      })
+      .then((state) => {
+        setDailyAssesments(state)
+      })
+  }, [currentMonthIndex])
 
   const handlePrevPage = async () => {
     setCurrentMonthIndex(currentMonthIndex - 1)

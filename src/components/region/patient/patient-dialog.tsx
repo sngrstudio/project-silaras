@@ -239,6 +239,42 @@ const PatientDialog: FC = () => {
           )}
         </div>
 
+        {/* Alamat */}
+        <div>
+          <label className='label' htmlFor='address'>
+            Alamat (opsional)
+          </label>
+          <input
+            id='address'
+            name='address'
+            className='input w-full'
+            type='text'
+            defaultValue={currentPatient.address || ''}
+            disabled={isPending}
+          />
+          {error && error.fields.address && (
+            <div className='label'>{error.fields.address.join(', ')}</div>
+          )}
+        </div>
+
+        {/* Nomor Telepon */}
+        <div>
+          <label className='label' htmlFor='phoneNumber'>
+            Nomor Telepon (opsional)
+          </label>
+          <input
+            id='phoneNumber'
+            name='phoneNumber'
+            className='input w-full'
+            type='tel'
+            defaultValue={currentPatient.phoneNumber || ''}
+            disabled={isPending}
+          />
+          {error && error.fields.phoneNumber && (
+            <div className='label'>{error.fields.phoneNumber.join(', ')}</div>
+          )}
+        </div>
+
         {/* hidden mandatory fields */}
         {currentPatient.id && (
           <input type='hidden' name='id' value={currentPatient.id} />

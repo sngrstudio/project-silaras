@@ -34,6 +34,8 @@ export const upsertPatient = async (data: {
   regionId: string
   initialWeight: number
   initialHeight: number
+  address?: string | null
+  phoneNumber?: string | null
   id?: string
 }) => {
   // Always set id: use provided or generate new
@@ -64,7 +66,9 @@ export const upsertPatient = async (data: {
           ? data.birthDate
           : new Date(data.birthDate),
       initialWeight: data.initialWeight,
-      initialHeight: data.initialHeight
+      initialHeight: data.initialHeight,
+      address: data.address ?? null,
+      phoneNumber: data.phoneNumber ?? null
     }
     await tx
       .insert(patient)
@@ -83,7 +87,9 @@ export const upsertPatient = async (data: {
           regionId: data.regionId,
           slug,
           initialWeight: data.initialWeight,
-          initialHeight: data.initialHeight
+          initialHeight: data.initialHeight,
+          address: data.address ?? null,
+          phoneNumber: data.phoneNumber ?? null
         }
       })
     // Only create patientMonthlyAssesment and patientDailyAssesment join rows for new patient
@@ -199,10 +205,9 @@ const generatePatientSlug = (name: string): string => {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-  const chars = '0123456789abcdefghijklmnopqrstuvwxyz'
-  let rand = ''
-  for (let i = 0; i < 6; i++) {
-    rand += chars[Math.floor(Math.random() * chars.length)]
-  }
+  // Generate a 16-character, URL-safe, alphanumeric random string
+  const rand = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+    .map((n) => 'abcdefghijklmnopqrstuvwxyz0123456789'[n % 36])
+    .join('')
   return `${base}-${rand}`
 }

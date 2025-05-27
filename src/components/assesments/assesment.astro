@@ -4,7 +4,7 @@ import CardTemplateRC from '~/components/common/card/card'
 ---
 
 <CardTemplateRC>
-  <AssesmentRC client:idle />
+  <AssesmentRC client:load />
 </CardTemplateRC>
 
 <script>
@@ -40,14 +40,6 @@ import CardTemplateRC from '~/components/common/card/card'
     return () => {
       setDailyAssesments([])
     }
-  })
-
-  $currentMonthIndex.subscribe(async (monthIndex) => {
-    const nextState = await actions.assesment.daily.getAll.orThrow({
-      patientSlug: getPatientSlug(),
-      monthIndex
-    })
-    setDailyAssesments(nextState)
   })
 
   // Refetch on page navigation

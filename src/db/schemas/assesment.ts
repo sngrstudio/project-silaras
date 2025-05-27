@@ -1,4 +1,5 @@
 import {
+  mysqlView,
   mysqlTable,
   varchar,
   double,
@@ -8,8 +9,8 @@ import {
   primaryKey,
   foreignKey
 } from 'drizzle-orm/mysql-core'
+import { eq, sum, sql, type SQL } from 'drizzle-orm'
 import { patient } from './patient'
-import { sql, type SQL } from 'drizzle-orm'
 
 /**
  * Table: monthlyAssesment
@@ -143,4 +144,49 @@ export const patientDailyAssesment = mysqlTable(
       .onDelete('cascade')
       .onUpdate('cascade')
   ]
+)
+
+/**
+ * View: patientMonthlyAssesmentWithTotalScore
+ * Drizzle ORM view that joins patientMonthlyAssesment, monthlyAssesment, and aggregates totalScore from patientDailyAssesment for each (patientId, monthlyAssesmentId).
+ * Uses Drizzle's query builder, not raw SQL.
+ */
+export const patientMonthlyAssesmentWithTotalScore = mysqlView(
+  'patient_monthly_assesment_with_total_score'
+).as((db) =>
+  db
+    .select({
+      patientId: patientMonthlyAssesment.patientId,
+      monthlyAssesmentId: patientMonthlyAssesment.monthlyAssesmentId,
+      weight: patientMonthlyAssesment.weight,
+      height: patientMonthlyAssesment.height,
+      month: monthlyAssesment.month,
+      totalScore: sum(patientDailyAssesment.score).as('total_score')
+    })
+    .from(patientMonthlyAssesment)
+    .innerJoin(
+      monthlyAssesment,
+      eq(patientMonthlyAssesment.monthlyAssesmentId, monthlyAssesment.id)
+    )
+    .leftJoin(
+      patientDailyAssesment,
+      eq(patientMonthlyAssesment.patientId, patientDailyAssesment.patientId)
+    )
+    .leftJoin(
+      dailyAssesment,
+      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+    )
+    .where(
+      eq(
+        patientMonthlyAssesment.monthlyAssesmentId,
+        dailyAssesment.monthlyAssesmentId
+      )
+    )
+    .groupBy(
+      patientMonthlyAssesment.patientId,
+      patientMonthlyAssesment.monthlyAssesmentId,
+      patientMonthlyAssesment.weight,
+      patientMonthlyAssesment.height,
+      monthlyAssesment.month
+    )
 )

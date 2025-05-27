@@ -39,5 +39,7 @@ export const patient = mysqlTable('patient', {
     .references(() => region.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   initialWeight: double('initial_weight').notNull().default(0),
-  initialHeight: double('initial_height').notNull().default(0)
+  initialHeight: double('initial_height').notNull().default(0),
+  address: varchar('address', { length: 255 }),
+  phoneNumber: varchar('phone_number', { length: 255 })
 })

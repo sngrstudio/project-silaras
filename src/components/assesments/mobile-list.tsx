@@ -25,7 +25,7 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
       </div>
 
       <div className='list-col-wrap'>
-        <AssesmentForm cell={cell} />
+        <AssesmentForm cell={cell} key={cell.row.original.dailyAssesmentId} />
       </div>
 
       <div>

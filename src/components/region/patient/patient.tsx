@@ -43,7 +43,7 @@ const dColumns = [
 
       return (
         <span>
-          {age <= 36
+          {age <= 24
             ? `${age} bulan`
             : `${Math.floor(age / 12)} tahun ${age % 12} bulan`}
         </span>
@@ -141,7 +141,9 @@ export const PatientAddButton: FC = () => {
       latitude: 0,
       longitude: 0,
       regionId: currentRegion?.id!,
-      id: ''
+      id: '',
+      address: '',
+      phoneNumber: ''
     })
   }
 

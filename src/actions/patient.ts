@@ -37,6 +37,8 @@ const patient = {
       regionId: z.string(),
       initialWeight: z.number(),
       initialHeight: z.number(),
+      address: z.string().optional().nullable(),
+      phoneNumber: z.string().optional().nullable(),
       id: z.string().optional().nullable()
     }),
     handler: async (input) => {
