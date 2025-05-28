@@ -95,7 +95,7 @@ export const dailyAssesment = mysqlTable(
     monthlyAssesmentId: varchar('monthly_assesment_id', {
       length: 255
     }).notNull(),
-    date: date('date').notNull(),
+    date: date('date').unique().notNull(),
     menu1: varchar('menu_1', { length: 255 }).notNull(),
     menu2: varchar('menu_2', { length: 255 }).notNull()
   },

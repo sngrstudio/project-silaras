@@ -2,65 +2,35 @@ import { defineAction } from 'astro:actions'
 import {
   upsertMonthlyAssesment,
   upsertDailyAssesment,
-  MONTHS,
-  type Month,
   getAllDailyAssesmentsByPatientAndMonth,
   upsertPatientDailyAssesment,
   getMonthlyAssesment,
-  upsertPatientMonthlyAssesment
+  upsertPatientMonthlyAssesment,
+  getDailyAssesments,
+  MONTHS,
+  type Month
 } from '../db/queries/assesment'
 import { z } from 'astro:schema'
 
 /**
  * Astro Actions for Assessment Definitions and Patient Results
- * - setMonthly: Upsert a monthly assessment definition
- * - setDaily: Upsert a daily assessment definition
- * - monthly.get/set: Get or set a patient's monthly assessment result
- * - daily.get/set: Get or set a patient's daily assessment result
+ *
+ * Structure:
+ * - monthly.get: Get a patient's monthly assessment summary (from view) by patientSlug and monthIndex (1-12)
+ * - monthly.set: Upsert (insert or update) a patient's monthly assessment result by patientId and monthlyAssesmentId
+ * - daily.set: Upsert (insert or update) a patient's daily assessment result by patientId and dailyAssesmentId
+ * - daily.getAll: Get all daily assessment results for a patient, paginated by monthIndex (1-12)
+ * - settings.setMonthly: Upsert a monthly assessment definition by month name (enum)
+ * - settings.setDaily: Upsert a daily assessment definition by monthlyAssesmentId, date, menu1, and menu2
  */
 const assesment = {
-  /**
-   * Upsert (insert or update) a monthly assessment definition.
-   * @param month Month name (enum)
-   * @returns The upserted or found monthly assessment row
-   */
-  setMonthly: defineAction({
-    input: z.object({ month: z.enum([...MONTHS]) }),
-    handler: async ({ month }) => upsertMonthlyAssesment(month as Month)
-  }),
-
-  /**
-   * Upsert (insert or update) a daily assessment definition.
-   * @param monthlyAssesmentId ID of the monthly assessment
-   * @param date Date of the daily assessment
-   * @param menu1 Menu 1
-   * @param menu2 Menu 2
-   * @returns The upserted or found daily assessment row
-   */
-  setDaily: defineAction({
-    input: z.object({
-      monthlyAssesmentId: z.string(),
-      date: z.union([z.string(), z.date()]),
-      menu1: z.string(),
-      menu2: z.string()
-    }),
-    handler: async (input) => {
-      return upsertDailyAssesment({
-        monthlyAssesmentId: input.monthlyAssesmentId,
-        date:
-          typeof input.date === 'string' ? new Date(input.date) : input.date,
-        menu1: input.menu1,
-        menu2: input.menu2
-      })
-    }
-  }),
-
   monthly: {
     /**
      * Get a patient's monthly assessment summary (from view).
-     * @param patientSlug Patient slug
-     * @param month Month name (enum)
-     * @returns The patient's monthly assessment summary or null
+     *
+     * @param {string} patientSlug - The slug of the patient.
+     * @param {number} monthIndex - The month index (1 = January, 12 = December).
+     * @returns {Promise<object|null>} The patient's monthly assessment summary (from view) or null if not found.
      */
     get: defineAction({
       input: z.object({
@@ -74,12 +44,13 @@ const assesment = {
       }
     }),
     /**
-     * Set (insert or update) a patient's monthly assessment result.
-     * @param patientId Patient ID
-     * @param monthlyAssesmentId Monthly assessment definition ID
-     * @param weight Patient's weight
-     * @param height Patient's height
-     * @returns true if successful
+     * Upsert (insert or update) a patient's monthly assessment result.
+     *
+     * @param {string} patientId - The ID of the patient.
+     * @param {string} monthlyAssesmentId - The ID of the monthly assessment definition.
+     * @param {number} weight - The patient's weight for the month.
+     * @param {number} height - The patient's height for the month.
+     * @returns {Promise<object|null>} The upserted or updated row from the view, or null if not found.
      */
     set: defineAction({
       accept: 'form',
@@ -97,10 +68,6 @@ const assesment = {
   daily: {
     /**
      * Upsert (insert or update) a patient's daily assessment result.
-     *
-     * This action will insert a new row into the patientDailyAssesment table if one does not exist for the given
-     * patientId and dailyAssesmentId, or update the existing row if it does. The upsert is performed using MySQL's
-     * ON DUPLICATE KEY UPDATE pattern, as recommended by Drizzle ORM for MySQL compatibility.
      *
      * @param {string} patientId - The ID of the patient.
      * @param {string} dailyAssesmentId - The ID of the daily assessment definition.
@@ -140,11 +107,12 @@ const assesment = {
     }),
     /**
      * Get all daily assessment results for a patient, paginated by month.
-     * @param patientSlug Patient slug
-     * @param monthIndex Month index (1 = January, 12 = December)
-     * @returns Array of daily assessment results for the given month
      *
-     * Example usage:
+     * @param {string} patientSlug - The slug of the patient.
+     * @param {number} monthIndex - The month index (1 = January, 12 = December).
+     * @returns {Promise<Array<object>>} Array of daily assessment results for the given month.
+     *
+     * @example
      *   await actions.assesment.daily.getAll({ patientSlug: 'slug', monthIndex: 6 }) // June
      */
     getAll: defineAction({
@@ -159,6 +127,59 @@ const assesment = {
           patientSlug,
           month
         })
+      }
+    })
+  },
+  settings: {
+    /**
+     * Upsert (insert or update) a monthly assessment definition.
+     *
+     * @param {string} month - Month name (enum: 'JANUARY', ...).
+     * @returns {Promise<object>} The upserted or found monthly assessment row.
+     */
+    setMonthly: defineAction({
+      input: z.object({ month: z.enum([...MONTHS]) }),
+      handler: async ({ month }) => upsertMonthlyAssesment(month as Month)
+    }),
+    /**
+     * Upsert (insert or update) a daily assessment definition.
+     *
+     * @param {string} monthlyAssesmentId - The ID of the monthly assessment.
+     * @param {string|Date} date - The date of the daily assessment.
+     * @param {string} menu1 - The first menu for the day.
+     * @param {string} menu2 - The second menu for the day.
+     * @returns {Promise<object>} The upserted or found daily assessment row.
+     */
+    setDaily: defineAction({
+      accept: 'form',
+      input: z.object({
+        monthlyAssesmentId: z.string(),
+        date: z.coerce.date(),
+        menu1: z.string(),
+        menu2: z.string()
+      }),
+      handler: async (input) => {
+        return await upsertDailyAssesment(input)
+      }
+    }),
+    /**
+     * Get daily assessment definitions for a given month.
+     *
+     * @param {number} monthIndex - The month index (1 = January, 12 = December).
+     * @returns {Promise<Array<object>>} Array of daily assessment definitions for the given month.
+     *
+     * @example
+     *   await actions.assesment.settings.getAllDaily({ monthIndex: 6 }) // June
+     */
+    getAllDaily: defineAction({
+      input: z.object({
+        monthIndex: z.number().int().min(1).max(12)
+      }),
+      handler: async ({ monthIndex }) => {
+        const month = MONTHS[monthIndex - 1]
+        if (!month) throw new Error('Invalid month index')
+        // getDailyAssesments returns daily assessment definitions for the month
+        return await getDailyAssesments(month)
       }
     })
   }

@@ -1,0 +1,21 @@
+---
+import MenuComponent from '~/components/menu/menu.astro'
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import BackIcon from '~icons/lucide/arrow-left'
+
+const props = {
+  title: 'Menu',
+  description: `Halaman setelan menu harian`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  <MenuComponent transition:name='settings-menu' transition:animate='none' />
+
+  <Fragment slot='controls'>
+    <a class='btn btn-ghost md:btn-sm' href='/'>
+      <BackIcon />
+      Beranda
+    </a>
+  </Fragment>
+</DLayout>

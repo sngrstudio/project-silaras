@@ -32,9 +32,14 @@ const AssesmentStatRC: FC = () => {
   const [_, action, isPending] = useActionState(handleUpdate, undefined)
 
   const handleSave = () => {
-    if (formRef.current && !isPending) {
-      formRef.current.requestSubmit()
-    }
+    if (!formRef.current || isPending || !monthlyAssesments) return
+    const form = formRef.current
+    // Only submit if something changed
+    const changed =
+      parseFloat(form.height.value) !== Number(monthlyAssesments.height) ||
+      parseFloat(form.weight.value) !== Number(monthlyAssesments.weight)
+    if (!changed) return
+    form.requestSubmit()
   }
 
   if (!monthlyAssesments) {

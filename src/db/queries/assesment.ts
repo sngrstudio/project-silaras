@@ -109,7 +109,7 @@ export async function upsertDailyAssesment({
   await db
     .insert(dailyAssesment)
     .values({ monthlyAssesmentId, date, menu1, menu2 })
-    .onDuplicateKeyUpdate({ set: { menu1, menu2 } })
+    .onDuplicateKeyUpdate({ set: { date, menu1, menu2 } })
   const [inserted] = await db
     .select()
     .from(dailyAssesment)
@@ -236,11 +236,18 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
     .then((rows) => rows[0] ?? null)
   if (!patientRow) return []
 
-  // Get monthly assessment id by month
-  const monthly = await db
+  // Get monthly assessment id by month as a subquery
+  const monthlyIdSubquery = db
     .select({ id: monthlyAssesment.id })
     .from(monthlyAssesment)
     .where(eq(monthlyAssesment.month, month))
+    .limit(1)
+
+  // Get the first row using the subquery
+  const monthly = await db
+    .select({ id: monthlyAssesment.id })
+    .from(monthlyAssesment)
+    .where(eq(monthlyAssesment.id, monthlyIdSubquery))
     .then((rows) => rows[0] ?? null)
   if (!monthly) return []
 
@@ -364,4 +371,27 @@ export async function upsertPatientMonthlyAssesment({
     )
     .limit(1)
   return row ?? undefined
+}
+
+/**
+ * Get all daily assessment definitions for a given month name.
+ *
+ * @param {Month} month - The month name (enum: 'JANUARY', 'FEBRUARY', ...).
+ * @returns {Promise<Array<object>>} Array of daily assessment definitions for the month.
+ */
+export async function getDailyAssesments(month: Month) {
+  // Use subquery for monthlyAssesmentId by month name
+  return await db
+    .select()
+    .from(dailyAssesment)
+    .where(
+      eq(
+        dailyAssesment.monthlyAssesmentId,
+        db
+          .select({ id: monthlyAssesment.id })
+          .from(monthlyAssesment)
+          .where(eq(monthlyAssesment.month, month))
+          .limit(1)
+      )
+    )
 }

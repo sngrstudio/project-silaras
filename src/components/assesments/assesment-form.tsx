@@ -38,9 +38,19 @@ const AssesmentForm: FC<AssesmentFormProps> = ({ cell }) => {
   const [_error, action, isPending] = useActionState(handleForm, undefined)
 
   const handleSave = () => {
-    if (formRef.current && !isPending) {
-      formRef.current.requestSubmit()
-    }
+    if (!formRef.current || isPending) return
+    const form = formRef.current
+    // Only submit if something changed
+    const changed =
+      form.containsStapleFood.checked !==
+        !!cell.row.original.containsStapleFood ||
+      form.containsSideDish.checked !== !!cell.row.original.containsSideDish ||
+      form.containsVegetables.checked !==
+        !!cell.row.original.containsVegetables ||
+      form.containsFruits.checked !== !!cell.row.original.containsFruits ||
+      form.isFollowingRecipe.checked !== !!cell.row.original.isFollowingRecipe
+    if (!changed) return
+    form.requestSubmit()
   }
 
   return (
