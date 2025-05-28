@@ -1,4 +1,8 @@
 import { upsertRegion, getRegionBySlug } from '../queries/region'
+import {
+  upsertMonthlyAssesment,
+  upsertDailyAssesment
+} from '../queries/assesment'
 import regionsData from './data/regions.json'
 
 async function seed() {
@@ -34,6 +38,42 @@ async function seed() {
       if (dbRegion && dbRegion.id && dbRegion.slug) {
         slugToId.set(dbRegion.slug, dbRegion.id)
       }
+    }
+  }
+
+  // --- Monthly and Daily Assessment Seeder ---
+  // Only generate for June to October, using correct enum and types
+  // Use upsertMonthlyAssesment and upsertDailyAssesment from queries
+  type MonthEnum = 'JUNE' | 'JULY' | 'AUGUST' | 'SEPTEMBER' | 'OCTOBER'
+  const months: { name: MonthEnum; days: number }[] = [
+    { name: 'JUNE', days: 30 },
+    { name: 'JULY', days: 31 },
+    { name: 'AUGUST', days: 31 },
+    { name: 'SEPTEMBER', days: 30 },
+    { name: 'OCTOBER', days: 31 }
+  ]
+
+  // Only push defined rows
+  const monthlyAssesmentRows: Array<{ id: string; month: MonthEnum }> = []
+  for (const m of months) {
+    const row = await upsertMonthlyAssesment(m.name)
+    if (row && row.id)
+      monthlyAssesmentRows.push(row as { id: string; month: MonthEnum })
+  }
+
+  for (let i = 0; i < months.length; i++) {
+    const month = months[i]
+    const monthlyRow = monthlyAssesmentRows[i]
+    if (!month || !monthlyRow || !monthlyRow.id) continue
+    for (let day = 1; day <= month.days; day++) {
+      if (day === 31 && month.days < 31) continue // skip 31st if not in month
+      const dateObj = new Date(Date.UTC(2025, 5 + i, day)) // June is month 5 (0-based)
+      await upsertDailyAssesment({
+        monthlyAssesmentId: monthlyRow.id,
+        date: dateObj,
+        menu1: '<<menu>>',
+        menu2: '<<menu>>'
+      })
     }
   }
 
