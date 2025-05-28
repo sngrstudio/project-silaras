@@ -53,8 +53,13 @@ export const patientMonthlyAssesment = mysqlTable(
     monthlyAssesmentId: varchar('monthly_assesment_id', {
       length: 255
     }).notNull(),
-    weight: double('weight').notNull(),
-    height: double('height').notNull()
+    weight: double('weight', { precision: 5, scale: 2 }).notNull(),
+    height: double('height', { precision: 5, scale: 2 }).notNull(),
+    bmi: double('bmi', { precision: 5, scale: 2 }).generatedAlwaysAs(
+      (): SQL =>
+        sql<number>`${patientMonthlyAssesment.weight} / pow(${patientMonthlyAssesment.height} / 100, 2)`,
+      { mode: 'stored' }
+    )
   },
   (table) => [
     primaryKey({ columns: [table.patientId, table.monthlyAssesmentId] }),
@@ -160,6 +165,7 @@ export const patientMonthlyAssesmentWithTotalScore = mysqlView(
       monthlyAssesmentId: patientMonthlyAssesment.monthlyAssesmentId,
       weight: patientMonthlyAssesment.weight,
       height: patientMonthlyAssesment.height,
+      bmi: patientMonthlyAssesment.bmi,
       month: monthlyAssesment.month,
       totalScore: sum(patientDailyAssesment.score).as('total_score')
     })
@@ -187,6 +193,7 @@ export const patientMonthlyAssesmentWithTotalScore = mysqlView(
       patientMonthlyAssesment.monthlyAssesmentId,
       patientMonthlyAssesment.weight,
       patientMonthlyAssesment.height,
+      patientMonthlyAssesment.bmi,
       monthlyAssesment.month
     )
 )

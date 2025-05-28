@@ -32,14 +32,19 @@ export const patient = mysqlTable('patient', {
     { mode: 'virtual' }
   ),
   status: mysqlEnum('status', ['HAMIL', 'MENYUSUI', 'ANAK-ANAK']).notNull(),
+  phoneNumber: varchar('phone_number', { length: 255 }),
+  address: varchar('address', { length: 255 }),
   latitude: double('latitude').notNull(),
   longitude: double('longitude').notNull(),
   regionId: varchar('region_id', { length: 36 })
     .notNull()
     .references(() => region.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  slug: varchar('slug', { length: 255 }).notNull().unique(),
-  initialWeight: double('initial_weight').notNull().default(0),
-  initialHeight: double('initial_height').notNull().default(0),
-  address: varchar('address', { length: 255 }),
-  phoneNumber: varchar('phone_number', { length: 255 })
+  initialWeight: double('initial_weight', { precision: 5, scale: 2 }).notNull().default(0),
+  initialHeight: double('initial_height', { precision: 5, scale: 2 }).notNull().default(0),
+  initialBMI: double('initial_bmi', { precision: 5, scale: 2 }).generatedAlwaysAs(
+    (): SQL =>
+      sql<number>`${patient.initialWeight} / pow(${patient.initialHeight} / 100, 2)`,
+    { mode: 'stored' }
+  ),
+  slug: varchar('slug', { length: 255 }).notNull().unique()
 })
