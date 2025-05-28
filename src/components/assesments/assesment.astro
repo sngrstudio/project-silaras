@@ -1,17 +1,25 @@
 ---
 import AssesmentRC from './assesment'
+import AssesmentStatRC from './assesment-stat'
 import CardTemplateRC from '~/components/common/card/card'
 ---
 
-<CardTemplateRC>
-  <AssesmentRC client:load />
-</CardTemplateRC>
+<section class='mb-4'>
+  <AssesmentStatRC client:load />
+</section>
+<section>
+  <CardTemplateRC>
+    <AssesmentRC client:load />
+  </CardTemplateRC>
+</section>
 
 <script>
   import { onMount, task } from 'nanostores'
   import {
     $dailyAssesments,
     setDailyAssesments,
+    $monthlyAssesments,
+    setMonthlyAssesment,
     $currentMonthIndex,
     setCurrentMonthIndex
   } from './assesment.store'
@@ -42,12 +50,35 @@ import CardTemplateRC from '~/components/common/card/card'
     }
   })
 
+  onMount($monthlyAssesments, () => {
+    task(async () => {
+      const state = await actions.assesment.monthly.get.orThrow({
+        patientSlug: getPatientSlug(),
+        monthIndex: $currentMonthIndex.get()
+      })
+      setMonthlyAssesment(state)
+    })
+
+    return () => {
+      setMonthlyAssesment(undefined)
+    }
+  })
+
   // Refetch on page navigation
   document.addEventListener('astro:page-load', async () => {
-    const newState = await actions.assesment.daily.getAll.orThrow({
-      patientSlug: getPatientSlug(),
-      monthIndex: $currentMonthIndex.get()
-    })
-    setDailyAssesments(newState)
+    const newDailyAssesmentState = await actions.assesment.daily.getAll.orThrow(
+      {
+        patientSlug: getPatientSlug(),
+        monthIndex: $currentMonthIndex.get()
+      }
+    )
+    setDailyAssesments(newDailyAssesmentState)
+
+    const newMonthlyAssesmentState =
+      await actions.assesment.monthly.get.orThrow({
+        patientSlug: getPatientSlug(),
+        monthIndex: $currentMonthIndex.get()
+      })
+    setMonthlyAssesment(newMonthlyAssesmentState)
   })
 </script>

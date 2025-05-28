@@ -5,11 +5,10 @@ import {
   MONTHS,
   type Month,
   getAllDailyAssesmentsByPatientAndMonth,
-  upsertPatientDailyAssesment
+  upsertPatientDailyAssesment,
+  getMonthlyAssesment,
+  upsertPatientMonthlyAssesment
 } from '../db/queries/assesment'
-import { db } from '../db/db'
-import { patientMonthlyAssesment } from '../db/schemas/assesment'
-import { eq, and } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
 /**
@@ -58,27 +57,20 @@ const assesment = {
 
   monthly: {
     /**
-     * Get a patient's monthly assessment result.
-     * @param patientId Patient ID
-     * @param monthlyAssesmentId Monthly assessment definition ID
-     * @returns The patient's monthly assessment result or null
+     * Get a patient's monthly assessment summary (from view).
+     * @param patientSlug Patient slug
+     * @param month Month name (enum)
+     * @returns The patient's monthly assessment summary or null
      */
     get: defineAction({
       input: z.object({
-        patientId: z.string(),
-        monthlyAssesmentId: z.string()
+        patientSlug: z.string(),
+        monthIndex: z.number().int().min(1).max(12)
       }),
-      handler: async ({ patientId, monthlyAssesmentId }) => {
-        return db
-          .select()
-          .from(patientMonthlyAssesment)
-          .where(
-            and(
-              eq(patientMonthlyAssesment.patientId, patientId),
-              eq(patientMonthlyAssesment.monthlyAssesmentId, monthlyAssesmentId)
-            )
-          )
-          .then((rows) => rows[0] ?? null)
+      handler: async ({ patientSlug, monthIndex }) => {
+        const month = MONTHS[monthIndex - 1]
+        if (!month) throw new Error('Invalid month index')
+        return await getMonthlyAssesment({ patientSlug, month })
       }
     }),
     /**
@@ -90,6 +82,7 @@ const assesment = {
      * @returns true if successful
      */
     set: defineAction({
+      accept: 'form',
       input: z.object({
         patientId: z.string(),
         monthlyAssesmentId: z.string(),
@@ -97,13 +90,7 @@ const assesment = {
         height: z.number()
       }),
       handler: async (input) => {
-        await db
-          .insert(patientMonthlyAssesment)
-          .values(input)
-          .onDuplicateKeyUpdate({
-            set: { weight: input.weight, height: input.height }
-          })
-        return true
+        return await upsertPatientMonthlyAssesment(input)
       }
     })
   },

@@ -2,7 +2,9 @@ import { db } from '../db'
 import {
   monthlyAssesment,
   dailyAssesment,
-  patientDailyAssesment
+  patientDailyAssesment,
+  patientMonthlyAssesment,
+  patientMonthlyAssesmentWithTotalScore
 } from '../schemas/assesment'
 import { patient } from '../schemas/patient'
 import { eq, and } from 'drizzle-orm'
@@ -276,4 +278,90 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
     .where(eq(patientDailyAssesment.patientId, patientRow.id))
 
   return results
+}
+
+/**
+ * Get a patient's monthly assessment summary (including total score and BMI) by patientSlug and month name.
+ * Returns a single row from the patientMonthlyAssesmentWithTotalScore view, or null if not found.
+ *
+ * @param {Object} params - The query parameters.
+ * @param {string} params.patientSlug - The slug of the patient.
+ * @param {Month} params.month - The month name (enum).
+ * @returns {Promise<object|null>} The monthly assessment summary row, or null if not found.
+ */
+export async function getMonthlyAssesment({
+  patientSlug,
+  month
+}: {
+  patientSlug: string
+  month: Month
+}) {
+  // Query the view for this patient and month using a subquery for patientId
+  const rows = await db
+    .select()
+    .from(patientMonthlyAssesmentWithTotalScore)
+    .where(
+      and(
+        eq(
+          patientMonthlyAssesmentWithTotalScore.patientId,
+          db
+            .select({ id: patient.id })
+            .from(patient)
+            .where(eq(patient.slug, patientSlug))
+            .limit(1)
+        ),
+        eq(patientMonthlyAssesmentWithTotalScore.month, month)
+      )
+    )
+    .limit(1)
+  return rows[0] ?? undefined
+}
+
+/**
+ * Upsert (insert or update) a patient's monthly assessment result by patientSlug and month name.
+ * Uses subqueries for patientId and monthlyAssesmentId, and returns the new/updated row in a single call.
+ *
+ * @param {Object} params - The upsert parameters.
+ * @param {string} params.patientSlug - The slug of the patient.
+ * @param {Month} params.month - The month name (enum).
+ * @param {number} params.weight - The patient's weight.
+ * @param {number} params.height - The patient's height.
+ * @returns {Promise<object|null>} The upserted or updated row, or null if not found.
+ */
+export async function upsertPatientMonthlyAssesment({
+  patientId,
+  monthlyAssesmentId,
+  weight,
+  height
+}: {
+  patientId: string
+  monthlyAssesmentId: string
+  weight: number
+  height: number
+}) {
+  await db
+    .insert(patientMonthlyAssesment)
+    .values({
+      patientId,
+      monthlyAssesmentId,
+      weight,
+      height
+    })
+    .onDuplicateKeyUpdate({ set: { weight, height } })
+
+  // Return the upserted row from the view (with totalScore, bmi, etc)
+  const [row] = await db
+    .select()
+    .from(patientMonthlyAssesmentWithTotalScore)
+    .where(
+      and(
+        eq(patientMonthlyAssesmentWithTotalScore.patientId, patientId),
+        eq(
+          patientMonthlyAssesmentWithTotalScore.monthlyAssesmentId,
+          monthlyAssesmentId
+        )
+      )
+    )
+    .limit(1)
+  return row ?? undefined
 }

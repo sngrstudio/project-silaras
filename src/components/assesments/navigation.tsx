@@ -3,7 +3,8 @@ import { useStore } from '@nanostores/react'
 import {
   $currentMonthIndex,
   setCurrentMonthIndex,
-  setDailyAssesments
+  setDailyAssesments,
+  setMonthlyAssesment
 } from './assesment.store'
 import { actions } from 'astro:actions'
 import PreviousIcon from '~icons/lucide/chevron-left'
@@ -37,6 +38,15 @@ const Navigation: FC = () => {
       })
       .then((state) => {
         setDailyAssesments(state)
+      })
+
+    actions.assesment.monthly.get
+      .orThrow({
+        patientSlug: getPatientSlug(),
+        monthIndex: currentMonthIndex
+      })
+      .then((state) => {
+        setMonthlyAssesment(state)
       })
   }, [currentMonthIndex])
 

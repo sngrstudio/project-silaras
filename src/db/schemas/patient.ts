@@ -39,9 +39,16 @@ export const patient = mysqlTable('patient', {
   regionId: varchar('region_id', { length: 36 })
     .notNull()
     .references(() => region.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  initialWeight: double('initial_weight', { precision: 5, scale: 2 }).notNull().default(0),
-  initialHeight: double('initial_height', { precision: 5, scale: 2 }).notNull().default(0),
-  initialBMI: double('initial_bmi', { precision: 5, scale: 2 }).generatedAlwaysAs(
+  initialWeight: double('initial_weight', { precision: 5, scale: 2 })
+    .notNull()
+    .default(0),
+  initialHeight: double('initial_height', { precision: 5, scale: 2 })
+    .notNull()
+    .default(0),
+  initialBMI: double('initial_bmi', {
+    precision: 5,
+    scale: 2
+  }).generatedAlwaysAs(
     (): SQL =>
       sql<number>`${patient.initialWeight} / pow(${patient.initialHeight} / 100, 2)`,
     { mode: 'stored' }
