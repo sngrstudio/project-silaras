@@ -12,9 +12,16 @@ const { class: className, ...props } = Astro.props
   <Navigation />
   <Drawer>
     {
+      Astro.slots.has('controls') && (
+        <div class='-mx-4 mb-4 flex w-full'>
+          <slot name='controls' />
+        </div>
+      )
+    }
+    {
       /* <Header /> */
       props.title && (
-        <header class='mb-12'>
+        <header class='mb-8'>
           <h1 class='text-2xl font-black md:text-4xl'>{props.title}</h1>
           {props.description && (
             <p class='mt-1 text-sm md:mt-2 md:text-base'>{props.description}</p>

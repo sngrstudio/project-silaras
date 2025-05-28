@@ -3,6 +3,7 @@ import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import Region from '~/components/region/subregion/region.astro'
 import Patient from '~/components/region/patient/patient.astro'
 import { actions } from 'astro:actions'
+import BackIcon from '~icons/lucide/arrow-left'
 
 const { slug } = Astro.params
 if (!slug) {
@@ -13,6 +14,10 @@ const page = await Astro.callAction(actions.region.getBySlug.orThrow, { slug })
 if (!page) {
   return Astro.redirect('/404')
 }
+
+const parentRegion = await Astro.callAction(actions.region.getById.orThrow, {
+  id: page.parentId || ''
+})
 
 const props = {
   title: page.name,
@@ -29,6 +34,20 @@ const props = {
   {
     page.type === 'DESA' && (
       <Patient transition:name={page.slug} transition:animate='none' />
+    )
+  }
+  {
+    /* controls */
+    parentRegion && (
+      <Fragment slot='controls'>
+        <a
+          class='btn btn-ghost md:btn-sm'
+          href={`/region/${parentRegion.slug}`}
+        >
+          <BackIcon />
+          <span>{parentRegion.name}</span>
+        </a>
+      </Fragment>
     )
   }
 </DLayout>

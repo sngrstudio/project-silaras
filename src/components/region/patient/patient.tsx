@@ -16,7 +16,8 @@ import {
 } from './patient.store'
 import AddPatientIcon from '~icons/lucide/user-plus'
 import EditIcon from '~icons/lucide/pen'
-import DeleteIcon from '~icons/lucide/trash-2'
+import WhatsAppIcon from '~icons/simple-icons/whatsapp'
+import GMapsIcon from '~icons/simple-icons/googlemaps'
 
 type Patient = Patients[number]
 
@@ -78,13 +79,23 @@ const dColumns = [
             <span>Edit</span>
           </button>
 
-          <button
-            className='btn btn-soft btn-error btn-xs'
-            onClick={handleEditBtn}
+          <a
+            className='btn btn-soft btn-neutral btn-xs'
+            href={`https://wa.me/${cell.row.original.phoneNumber?.replace(/^08/, '628')}`}
+            target='_blank'
           >
-            <DeleteIcon />
-            <span>Hapus</span>
-          </button>
+            <WhatsAppIcon />
+            <span>WhatsApp</span>
+          </a>
+
+          <a
+            className='btn btn-soft btn-neutral btn-xs'
+            href={`https://www.google.com/maps/search/?api=1&query=${cell.row.original.latitude},${cell.row.original.longitude}`}
+            target='_blank'
+          >
+            <GMapsIcon />
+            <span>Lokasi</span>
+          </a>
         </div>
       )
     }

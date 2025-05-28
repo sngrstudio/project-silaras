@@ -2,6 +2,7 @@
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import Assesment from '~/components/assesments/assesment.astro'
 import { actions } from 'astro:actions'
+import BackIcon from '~icons/lucide/arrow-left'
 
 const { slug } = Astro.params
 if (!slug) {
@@ -15,6 +16,10 @@ if (!patient) {
   return Astro.redirect('/404')
 }
 
+const region = await Astro.callAction(actions.region.getById.orThrow, {
+  id: patient.regionId
+})
+
 const props = {
   title: patient.name,
   description: `Halaman pasien untuk ${patient.name}`
@@ -22,5 +27,17 @@ const props = {
 ---
 
 <DLayout {...props}>
-  <Assesment />
+  <Assesment transition:name={patient.slug} transition:animate='none' />
+
+  {
+    /* controls */
+    region && (
+      <Fragment slot='controls'>
+        <a class='btn btn-ghost md:btn-sm' href={`/region/${region.slug}`}>
+          <BackIcon />
+          <span>{region.name}</span>
+        </a>
+      </Fragment>
+    )
+  }
 </DLayout>
