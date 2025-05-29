@@ -1,1 +1,0 @@
-ALTER TABLE `daily_assesment` ADD CONSTRAINT `daily_assesment_date_unique` UNIQUE(`date`);

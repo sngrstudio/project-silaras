@@ -1,2 +1,0 @@
-ALTER TABLE `patient_daily_assesment` MODIFY COLUMN `score` tinyint unsigned GENERATED ALWAYS AS (`patient_daily_assesment`.`contains_staple_food` + `patient_daily_assesment`.`contains_side_dish` + `patient_daily_assesment`.`contains_vegetables` + `patient_daily_assesment`.`contains_fruits` + `patient_daily_assesment`.`is_following_recipe`) STORED;--> statement-breakpoint
-ALTER TABLE `patient` ADD `age` tinyint unsigned GENERATED ALWAYS AS (timestampdiff(year, `patient`.`birth_date`, curdate())) VIRTUAL;

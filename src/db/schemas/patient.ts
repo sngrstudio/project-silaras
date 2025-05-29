@@ -19,7 +19,7 @@ import { sql, type SQL } from 'drizzle-orm'
  */
 
 export const patient = mysqlTable('patient', {
-  id: varchar('id', { length: 255 })
+  id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
     .$default(() => Bun.randomUUIDv7()),

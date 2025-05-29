@@ -18,7 +18,7 @@ import { patient } from './patient'
  * Each row represents a unique month for which assessments are defined.
  */
 export const monthlyAssesment = mysqlTable('monthly_assesment', {
-  id: varchar('id', { length: 255 })
+  id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
     .$default(() => Bun.randomUUIDv7()),
@@ -49,9 +49,9 @@ export const monthlyAssesment = mysqlTable('monthly_assesment', {
 export const patientMonthlyAssesment = mysqlTable(
   'patient_monthly_assesment',
   {
-    patientId: varchar('patient_id', { length: 255 }).notNull(),
+    patientId: varchar('patient_id', { length: 36 }).notNull(),
     monthlyAssesmentId: varchar('monthly_assesment_id', {
-      length: 255
+      length: 36
     }).notNull(),
     weight: double('weight', { precision: 5, scale: 2 }).notNull(),
     height: double('height', { precision: 5, scale: 2 }).notNull(),
@@ -88,12 +88,12 @@ export const patientMonthlyAssesment = mysqlTable(
 export const dailyAssesment = mysqlTable(
   'daily_assesment',
   {
-    id: varchar('id', { length: 255 })
+    id: varchar('id', { length: 36 })
       .primaryKey()
       .notNull()
       .$default(() => Bun.randomUUIDv7()),
     monthlyAssesmentId: varchar('monthly_assesment_id', {
-      length: 255
+      length: 36
     }).notNull(),
     date: date('date').unique().notNull(),
     menu1: varchar('menu_1', { length: 255 }).notNull(),
@@ -119,8 +119,8 @@ export const dailyAssesment = mysqlTable(
 export const patientDailyAssesment = mysqlTable(
   'patient_daily_assesment',
   {
-    patientId: varchar('patient_id', { length: 255 }).notNull(),
-    dailyAssesmentId: varchar('daily_assesment_id', { length: 255 }).notNull(),
+    patientId: varchar('patient_id', { length: 36 }).notNull(),
+    dailyAssesmentId: varchar('daily_assesment_id', { length: 36 }).notNull(),
     containsStapleFood: boolean('contains_staple_food').default(false),
     containsSideDish: boolean('contains_side_dish').default(false),
     containsVegetables: boolean('contains_vegetables').default(false),

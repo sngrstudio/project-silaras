@@ -21,7 +21,7 @@ import {
  */
 
 export const region = mysqlTable('region', {
-  id: varchar('id', { length: 255 })
+  id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
     .$default(() => Bun.randomUUIDv7()),

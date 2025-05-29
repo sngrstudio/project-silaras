@@ -1,1 +1,0 @@
-ALTER TABLE `patient` ADD `initial_bmi` double GENERATED ALWAYS AS (`patient`.`initial_weight` / pow(`patient`.`initial_height` / 100, 2)) STORED;

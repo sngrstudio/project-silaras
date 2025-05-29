@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d206148b-5765-4a08-bd1f-7de2160086ee",
+  "id": "8a6d23df-73ee-4c75-9924-61379d5c80d4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "daily_assesment": {
@@ -9,14 +9,14 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "monthly_assesment_id": {
           "name": "monthly_assesment_id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -67,7 +67,14 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "daily_assesment_date_unique": {
+          "name": "daily_assesment_date_unique",
+          "columns": [
+            "date"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "monthly_assesment": {
@@ -75,7 +82,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -106,14 +113,14 @@
       "columns": {
         "patient_id": {
           "name": "patient_id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "daily_assesment_id": {
           "name": "daily_assesment_id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -160,7 +167,7 @@
         },
         "score": {
           "name": "score",
-          "type": "tinyint",
+          "type": "tinyint unsigned",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
@@ -216,31 +223,42 @@
       "columns": {
         "patient_id": {
           "name": "patient_id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "monthly_assesment_id": {
           "name": "monthly_assesment_id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "weight": {
           "name": "weight",
-          "type": "double",
+          "type": "double(5,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "height": {
           "name": "height",
-          "type": "double",
+          "type": "double(5,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "bmi": {
+          "name": "bmi",
+          "type": "double(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "`patient_monthly_assesment`.`weight` / pow(`patient_monthly_assesment`.`height` / 100, 2)",
+            "type": "stored"
+          }
         }
       },
       "indexes": {},
@@ -289,7 +307,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -315,6 +333,17 @@
           "notNull": true,
           "autoincrement": false
         },
+        "age": {
+          "name": "age",
+          "type": "tinyint unsigned",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "timestampdiff(month, `patient`.`birth_date`, curdate())",
+            "type": "virtual"
+          }
+        },
         "status": {
           "name": "status",
           "type": "enum('HAMIL','MENYUSUI','ANAK-ANAK')",
@@ -322,9 +351,30 @@
           "notNull": true,
           "autoincrement": false
         },
-        "location": {
-          "name": "location",
-          "type": "json",
+        "phone_number": {
+          "name": "phone_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -336,16 +386,9 @@
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "initial_weight": {
           "name": "initial_weight",
-          "type": "double",
+          "type": "double(5,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -353,11 +396,29 @@
         },
         "initial_height": {
           "name": "initial_height",
-          "type": "double",
+          "type": "double(5,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": 0
+        },
+        "initial_bmi": {
+          "name": "initial_bmi",
+          "type": "double(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "`patient`.`initial_weight` / pow(`patient`.`initial_height` / 100, 2)",
+            "type": "stored"
+          }
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -399,7 +460,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
+          "type": "varchar(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -466,9 +527,218 @@
         }
       },
       "checkConstraint": {}
+    },
+    "session": {
+      "name": "session",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "session_id": {
+          "name": "session_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "user": {
+      "name": "user",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "access_level": {
+          "name": "access_level",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "profile_photo": {
+          "name": "profile_photo",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "region_id": {
+          "name": "region_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_region_id_region_id_fk": {
+          "name": "user_region_id_region_id_fk",
+          "tableFrom": "user",
+          "tableTo": "region",
+          "columnsFrom": [
+            "region_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "user_id": {
+          "name": "user_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "columns": [
+            "username"
+          ]
+        },
+        "user_phone_number_unique": {
+          "name": "user_phone_number_unique",
+          "columns": [
+            "phone_number"
+          ]
+        }
+      },
+      "checkConstraint": {}
     }
   },
-  "views": {},
+  "views": {
+    "patient_monthly_assesment_with_total_score": {
+      "columns": {
+        "patient_id": {
+          "name": "patient_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "monthly_assesment_id": {
+          "name": "monthly_assesment_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "double(5,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "height": {
+          "name": "height",
+          "type": "double(5,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bmi": {
+          "name": "bmi",
+          "type": "double(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "`patient_monthly_assesment`.`weight` / pow(`patient_monthly_assesment`.`height` / 100, 2)",
+            "type": "stored"
+          }
+        },
+        "month": {
+          "name": "month",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "name": "patient_monthly_assesment_with_total_score",
+      "isExisting": false,
+      "definition": "select `patient_monthly_assesment`.`patient_id`, `patient_monthly_assesment`.`monthly_assesment_id`, `patient_monthly_assesment`.`weight`, `patient_monthly_assesment`.`height`, `patient_monthly_assesment`.`bmi`, `monthly_assesment`.`month`, sum(`patient_daily_assesment`.`score`) as `total_score` from `patient_monthly_assesment` inner join `monthly_assesment` on `patient_monthly_assesment`.`monthly_assesment_id` = `monthly_assesment`.`id` left join `patient_daily_assesment` on `patient_monthly_assesment`.`patient_id` = `patient_daily_assesment`.`patient_id` left join `daily_assesment` on `patient_daily_assesment`.`daily_assesment_id` = `daily_assesment`.`id` where `patient_monthly_assesment`.`monthly_assesment_id` = `daily_assesment`.`monthly_assesment_id` group by `patient_monthly_assesment`.`patient_id`, `patient_monthly_assesment`.`monthly_assesment_id`, `patient_monthly_assesment`.`weight`, `patient_monthly_assesment`.`height`, `patient_monthly_assesment`.`bmi`, `monthly_assesment`.`month`",
+      "algorithm": "undefined",
+      "sqlSecurity": "definer"
+    }
+  },
   "_meta": {
     "schemas": {},
     "tables": {},
