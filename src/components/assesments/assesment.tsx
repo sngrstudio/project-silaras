@@ -34,7 +34,7 @@ const dColumns = [
         <div className='flex flex-col gap-y-1'>
           {menus.map((menu, i) => (
             <span
-              className='badge badge-soft badge-sm data-[menu=0]:badge-primary data-[menu=1]:badge-accent'
+              className='badge badge-soft badge-sm md:badge-md data-[menu=0]:badge-primary data-[menu=1]:badge-accent'
               data-menu={i}
               key={i}
             >
