@@ -7,20 +7,12 @@ services:
     triggeredBy:
       - postEnvironmentStart
 
-  minio:
-    name: Storage (MinIO)
-    commands:
-      start: docker compose up minio
-      stop: docker compose stop minio
-    triggeredBy:
-      - postEnvironmentStart
-
   server:
     name: Astro Dev Server
     commands:
       start: bun run dev --host=0.0.0.0
     triggeredBy:
-      - manual
+      - postEnvironmentStart
 
   studio:
     name: Drizzle Studio

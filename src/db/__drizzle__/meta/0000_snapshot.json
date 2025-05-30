@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "8a6d23df-73ee-4c75-9924-61379d5c80d4",
+  "id": "08cb34c0-43dc-4e5f-8b55-42e1fb7ab6f5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "daily_assesment": {
@@ -302,6 +302,44 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "presigned_image_url": {
+      "name": "presigned_image_url",
+      "columns": {
+        "file_name": {
+          "name": "file_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "presigned_url": {
+          "name": "presigned_url",
+          "type": "varchar(511)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "presigned_image_url_file_name": {
+          "name": "presigned_image_url_file_name",
+          "columns": [
+            "file_name"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "patient": {
       "name": "patient",
       "columns": {
@@ -526,6 +564,37 @@
           ]
         }
       },
+      "checkConstraint": {}
+    },
+    "site": {
+      "name": "site",
+      "columns": {
+        "property": {
+          "name": "property",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "site_property": {
+          "name": "site_property",
+          "columns": [
+            "property"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     },
     "session": {

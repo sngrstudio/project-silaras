@@ -5,5 +5,6 @@ declare module 'bun' {
     S3_SECRET_ACCESS_KEY: string
     S3_ENDPOINT: string
     S3_BUCKET: string
+    S3_REGION: string
   }
 }

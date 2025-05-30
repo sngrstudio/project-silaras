@@ -2,7 +2,11 @@ import type { FC } from 'react'
 
 const SETTINGS_MENU = [
   {
-    label: 'Menu',
+    label: 'Setelan Situs',
+    href: '/settings/site'
+  },
+  {
+    label: 'Setelan Menu',
     href: '/settings/menu'
   }
 ]

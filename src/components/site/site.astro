@@ -1,0 +1,27 @@
+---
+import SiteSettingsRC from './site'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<section>
+  <CardTemplateRC>
+    <SiteSettingsRC client:load />
+  </CardTemplateRC>
+</section>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $siteSettings, setSiteSettings } from './site.store'
+  import { actions } from 'astro:actions'
+
+  onMount($siteSettings, () => {
+    task(async () => {
+      const state = await actions.site.getAll.orThrow()
+      setSiteSettings(state)
+    })
+
+    return () => {
+      setSiteSettings(undefined)
+    }
+  })
+</script>

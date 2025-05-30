@@ -1,16 +1,16 @@
 ---
-import MenuComponent from '~/components/menu/menu.astro'
+import SiteComponent from '~/components/site/site.astro'
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import BackIcon from '~icons/lucide/arrow-left'
 
 const props = {
-  title: 'Menu',
-  description: `Setelan menu harian.`
+  title: 'Setelan Situs',
+  description: `Setelan dasar situs.`
 } satisfies DLayoutProps
 ---
 
 <DLayout {...props}>
-  <MenuComponent transition:name='settings-menu' transition:animate='none' />
+  <SiteComponent transition:name='settings-menu' transition:animate='none' />
 
   <Fragment slot='controls'>
     <a class='btn btn-ghost md:btn-sm' href='/'>

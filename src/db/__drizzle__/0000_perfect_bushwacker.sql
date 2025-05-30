@@ -35,6 +35,13 @@ CREATE TABLE `patient_monthly_assesment` (
 	CONSTRAINT `patient_monthly_assesment_patient_id_monthly_assesment_id_pk` PRIMARY KEY(`patient_id`,`monthly_assesment_id`)
 );
 --> statement-breakpoint
+CREATE TABLE `presigned_image_url` (
+	`file_name` varchar(255) NOT NULL,
+	`presigned_url` varchar(511) NOT NULL,
+	`expires_at` datetime NOT NULL,
+	CONSTRAINT `presigned_image_url_file_name` PRIMARY KEY(`file_name`)
+);
+--> statement-breakpoint
 CREATE TABLE `patient` (
 	`id` varchar(36) NOT NULL,
 	`name` varchar(255) NOT NULL,
@@ -63,6 +70,12 @@ CREATE TABLE `region` (
 	`parent_id` varchar(36),
 	CONSTRAINT `region_id` PRIMARY KEY(`id`),
 	CONSTRAINT `region_slug_unique` UNIQUE(`slug`)
+);
+--> statement-breakpoint
+CREATE TABLE `site` (
+	`property` varchar(255) NOT NULL,
+	`value` text NOT NULL,
+	CONSTRAINT `site_property` PRIMARY KEY(`property`)
 );
 --> statement-breakpoint
 CREATE TABLE `session` (

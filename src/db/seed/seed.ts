@@ -3,6 +3,7 @@ import {
   upsertMonthlyAssesment,
   upsertDailyAssesment
 } from '../queries/assesment'
+import { upsertSiteProperty } from '../queries/site'
 import regionsData from './data/regions.json'
 
 async function seed() {
@@ -76,6 +77,14 @@ async function seed() {
       })
     }
   }
+
+  // --- Site Settings Seeder ---
+  await upsertSiteProperty('SITE_NAME', 'Silaras')
+  await upsertSiteProperty(
+    'SITE_DESCRIPTION',
+    'Sistem Laporan Dapur Sehat Atasi Stunting (DASHAT)'
+  )
+  await upsertSiteProperty('SITE_LOGO', '')
 
   console.log('Seed completed!')
 }

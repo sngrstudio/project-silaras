@@ -12,7 +12,7 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [4321, 4322, 3306, 4983, 9000, 9001],
+  "forwardPorts": [4321, 4322, 3306, 4983],
   "portsAttributes": {
     "4321": {
       "label": "Astro's Dev Server",
@@ -28,14 +28,6 @@
     },
     "4983": {
       "label": "Drizzle Studio",
-      "onAutoForward": "silent"
-    },
-    "9000": {
-      "label": "MinIO API",
-      "onAutoForward": "notify"
-    },
-    "9001": {
-      "label": "MinIO Console",
       "onAutoForward": "silent"
     }
   },
@@ -59,7 +51,21 @@
         },
         "editor.quickSuggestions": {
           "strings": "on"
-        }
+        },
+        "sqltools.connections": [
+          {
+            "mysqlOptions": {
+              "authProtocol": "default",
+              "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "MariaDB",
+            "name": "test",
+            "group": "test",
+            "connectString": "mysql://test:test@localhost:3306/test"
+          }
+        ]
       }
     }
   },
