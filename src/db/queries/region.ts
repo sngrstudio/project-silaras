@@ -107,6 +107,21 @@ export const getAllRegions = async (
 }
 
 /**
+ * Get all regions by type without pagination.
+ * @param type Region type ('KABUPATEN', 'KECAMATAN', 'DESA')
+ * @returns Array of regions of the specified type
+ */
+export const getRegionsByType = async (
+  type: (typeof region.$inferInsert)['type']
+) => {
+  return db
+    .select()
+    .from(region)
+    .where(eq(region.type, type))
+    .orderBy(region.name)
+}
+
+/**
  * Delete a region by id.
  * @param id Region id
  * @returns void

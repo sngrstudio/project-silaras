@@ -4,6 +4,7 @@ import {
   getRegionById,
   getRegionBySlug,
   getAllRegions,
+  getRegionsByType,
   deleteRegion
 } from '../db/queries/region'
 import { z } from 'astro:schema'
@@ -72,6 +73,18 @@ const region = {
     }),
     handler: async ({ page, size, parentSlug }) =>
       getAllRegions(page, size, parentSlug)
+  }),
+
+  /**
+   * Get all regions by type without pagination.
+   * @param type Region type ('KABUPATEN', 'KECAMATAN', 'DESA')
+   * @returns Array of regions of the specified type
+   */
+  getByType: defineAction({
+    input: z.object({
+      type: z.enum(['KABUPATEN', 'KECAMATAN', 'DESA'])
+    }),
+    handler: async ({ type }) => getRegionsByType(type)
   }),
 
   /**

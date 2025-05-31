@@ -1,9 +1,19 @@
-import { useActionState, useRef, type FC } from 'react'
+import { useActionState, useRef, useEffect, useState, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 
 const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
   const formRef = useRef<HTMLFormElement>(null)
+  const [regionId, setRegionId] = useState<string | undefined>(undefined)
+
+  // Fetch KABUPATEN region ID when first is true (first administrator signup)
+  useEffect(() => {
+    if (first) {
+      actions.region.getByType
+        .orThrow({ type: 'KABUPATEN' })
+        .then(([region]) => setRegionId(region?.id ?? undefined))
+    }
+  }, [first])
 
   const handleForm = async (_prev: unknown, formData: FormData) => {
     const { error, data } = await actions.user.upsert(formData)
@@ -100,6 +110,9 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
       </div>
 
       <input type='hidden' name='accessLevel' value={first ? 4 : 2} />
+      {first && regionId && (
+        <input type='hidden' name='regionId' value={regionId} />
+      )}
 
       <div className='mt-6 flex w-full flex-col-reverse gap-y-2'>
         <button
