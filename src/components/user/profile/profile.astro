@@ -1,0 +1,31 @@
+---
+// filepath: /workspaces/project-silaras/src/components/user/profile/profile.astro
+import ProfileRC from './profile'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<section>
+  <CardTemplateRC>
+    <ProfileRC client:load />
+  </CardTemplateRC>
+</section>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $currentUser,
+    setCurrentUser
+  } from '~/components/layout/drawer/drawer.store'
+  import { actions } from 'astro:actions'
+
+  onMount($currentUser, () => {
+    task(async () => {
+      const user = await actions.user.getCurrent.orThrow()
+      setCurrentUser(user)
+    })
+
+    return () => {
+      // Don't clear current user on unmount as it's used globally
+    }
+  })
+</script>

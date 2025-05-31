@@ -1,5 +1,5 @@
 ---
-import SiteComponent from '~/components/settings/site/site.astro'
+import ProfileComponent from '~/components/user/profile/profile.astro'
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import BackIcon from '~icons/lucide/arrow-left'
 
@@ -9,13 +9,13 @@ if (!user) {
 }
 
 const props = {
-  title: 'Setelan Situs',
-  description: `Setelan dasar situs.`
+  title: 'Profil Pengguna',
+  description: `Kelola profil dan pengaturan akun Anda.`
 } satisfies DLayoutProps
 ---
 
 <DLayout {...props}>
-  <SiteComponent transition:name='settings-menu' transition:animate='none' />
+  <ProfileComponent transition:name='profile-page' transition:animate='none' />
 
   <Fragment slot='controls'>
     <a class='btn btn-ghost md:btn-sm' href='/'>

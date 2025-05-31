@@ -22,7 +22,7 @@ const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
       <div className='drawer-content h-[calc(100vh-4rem)] overflow-auto p-4 md:p-8'>
         {children}
       </div>
-      <div className='drawer-side'>
+      <div className='drawer-side xl:max-h-[calc(100dvh-4rem)]'>
         <label
           htmlFor='drawer'
           className='drawer-overlay'

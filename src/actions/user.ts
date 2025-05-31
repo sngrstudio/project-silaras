@@ -17,6 +17,7 @@ import {
 } from '../auth/cookies'
 import { z } from 'astro:schema'
 import { deleteS3, uploadS3 } from '~/lib/s3'
+import { getFileHash } from '~/helper/file-hash'
 
 /**
  * Astro Actions for User table
@@ -66,12 +67,13 @@ const user = {
       const existingUser = await getUserByUsername(input.username)
 
       let profilePhoto
-      if (profilePhotoFile) {
+      if (profilePhotoFile && profilePhotoFile.name) {
         if (existingUser && existingUser.profilePhoto) {
           await deleteS3(existingUser.profilePhoto)
         }
 
-        profilePhoto = `user-${input.username}-${Bun.randomUUIDv7()}.${profilePhotoFile.name.lastIndexOf('.')}`
+        const hashHex = await getFileHash(profilePhotoFile)
+        profilePhoto = `user-${input.username}-${hashHex}.${profilePhotoFile.name.split('.').pop() || ''}`
         await uploadS3(profilePhotoFile, profilePhoto)
       }
       // Prepare user data, hashing password if provided
