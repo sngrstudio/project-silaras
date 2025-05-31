@@ -8,8 +8,9 @@ interface MobileListProps {
 }
 
 const MobileList: FC<MobileListProps> = ({ cell }) => {
-  const name = cell.row.original.name
-  const path = `/region/${cell.row.original.slug}`
+  const region = cell.row.original
+  const name = region.name
+  const path = `/region/${region.slug}`
 
   return (
     <>
@@ -17,6 +18,11 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
         <a className='link text-lg font-bold' href={path}>
           {name}
         </a>
+        <div className='mt-1'>
+          <span className='badge badge-soft badge-neutral badge-sm'>
+            {region.type}
+          </span>
+        </div>
       </div>
       <div>
         <a
