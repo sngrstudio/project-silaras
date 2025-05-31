@@ -1,8 +1,15 @@
 ---
 import Layout from './_layout.astro'
 import SignupComponent from '~/components/user/signup/signup.astro'
+
+const { user } = Astro.locals
+if (user) {
+  return Astro.redirect('/')
+}
+
+const first = Astro.url.searchParams.get('first')
 ---
 
 <Layout>
-  <SignupComponent />
+  <SignupComponent first={!!first} />
 </Layout>

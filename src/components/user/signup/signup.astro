@@ -1,5 +1,11 @@
 ---
 import SignupFormRC from './signup'
+
+interface Props {
+  first?: boolean | undefined
+}
+
+const { first } = Astro.props
 ---
 
-<SignupFormRC client:load />
+<SignupFormRC first={first} client:load />

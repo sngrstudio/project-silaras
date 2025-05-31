@@ -227,6 +227,21 @@ const user = {
         deleteSessionTokenCookie(ctx)
       }
     })
+  },
+
+  checks: {
+    isNoAdmin: defineAction({
+      handler: async () => {
+        const admins = await getAllUsers().then((users) =>
+          users.filter((user) => user.accessLevel >= 4)
+        )
+        if (admins.length > 0) {
+          return false
+        } else {
+          return true
+        }
+      }
+    })
   }
 }
 

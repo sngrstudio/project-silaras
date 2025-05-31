@@ -5,3 +5,24 @@ import DrawerRC from './drawer'
 <DrawerRC client:load>
   <slot />
 </DrawerRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $currentUser, setCurrentUser, setOpenDrawer } from './drawer.store'
+  import { actions } from 'astro:actions'
+
+  onMount($currentUser, () => {
+    task(async () => {
+      const state = await actions.user.getCurrent.orThrow()
+      setCurrentUser(state)
+    })
+
+    return () => {
+      setCurrentUser(undefined)
+    }
+  })
+
+  document.addEventListener('astro:page-load', () => {
+    setOpenDrawer(false)
+  })
+</script>

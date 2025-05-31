@@ -1,7 +1,8 @@
 import { useActionState, useRef, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
+import { navigate } from 'astro:transitions/client'
 
-const SignupFormRC: FC = () => {
+const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleForm = async (_prev: unknown, formData: FormData) => {
@@ -15,6 +16,7 @@ const SignupFormRC: FC = () => {
       return undefined
     }
 
+    navigate(`/user/login/?user=${data?.username}`)
     return undefined
   }
 
@@ -97,16 +99,21 @@ const SignupFormRC: FC = () => {
         />
       </div>
 
-      <input type='hidden' name='accessLevel' value='2' />
+      <input type='hidden' name='accessLevel' value={first ? 4 : 2} />
 
-      <div className='flex w-full flex-col-reverse md:flex-row-reverse'>
+      <div className='mt-6 flex w-full flex-col-reverse gap-y-2'>
         <button
-          className='btn btn-primary max-md:w-full'
+          className='btn btn-primary w-full'
           type='submit'
           disabled={isPending}
         >
-          Sign Up
+          Daftar
         </button>
+        {!first && (
+          <a className='btn btn-link' href='/user/login'>
+            Sudah mendaftar?
+          </a>
+        )}
       </div>
     </form>
   )

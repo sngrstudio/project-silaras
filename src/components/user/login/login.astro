@@ -1,5 +1,11 @@
 ---
 import LoginFormRC from './login'
+
+interface Props {
+  userName?: string | undefined
+}
+
+const { userName } = Astro.props
 ---
 
-<LoginFormRC client:load />
+<LoginFormRC userName={userName} client:load />

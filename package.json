@@ -18,15 +18,15 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/node": "^9.2.1",
-    "@astrojs/react": "^4.2.7",
+    "@astrojs/node": "9.2.2",
+    "@astrojs/react": "4.3.0",
     "@nanostores/persistent": "^1.0.0",
     "@nanostores/react": "^1.0.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@tailwindcss/vite": "^4.1.6",
     "@tanstack/react-table": "^8.21.3",
-    "astro": "5.7.12",
+    "astro": "5.8.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.43.1",
     "drizzle-zod": "^0.7.1",

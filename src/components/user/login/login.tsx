@@ -2,7 +2,7 @@ import { useActionState, useRef, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 
-const LoginForm: FC = () => {
+const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleForm = async (_prev: unknown, formData: FormData) => {
@@ -38,6 +38,7 @@ const LoginForm: FC = () => {
           type='text'
           id='username'
           name='username'
+          defaultValue={userName}
           required
           disabled={isPending}
         />
@@ -57,14 +58,17 @@ const LoginForm: FC = () => {
         />
       </div>
 
-      <div className='flex w-full flex-col-reverse md:flex-row-reverse'>
+      <div className='mt-4 flex w-full flex-col-reverse gap-y-2'>
         <button
-          className='btn btn-primary max-md:w-full'
+          className='btn btn-primary w-full'
           type='submit'
           disabled={isPending}
         >
           Login
         </button>
+        <a className='btn btn-link' href='/user/signup'>
+          Daftarkan akun
+        </a>
       </div>
     </form>
   )
