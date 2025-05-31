@@ -1,6 +1,9 @@
 import { type FC, type TableHTMLAttributes } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { clsx } from 'clsx/lite'
+import ChevronUpIcon from '~icons/lucide/chevron-up'
+import ChevronDownIcon from '~icons/lucide/chevron-down'
+import ChevronsUpDownIcon from '~icons/lucide/chevrons-up-down'
 
 export interface TableTemplateProps
   extends TableHTMLAttributes<HTMLTableElement> {
@@ -32,9 +35,31 @@ const TableTemplate: FC<TableTemplateProps> = ({
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
               <th key={header.id}>
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
+                {header.isPlaceholder ? null : (
+                  <div
+                    className={clsx(
+                      'flex items-center gap-2',
+                      header.column.getCanSort() &&
+                        'hover:text-primary cursor-pointer select-none'
+                    )}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {header.column.getCanSort() && (
+                      <span className='ml-1'>
+                        {header.column.getIsSorted() === 'desc' ? (
+                          <ChevronDownIcon className='h-4 w-4' />
+                        ) : header.column.getIsSorted() === 'asc' ? (
+                          <ChevronUpIcon className='h-4 w-4' />
+                        ) : (
+                          <ChevronsUpDownIcon className='h-4 w-4 opacity-50' />
+                        )}
+                      </span>
+                    )}
+                  </div>
                 )}
               </th>
             ))}

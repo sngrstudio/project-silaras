@@ -12,6 +12,10 @@ const SETTINGS_MENU = [
   {
     label: 'Setelan Menu',
     href: '/settings/menu'
+  },
+  {
+    label: 'Manajemen Pengguna',
+    href: '/settings/users'
   }
 ]
 

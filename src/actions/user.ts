@@ -4,6 +4,7 @@ import {
   getUserById,
   getUserByUsername,
   getAllUsers,
+  searchUsers,
   deleteUser
 } from '../db/queries/user'
 import {
@@ -41,12 +42,30 @@ const user = {
         fullName: z.string(),
         phoneNumber: z.string().optional(),
         profilePhotoFile: z.instanceof(File).optional(),
-        regionId: z.string().optional().nullable(),
+        regionId: z
+          .string()
+          .optional()
+          .nullable()
+          .transform((val) => {
+            // Convert empty string to null
+            if (val === '' || val === undefined) return null
+            return val
+          }),
         id: z.string().optional()
       })
       .refine(
         (data) => {
-          // If either password field is provided, both must be defined
+          // For new users (no id), password is required
+          if (!data.id) {
+            if (!data.password || !data.confirmPassword) {
+              return false
+            }
+            // Both are provided, they must match exactly
+            return data.password === data.confirmPassword
+          }
+
+          // For existing users (with id), password is optional
+          // If either password field is provided, both must be defined and match
           if (data.password || data.confirmPassword) {
             if (!data.password || !data.confirmPassword) {
               return false
@@ -54,7 +73,7 @@ const user = {
             // Both are defined, they must match exactly
             return data.password === data.confirmPassword
           }
-          // No password fields provided, that's ok (might be an update)
+          // No password fields provided for update, that's ok
           return true
         },
         {
@@ -148,13 +167,49 @@ const user = {
   }),
 
   /**
+   * Search users by name, village/region, or phone number.
+   * @param searchTerm Search term to filter by
+   * @param page Page number (1-based, defaults to 1)
+   * @param size Page size (defaults to 10)
+   * @returns Array of users matching the search term
+   */
+  search: defineAction({
+    input: z.object({
+      searchTerm: z.string().min(1),
+      page: z.number().optional(),
+      size: z.number().optional()
+    }),
+    handler: async ({ searchTerm, page, size }) =>
+      searchUsers(searchTerm, page, size)
+  }),
+
+  /**
    * Delete a user by id and all their associated sessions.
+   * Prevents users from deleting their own account for security.
    * @param id User id
    * @returns void
    */
   delete: defineAction({
     input: z.object({ id: z.string() }),
-    handler: async ({ id }) => {
+    handler: async ({ id }, ctx) => {
+      const currentUser = ctx.locals.user
+
+      // Prevent user from deleting their own account
+      if (currentUser && currentUser.id === id) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Anda tidak dapat menghapus akun Anda sendiri.'
+        })
+      }
+
+      // Only allow admins to delete users
+      if (!currentUser || currentUser.accessLevel < 4) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Hanya administrator yang dapat menghapus pengguna.'
+        })
+      }
+
       await invalidateAllSession(id) // First delete all user sessions
       await deleteUser(id) // Then delete the user
     }

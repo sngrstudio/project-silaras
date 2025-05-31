@@ -1,0 +1,391 @@
+import { type FC, useState, useMemo, useEffect } from 'react'
+import TableTemplate from '../../common/table/desktop'
+import ListTemplate from '../../common/table/mobile'
+import MobileList from './mobile-list'
+import Navigation from './navigation'
+import {
+  useReactTable,
+  createColumnHelper,
+  getCoreRowModel,
+  getSortedRowModel,
+  type SortingState
+} from '@tanstack/react-table'
+import { useStore } from '@nanostores/react'
+import { $users, setCurrentUser, setUsers, type Users } from './users.store'
+import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
+import { actions } from 'astro:actions'
+import EditIcon from '~icons/lucide/pen'
+import TrashIcon from '~icons/lucide/trash-2'
+import WhatsAppIcon from '~icons/simple-icons/whatsapp'
+import UserPlusIcon from '~icons/lucide/user-plus'
+import Image from '~/components/common/image/image'
+import type { GetImageResult } from 'astro'
+
+// Avatar component that handles profile photo fetching
+const UserAvatar: FC<{
+  profilePhoto: string | null | undefined
+  fullName: string
+  size?: 'sm' | 'md'
+}> = ({ profilePhoto, fullName, size = 'md' }) => {
+  const profilePhotoUrl = useProfilePhoto(profilePhoto)
+  const sizeClass = size === 'sm' ? 'w-8' : 'w-10'
+
+  return (
+    <div className={`avatar ${!profilePhotoUrl ? 'avatar-placeholder' : ''}`}>
+      {profilePhotoUrl ? (
+        <div className={`${sizeClass} mask mask-circle`}>
+          <Image image={profilePhotoUrl} alt={fullName} />
+        </div>
+      ) : (
+        <div
+          className={`bg-primary text-primary-content aspect-square rounded-full ${sizeClass}`}
+        >
+          <span className={size === 'sm' ? 'text-xs' : 'text-xl'}>
+            {fullName.charAt(0).toUpperCase()}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const columnHelper = createColumnHelper<Users[number]>()
+
+// Cache for profile photo URLs to avoid repeated API calls
+const profilePhotoCache = new Map<string, GetImageResult>()
+
+const useProfilePhoto = (fileName: string | null | undefined) => {
+  const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
+    undefined
+  )
+
+  useEffect(() => {
+    if (!fileName) {
+      setProfilePhoto(undefined)
+      return
+    }
+
+    // Check cache first
+    if (profilePhotoCache.has(fileName)) {
+      setProfilePhoto(profilePhotoCache.get(fileName))
+      return
+    }
+
+    // Fetch presigned URL
+    actions.image.getPresignedImage
+      .orThrow({ fileName, width: 40, height: 40 })
+      .then((image) => {
+        profilePhotoCache.set(fileName, image)
+        setProfilePhoto(image)
+      })
+      .catch(() => {
+        setProfilePhoto(undefined)
+      })
+  }, [fileName])
+
+  return profilePhoto
+}
+
+const accessLevelText = (level: number) => {
+  switch (level) {
+    case 1:
+      return 'Viewer'
+    case 2:
+      return 'Editor'
+    case 3:
+      return 'Coordinator'
+    case 4:
+      return 'Admin'
+    default:
+      return 'Unknown'
+  }
+}
+
+// Component for delete button with self-deletion protection
+const UserDeleteButton: FC<{ user: Users[number]; onDelete: () => void }> = ({
+  user,
+  onDelete
+}) => {
+  const currentUser = useStore($globalCurrentUser)
+  const isSelf = currentUser && currentUser.id === user.id
+
+  if (isSelf) {
+    return (
+      <button
+        className='btn btn-soft btn-error btn-xs cursor-not-allowed opacity-50'
+        disabled
+        title='Anda tidak dapat menghapus akun Anda sendiri'
+        aria-label={`Cannot delete own account: ${user.fullName}`}
+      >
+        <TrashIcon />
+        <span>Hapus</span>
+      </button>
+    )
+  }
+
+  return (
+    <button
+      className='btn btn-soft btn-error btn-xs'
+      onClick={onDelete}
+      aria-label={`Delete ${user.fullName}`}
+    >
+      <TrashIcon />
+      <span>Hapus</span>
+    </button>
+  )
+}
+
+const dColumns = [
+  columnHelper.accessor('fullName', {
+    header: 'Nama Lengkap',
+    enableSorting: true,
+    cell: (cell) => (
+      <div className='flex items-center gap-3'>
+        <UserAvatar
+          profilePhoto={cell.row.original.profilePhoto}
+          fullName={cell.getValue()}
+        />
+        <div>
+          <div className='font-bold'>{cell.getValue()}</div>
+          <div className='text-sm opacity-75'>
+            @{cell.row.original.username}
+          </div>
+        </div>
+      </div>
+    )
+  }),
+  columnHelper.accessor('accessLevel', {
+    header: 'Level Akses',
+    enableSorting: true,
+    cell: (cell) => (
+      <span className='badge badge-soft badge-primary badge-sm'>
+        {accessLevelText(cell.getValue())}
+      </span>
+    )
+  }),
+  columnHelper.accessor('regionName', {
+    header: 'Wilayah',
+    enableSorting: true,
+    cell: (cell) => {
+      const regionName = cell.getValue()
+      const regionType = cell.row.original.regionType
+      if (!regionName) return <span className='text-gray-400'>-</span>
+
+      return (
+        <div>
+          <div className='font-medium'>{regionName}</div>
+          <div className='text-xs text-gray-500 capitalize'>
+            {regionType?.toLowerCase()}
+          </div>
+        </div>
+      )
+    }
+  }),
+  columnHelper.accessor('phoneNumber', {
+    header: 'Nomor Telepon',
+    enableSorting: false,
+    cell: (cell) => {
+      const phone = cell.getValue()
+      if (!phone) return <span className='text-gray-400'>-</span>
+
+      return (
+        <div className='flex items-center gap-2'>
+          <span>{phone}</span>
+          <a
+            className='btn btn-ghost btn-xs'
+            href={`https://wa.me/${phone.replace(/^08/, '628')}`}
+            target='_blank'
+            aria-label='WhatsApp'
+          >
+            <WhatsAppIcon />
+          </a>
+        </div>
+      )
+    }
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    cell: (cell) => {
+      const handleEditBtn = () => {
+        setCurrentUser(cell.row.original)
+      }
+
+      const handleDeleteBtn = async () => {
+        const user = cell.row.original
+        const confirmed = confirm(
+          `Apakah Anda yakin ingin menghapus pengguna "${user.fullName}"?`
+        )
+
+        if (confirmed) {
+          try {
+            await actions.user.delete({ id: user.id })
+
+            // Refresh the users list
+            const currentPage = await import('./users.store').then((m) =>
+              m.$currentPage.get()
+            )
+            const updatedUsers = await actions.user.getAll.orThrow({
+              page: currentPage,
+              size: 10
+            })
+            setUsers(updatedUsers)
+          } catch (error: any) {
+            alert(error.message || 'Terjadi kesalahan saat menghapus pengguna.')
+          }
+        }
+      }
+
+      return (
+        <div className='flex gap-2'>
+          <button
+            className='btn btn-soft btn-primary btn-xs'
+            onClick={handleEditBtn}
+          >
+            <EditIcon />
+            <span>Edit</span>
+          </button>
+          <UserDeleteButton
+            user={cell.row.original}
+            onDelete={handleDeleteBtn}
+          />
+        </div>
+      )
+    }
+  })
+]
+
+const mColumns = [
+  columnHelper.display({
+    id: 'mobile',
+    cell: (cell) => <MobileList cell={cell} />
+  })
+]
+
+const UsersRC: FC = () => {
+  const users = useStore($users)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Filter users based on search term (client-side filtering for now)
+  const filteredUsers = useMemo(() => {
+    if (!users || !searchTerm.trim()) return users || []
+
+    const lowerSearchTerm = searchTerm.toLowerCase()
+    return users.filter(
+      (user) =>
+        user.fullName.toLowerCase().includes(lowerSearchTerm) ||
+        user.regionName?.toLowerCase().includes(lowerSearchTerm) ||
+        user.phoneNumber?.toLowerCase().includes(lowerSearchTerm)
+    )
+  }, [users, searchTerm])
+
+  if (!users) {
+    return <></>
+  }
+
+  return (
+    <>
+      <div className='mb-4'>
+        <h2 className='mb-3 text-lg font-semibold'>Daftar Pengguna</h2>
+        <div className='flex flex-col gap-3 sm:flex-row-reverse sm:items-center sm:gap-2'>
+          <button
+            className='btn btn-primary btn-sm w-full sm:w-auto'
+            onClick={() => setCurrentUser({} as Users[number])} // Empty user for new user creation
+          >
+            <UserPlusIcon />
+            <span>Tambah Pengguna</span>
+          </button>
+          <div className='relative flex-1 sm:flex-none'>
+            <input
+              type='text'
+              placeholder='Cari pengguna...'
+              className='input input-bordered input-sm w-full sm:w-48'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      <UsersTableRenderer users={filteredUsers} />
+      <Navigation />
+    </>
+  )
+}
+
+export default UsersRC
+
+const UsersTableRenderer: FC<{ users: Users }> = ({ users }) => {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'accessLevel', desc: true }, // Sort by access level descending (4 first)
+    { id: 'fullName', desc: false } // Then by name alphabetically
+  ])
+
+  // Sort users data for mobile table manually since mobile only has display column
+  const sortedUsers = useMemo(() => {
+    if (!sorting.length) return users
+
+    return [...users].sort((a, b) => {
+      for (const sort of sorting) {
+        let aVal: any
+        let bVal: any
+
+        if (sort.id === 'accessLevel') {
+          aVal = a.accessLevel
+          bVal = b.accessLevel
+        } else if (sort.id === 'fullName') {
+          aVal = a.fullName
+          bVal = b.fullName
+        } else if (sort.id === 'regionName') {
+          aVal = a.regionName || ''
+          bVal = b.regionName || ''
+        } else {
+          continue
+        }
+
+        let comparison = 0
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          comparison = aVal.localeCompare(bVal)
+        } else {
+          comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+        }
+
+        if (comparison !== 0) {
+          return sort.desc ? -comparison : comparison
+        }
+      }
+      return 0
+    })
+  }, [users, sorting])
+
+  const dTable = useReactTable({
+    columns: dColumns,
+    data: users,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting
+    },
+    onSortingChange: setSorting,
+    initialState: {
+      sorting: [
+        { id: 'accessLevel', desc: true },
+        { id: 'fullName', desc: false }
+      ]
+    }
+  })
+
+  const mTable = useReactTable({
+    columns: mColumns,
+    data: sortedUsers, // Use pre-sorted data for mobile
+    getCoreRowModel: getCoreRowModel()
+    // Remove sorting for mobile table since it only has one display column
+  })
+
+  return (
+    <>
+      <ListTemplate table={mTable} className='-mx-6 md:hidden' />
+      <TableTemplate table={dTable} className='max-md:hidden' />
+    </>
+  )
+}

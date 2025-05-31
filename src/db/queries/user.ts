@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { user, session } from '../schemas/user'
-import { eq } from 'drizzle-orm'
+import { region } from '../schemas/region'
+import { eq, or, like } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 
 /**
@@ -75,14 +76,69 @@ export const getUserByUsername = async (username: string) => {
 }
 
 /**
- * Get a paginated list of users.
+ * Get a paginated list of users with region information.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
  * @returns Array of users for the page
  */
 export const getAllUsers = async (page: number = 1, size: number = 10) => {
   const offset = (page - 1) * size
-  return db.select().from(user).limit(size).offset(offset)
+  return db
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId,
+      regionName: region.name,
+      regionType: region.type
+    })
+    .from(user)
+    .leftJoin(region, eq(user.regionId, region.id))
+    .limit(size)
+    .offset(offset)
+}
+
+/**
+ * Search users by name, village/region, or phone number.
+ * @param searchTerm Search term to filter by
+ * @param page Page number (1-based, defaults to 1)
+ * @param size Page size (defaults to 10)
+ * @returns Array of users matching the search term
+ */
+export const searchUsers = async (
+  searchTerm: string,
+  page: number = 1,
+  size: number = 10
+) => {
+  const offset = (page - 1) * size
+  const searchPattern = `%${searchTerm}%`
+
+  return db
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId,
+      regionName: region.name,
+      regionType: region.type
+    })
+    .from(user)
+    .leftJoin(region, eq(user.regionId, region.id))
+    .where(
+      or(
+        like(user.fullName, searchPattern),
+        like(region.name, searchPattern),
+        like(user.phoneNumber, searchPattern)
+      )
+    )
+    .limit(size)
+    .offset(offset)
 }
 
 /**

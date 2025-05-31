@@ -13,12 +13,10 @@ export const user = mysqlTable('user', {
   fullName: varchar('full_name', { length: 255 }).notNull(),
   phoneNumber: varchar('phone_number', { length: 32 }).unique(),
   profilePhoto: varchar('profile_photo', { length: 255 }),
-  regionId: varchar('region_id', { length: 36 })
-    .references(() => region.id, {
-      onDelete: 'no action',
-      onUpdate: 'no action'
-    })
-    .default('')
+  regionId: varchar('region_id', { length: 36 }).references(() => region.id, {
+    onDelete: 'no action',
+    onUpdate: 'no action'
+  })
 })
 
 export const session = mysqlTable('session', {

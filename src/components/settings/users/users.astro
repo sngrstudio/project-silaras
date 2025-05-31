@@ -1,0 +1,40 @@
+---
+import UsersRC from './users'
+import UserDialogRC from './user-dialog'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<CardTemplateRC>
+  <UsersRC client:idle />
+  <UserDialogRC client:only='react' />
+</CardTemplateRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $users, setUsers, setCurrentPage } from './users.store'
+  import { actions } from 'astro:actions'
+
+  onMount($users, () => {
+    task(async () => {
+      const state = await actions.user.getAll.orThrow({
+        page: 1,
+        size: 10
+      })
+      setUsers(state)
+      setCurrentPage(1)
+    })
+    return () => {
+      setUsers(undefined)
+      setCurrentPage(1)
+    }
+  })
+
+  document.addEventListener('astro:page-load', async () => {
+    const state = await actions.user.getAll.orThrow({
+      page: 1,
+      size: 10
+    })
+    setUsers(state)
+    setCurrentPage(1)
+  })
+</script>
