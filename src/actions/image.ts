@@ -1,6 +1,7 @@
 import { defineAction } from 'astro:actions'
 import { getPresignURLS3 } from '../lib/s3'
 import { getPresignedImageURL } from '../db/queries/image'
+import { getImage } from 'astro:assets'
 import { z } from 'astro:schema'
 
 /**
@@ -29,11 +30,21 @@ const image = {
    * // Use URL for upload: await fetch(url, { method: "PUT", body: file })
    * // Or for download: await fetch(url)
    */
-  getPresignedURL: defineAction({
-    input: z.object({
-      fileName: z.string()
-    }),
-    handler: async ({ fileName }) => {
+  getPresignedImage: defineAction({
+    input: z
+      .object({
+        fileName: z.string(),
+        width: z.number().optional(),
+        height: z.number().optional()
+      })
+      .refine(({ width, height }) => {
+        if (width || height) {
+          return !!width && !!height
+        } else {
+          return true
+        }
+      }),
+    handler: async ({ fileName, width, height }) => {
       // Check if we have an existing presigned URL
       const existingURL = await getPresignedImageURL(fileName)
 
@@ -43,14 +54,22 @@ const image = {
         const hoursUntilExpiry =
           (existingURL.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60)
 
-        // If URL exists but will expire in 6 hours or less, renew it
-        if (hoursUntilExpiry <= 6) {
+        // If URL exists but will expire in 24 hours or less, renew it
+        if (hoursUntilExpiry <= 24) {
           const renewed = await getPresignURLS3(fileName)
-          return renewed?.presignedUrl ?? existingURL.presignedUrl
+          return await getImage({
+            src: renewed?.presignedUrl ?? existingURL.presignedUrl,
+            width,
+            height
+          })
         }
 
         // If URL exists and not about to expire, return it
-        return existingURL.presignedUrl
+        return await getImage({
+          src: existingURL.presignedUrl,
+          width,
+          height
+        })
       }
 
       // If no existing URL, generate a new one
@@ -58,7 +77,11 @@ const image = {
       if (!newURL?.presignedUrl) {
         throw new Error('Failed to generate presigned URL')
       }
-      return newURL.presignedUrl
+      return await getImage({
+        src: newURL.presignedUrl,
+        width,
+        height
+      })
     }
   })
 }

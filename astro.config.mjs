@@ -9,7 +9,7 @@ import icons from 'unplugin-icons/vite'
 export default defineConfig({
   integrations: [react()],
   image: {
-    domains: ['localhost:9000']
+    domains: []
   },
   adapter: node({
     mode: 'middleware'

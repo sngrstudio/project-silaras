@@ -1,8 +1,20 @@
 ---
 import NavigationRC from './navigation'
 import DrawerButtonRC from '../drawer/button'
+import { actions } from 'astro:actions'
+
+const site = await Astro.callAction(actions.site.getAll.orThrow, {})
+export type Site = typeof site
+
+const logo = site.SITE_LOGO
+  ? await Astro.callAction(actions.image.getPresignedImage.orThrow, {
+      fileName: site.SITE_LOGO,
+      width: 35,
+      height: 35
+    })
+  : undefined
 ---
 
-<NavigationRC>
+<NavigationRC site={site} logo={logo}>
   <DrawerButtonRC client:load />
 </NavigationRC>

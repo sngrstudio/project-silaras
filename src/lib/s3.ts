@@ -1,4 +1,4 @@
-import { S3Client, write } from 'bun'
+import { S3Client } from 'bun'
 import {
   deletePresignedImageURL,
   getPresignedImageURL,
@@ -15,7 +15,7 @@ export const s3 = new S3Client({
 export const uploadS3 = async (file: File, fileName: string) => {
   try {
     const s3file = s3.file(fileName)
-    await write(s3file, file)
+    await s3file.write(file, { type: file.type })
   } catch (error: any) {
     // Bun's S3 client throws S3Error with code property
     throw new Error(`Failed to upload file: ${error.code || error.message}`)

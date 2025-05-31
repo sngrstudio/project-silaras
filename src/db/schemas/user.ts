@@ -14,11 +14,11 @@ export const user = mysqlTable('user', {
   phoneNumber: varchar('phone_number', { length: 32 }).unique(),
   profilePhoto: varchar('profile_photo', { length: 255 }),
   regionId: varchar('region_id', { length: 36 })
-    .notNull()
     .references(() => region.id, {
       onDelete: 'no action',
       onUpdate: 'no action'
     })
+    .default('')
 })
 
 export const session = mysqlTable('session', {

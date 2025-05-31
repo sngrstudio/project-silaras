@@ -30,6 +30,7 @@ const user = {
    * @returns The newly created or updated user object
    */
   upsert: defineAction({
+    accept: 'form',
     input: z
       .object({
         username: z.string(),
@@ -39,20 +40,25 @@ const user = {
         fullName: z.string(),
         phoneNumber: z.string().optional(),
         profilePhotoFile: z.instanceof(File).optional(),
-        regionId: z.string(),
+        regionId: z.string().optional().nullable(),
         id: z.string().optional()
       })
       .refine(
         (data) => {
-          // If either password field is provided, both must match
+          // If either password field is provided, both must be defined
           if (data.password || data.confirmPassword) {
+            if (!data.password || !data.confirmPassword) {
+              return false
+            }
+            // Both are defined, they must match exactly
             return data.password === data.confirmPassword
           }
-          // If no password fields provided, that's ok (might be an update)
+          // No password fields provided, that's ok (might be an update)
           return true
         },
         {
-          message: "Passwords don't match",
+          message:
+            'Kedua kolom password wajib diisi, dan harus sama kedua-duanya.',
           path: ['confirmPassword']
         }
       ),
@@ -78,7 +84,7 @@ const user = {
         fullName: input.fullName,
         phoneNumber: input.phoneNumber ?? null,
         profilePhoto: profilePhoto ?? null,
-        regionId: input.regionId,
+        regionId: input.regionId ?? null,
         ...(input.id ? { id: input.id } : {})
       }
 
@@ -160,6 +166,7 @@ const user = {
      * @throws {ActionError} with "UNAUTHORIZED" code if login fails
      */
     login: defineAction({
+      accept: 'form',
       input: z.object({
         username: z.string(),
         password: z.string()

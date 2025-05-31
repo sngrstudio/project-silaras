@@ -68,7 +68,7 @@ const site = {
       const updates: Array<Promise<string>> = []
 
       // Handle logo file if provided
-      if (input.siteLogo) {
+      if (input.siteLogo && input.siteLogo.name) {
         const hashHex = Array.from(
           new Uint8Array(
             await crypto.subtle.digest(

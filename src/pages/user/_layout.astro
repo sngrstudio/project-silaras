@@ -1,0 +1,24 @@
+---
+import MainLayout, { type Props as MainLayoutProps } from '../_layout.astro'
+
+export interface Props extends MainLayoutProps {}
+const { class: className, ...props } = Astro.props
+---
+
+<MainLayout class:list={['', className]} {...props}>
+  {/* <body /> */}
+  <main class='hero bg-base-200 min-h-screen'>
+    <div class='hero-content flex-col lg:flex-row-reverse'>
+      <div class='card bg-base-100 w-full max-w-sm shrink-0 shadow'>
+        <div class='card-body'>
+          <slot />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  {/* <head /> */}
+  <Fragment slot='head'>
+    <slot name='head' />
+  </Fragment>
+</MainLayout>

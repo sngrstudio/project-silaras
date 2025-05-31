@@ -20,7 +20,7 @@ export const upsertUser = async (data: {
   fullName: string
   phoneNumber?: string | null
   profilePhoto?: string | null
-  regionId: string
+  regionId?: string | null
   id?: string
 }) => {
   const id = data.id ?? randomUUID()
@@ -40,7 +40,7 @@ export const upsertUser = async (data: {
         fullName: data.fullName,
         phoneNumber: data.phoneNumber ?? undefined,
         profilePhoto: data.profilePhoto ?? undefined,
-        regionId: data.regionId
+        regionId: data.regionId ?? undefined
       }
     })
   return await getUserById(id)
