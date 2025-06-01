@@ -1,6 +1,6 @@
 import { type FC, useState, useEffect } from 'react'
 import type { CellContext } from '@tanstack/react-table'
-import type { Users } from './users.store'
+import type { User } from './users.store'
 import { setCurrentUser, setUsers, $currentPage } from './users.store'
 import { actions } from 'astro:actions'
 import EditIcon from '~icons/lucide/pen'
@@ -75,7 +75,7 @@ const UserAvatar: FC<{
 }
 
 interface MobileListProps {
-  cell: CellContext<Users[number], unknown>
+  cell: CellContext<User, unknown>
   currentUser: CurrentUser | null
 }
 

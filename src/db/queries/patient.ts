@@ -1,13 +1,7 @@
 import { db } from '../db'
 import { patient } from '../schemas/patient'
 import { region } from '../schemas/region'
-import {
-  patientMonthlyAssesment,
-  patientDailyAssesment,
-  monthlyAssesment,
-  dailyAssesment
-} from '../schemas/assesment'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 
 /**
  * Patient table query functions.
@@ -40,21 +34,21 @@ export const upsertPatient = async (data: {
 }) => {
   // Always set id: use provided or generate new
   const id = data.id ?? Bun.randomUUIDv7()
-  // If no id, generate slug for new patient
-  let slug: string
-  if (!data.id) {
-    slug = generatePatientSlug(data.name)
-  } else {
-    // update: fetch existing slug
-    const existing = await db
-      .select({ slug: patient.slug })
-      .from(patient)
-      .where(eq(patient.id, data.id))
-      .limit(1)
-      .then((rows) => rows[0])
-    if (!existing?.slug) throw new Error('Patient not found for update')
-    slug = existing.slug
-  }
+  const isUpdate = !!data.id
+
+  // Generate or fetch slug in a single operation
+  const slug = isUpdate
+    ? await db
+        .select({ slug: patient.slug })
+        .from(patient)
+        .where(eq(patient.id, data.id!))
+        .limit(1)
+        .then((rows) => {
+          if (!rows[0]?.slug) throw new Error('Patient not found for update')
+          return rows[0].slug
+        })
+    : generatePatientSlug(data.name)
+
   // Transactional logic
   return await db.transaction(async (tx) => {
     const preparedData = {
@@ -70,6 +64,7 @@ export const upsertPatient = async (data: {
       address: data.address ?? null,
       phoneNumber: data.phoneNumber ?? null
     }
+
     await tx
       .insert(patient)
       .values(preparedData)
@@ -92,35 +87,28 @@ export const upsertPatient = async (data: {
           phoneNumber: data.phoneNumber ?? null
         }
       })
-    // Only create patientMonthlyAssesment and patientDailyAssesment join rows for new patient
-    if (!data.id) {
-      // For each available monthly assessment, create join row for this patient
-      const monthlyAssesments = await tx.select().from(monthlyAssesment)
-      for (const monthly of monthlyAssesments) {
-        await tx.insert(patientMonthlyAssesment).values({
-          patientId: id,
-          monthlyAssesmentId: monthly.id,
-          weight: data.initialWeight,
-          height: data.initialHeight
-        })
-        // For each available daily assessment for this monthly, create join row for this patient
-        const dailyAssesments = await tx
-          .select()
-          .from(dailyAssesment)
-          .where(eq(dailyAssesment.monthlyAssesmentId, monthly.id))
-        for (const daily of dailyAssesments) {
-          await tx.insert(patientDailyAssesment).values({
-            patientId: id,
-            dailyAssesmentId: daily.id,
-            containsStapleFood: false,
-            containsSideDish: false,
-            containsVegetables: false,
-            containsFruits: false,
-            isFollowingRecipe: false
-          })
-        }
-      }
+
+    // Only create assessment join rows for new patients
+    if (!isUpdate) {
+      // Use a single query with cross join to create all assessment records
+      await tx.execute(sql`
+        INSERT INTO patient_monthly_assesment (patient_id, monthly_assesment_id, weight, height)
+        SELECT ${id}, ma.id, ${data.initialWeight}, ${data.initialHeight}
+        FROM monthly_assesment ma
+      `)
+
+      await tx.execute(sql`
+        INSERT INTO patient_daily_assesment (
+          patient_id, daily_assesment_id, 
+          contains_staple_food, contains_side_dish, 
+          contains_vegetables, contains_fruits, is_following_recipe
+        )
+        SELECT ${id}, da.id, false, false, false, false, false
+        FROM daily_assesment da
+        INNER JOIN monthly_assesment ma ON da.monthly_assesment_id = ma.id
+      `)
     }
+
     return await getPatientById(id)
   })
 }
@@ -169,6 +157,7 @@ export const getAllPatients = async (
 ) => {
   const offset = (page - 1) * size
 
+  // Use subquery to filter by regionSlug directly
   return db
     .select()
     .from(patient)

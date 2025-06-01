@@ -6,7 +6,7 @@ export type Users = Awaited<ReturnType<typeof actions.user.getAll.orThrow>>
 export const $users = atom<Users | undefined>(undefined)
 export const setUsers = (state: Users | undefined) => $users.set(state)
 
-export type User = Users[number]
+export type User = Users['users'][number]
 
 export const $currentUser = atom<User | undefined>(undefined)
 export const setCurrentUser = (state: User | undefined) =>

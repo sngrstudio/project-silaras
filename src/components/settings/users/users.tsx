@@ -15,7 +15,7 @@ import {
   $users,
   setCurrentUser,
   setUsers,
-  type Users,
+  type User,
   $currentPage
 } from './users.store'
 import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
@@ -65,7 +65,7 @@ const UserAvatar: FC<{
   )
 }
 
-const columnHelper = createColumnHelper<Users[number]>()
+const columnHelper = createColumnHelper<User>()
 
 // Cache for profile photo URLs to avoid repeated API calls
 const profilePhotoCache = new Map<string, GetImageResult>()
@@ -118,7 +118,7 @@ const accessLevelText = (level: number) => {
 }
 
 // Component for delete button with self-deletion protection
-const UserDeleteButton: FC<{ user: Users[number]; onDelete: () => void }> = ({
+const UserDeleteButton: FC<{ user: User; onDelete: () => void }> = ({
   user,
   onDelete
 }) => {
@@ -352,10 +352,10 @@ const UsersRC: FC = () => {
 
   // Filter users based on search term (client-side filtering for now)
   const filteredUsers = useMemo(() => {
-    if (!users || !searchTerm.trim()) return users || []
+    if (!users || !searchTerm.trim()) return users?.users || []
 
     const lowerSearchTerm = searchTerm.toLowerCase()
-    return users.filter(
+    return users.users.filter(
       (user) =>
         user.fullName.toLowerCase().includes(lowerSearchTerm) ||
         user.regionName?.toLowerCase().includes(lowerSearchTerm) ||
@@ -375,7 +375,7 @@ const UsersRC: FC = () => {
           {canCreateUsers && (
             <button
               className='btn btn-primary btn-sm w-full sm:w-auto'
-              onClick={() => setCurrentUser({} as Users[number])} // Empty user for new user creation
+              onClick={() => setCurrentUser({} as User)} // Empty user for new user creation
             >
               <UserPlusIcon />
               <span>Tambah Pengguna</span>
@@ -400,7 +400,7 @@ const UsersRC: FC = () => {
 
 export default UsersRC
 
-const UsersTableRenderer: FC<{ users: Users }> = ({ users }) => {
+const UsersTableRenderer: FC<{ users: User[] }> = ({ users }) => {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'accessLevel', desc: true }, // Sort by access level descending (4 first)
     { id: 'fullName', desc: false } // Then by name alphabetically

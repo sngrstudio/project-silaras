@@ -38,25 +38,21 @@ export type Month = (typeof MONTHS)[number]
  * await upsertMonthlyAssesment('JUNE')
  */
 export async function upsertMonthlyAssesment(month: Month) {
-  // Try to find existing
-  const existing = await db
-    .select()
-    .from(monthlyAssesment)
-    .where(eq(monthlyAssesment.month, month))
-    .limit(1)
-  if (existing.length > 0) return existing[0]
-  // Insert new or update if exists (MySQL upsert)
+  // Use a single upsert operation and return with subquery
   await db
     .insert(monthlyAssesment)
     .values({ month })
     .onDuplicateKeyUpdate({ set: { month } })
-  const [inserted] = await db
+
+  return await db
     .select()
     .from(monthlyAssesment)
     .where(eq(monthlyAssesment.month, month))
     .limit(1)
-  if (!inserted) throw new Error('Failed to upsert monthly assessment')
-  return inserted
+    .then((rows) => {
+      if (!rows[0]) throw new Error('Failed to upsert monthly assessment')
+      return rows[0]
+    })
 }
 
 /**
@@ -91,26 +87,13 @@ export async function upsertDailyAssesment({
   menu1: string
   menu2: string
 }) {
-  // Try to find existing
-  const existing = await db
-    .select()
-    .from(dailyAssesment)
-    .where(
-      and(
-        eq(dailyAssesment.monthlyAssesmentId, monthlyAssesmentId),
-        eq(dailyAssesment.date, date),
-        eq(dailyAssesment.menu1, menu1),
-        eq(dailyAssesment.menu2, menu2)
-      )
-    )
-    .limit(1)
-  if (existing.length > 0) return existing[0]
-  // Insert new or update if exists (MySQL upsert)
+  // Use single upsert operation
   await db
     .insert(dailyAssesment)
     .values({ monthlyAssesmentId, date, menu1, menu2 })
     .onDuplicateKeyUpdate({ set: { date, menu1, menu2 } })
-  const [inserted] = await db
+
+  return await db
     .select()
     .from(dailyAssesment)
     .where(
@@ -122,8 +105,10 @@ export async function upsertDailyAssesment({
       )
     )
     .limit(1)
-  if (!inserted) throw new Error('Failed to upsert daily assessment')
-  return inserted
+    .then((rows) => {
+      if (!rows[0]) throw new Error('Failed to upsert daily assessment')
+      return rows[0]
+    })
 }
 
 /**
@@ -211,7 +196,7 @@ export async function upsertPatientDailyAssesment({
  * Get all daily assessments for a patient (by slug) and month.
  *
  * Returns an array of daily assessment results for the given patient and month, including both the assessment
- * definition (date, menu1, menu2) and the patient's results (booleans and score). Uses a SQL JOIN for efficiency.
+ * definition (date, menu1, menu2) and the patient's results (booleans and score). Uses a single SQL query with joins.
  *
  * @param {Object} params - The query parameters.
  * @param {string} params.patientSlug - The slug of the patient.
@@ -228,39 +213,8 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
   patientSlug: string
   month: Month
 }) {
-  // Get patient id by slug
-  const patientRow = await db
-    .select({ id: patient.id })
-    .from(patient)
-    .where(eq(patient.slug, patientSlug))
-    .then((rows) => rows[0] ?? null)
-  if (!patientRow) return []
-
-  // Get monthly assessment id by month as a subquery
-  const monthlyIdSubquery = db
-    .select({ id: monthlyAssesment.id })
-    .from(monthlyAssesment)
-    .where(eq(monthlyAssesment.month, month))
-    .limit(1)
-
-  // Get the first row using the subquery
-  const monthly = await db
-    .select({ id: monthlyAssesment.id })
-    .from(monthlyAssesment)
-    .where(eq(monthlyAssesment.id, monthlyIdSubquery))
-    .then((rows) => rows[0] ?? null)
-  if (!monthly) return []
-
-  // Get all daily assessment ids for this month
-  const dailyDefs = await db
-    .select({ id: dailyAssesment.id })
-    .from(dailyAssesment)
-    .where(eq(dailyAssesment.monthlyAssesmentId, monthly.id))
-
-  if (!dailyDefs.length) return []
-
-  // Get all patient daily assessment results for this patient and these daily definitions using a JOIN
-  const results = await db
+  // Single query with subqueries to get all daily assessment results
+  return await db
     .select({
       patientId: patientDailyAssesment.patientId,
       dailyAssesmentId: patientDailyAssesment.dailyAssesmentId,
@@ -277,14 +231,25 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
     .from(patientDailyAssesment)
     .innerJoin(
       dailyAssesment,
+      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+    )
+    .innerJoin(
+      monthlyAssesment,
       and(
-        eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id),
-        eq(dailyAssesment.monthlyAssesmentId, monthly.id)
+        eq(dailyAssesment.monthlyAssesmentId, monthlyAssesment.id),
+        eq(monthlyAssesment.month, month)
       )
     )
-    .where(eq(patientDailyAssesment.patientId, patientRow.id))
-
-  return results
+    .where(
+      eq(
+        patientDailyAssesment.patientId,
+        db
+          .select({ id: patient.id })
+          .from(patient)
+          .where(eq(patient.slug, patientSlug))
+          .limit(1)
+      )
+    )
 }
 
 /**

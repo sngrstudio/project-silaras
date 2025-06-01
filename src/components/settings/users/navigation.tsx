@@ -13,7 +13,7 @@ const Navigation: FC = () => {
     return <></>
   }
 
-  const hasNextPage = users.length === 10 // Assuming 10 is the page size
+  const hasNextPage = users.users.length === 10 // Assuming 10 is the page size
   const hasPrevPage = currentPage > 1
 
   const handlePrevPage = async () => {

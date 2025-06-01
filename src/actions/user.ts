@@ -22,7 +22,7 @@ import {
 import { z } from 'astro:schema'
 import { deleteS3, uploadS3 } from '~/lib/s3'
 import { getFileHash } from '~/utils/file-hash'
-import { getRegionById } from '../db/queries/region'
+import { getRegionById, getRegionsByType } from '../db/queries/region' // Added getRegionsByType
 import {
   canUserEditUser,
   canUserAccessUser,
@@ -94,84 +94,149 @@ const user = {
       ),
     handler: async ({ profilePhotoFile, ...input }, ctx) => {
       const currentUser = ctx.locals.user
+      const isCreatingNewUser = !input.id
+      let isFirstAdminSignupScenario = false
 
-      // Only coordinators (level 3) and above can create/edit users
-      if (!currentUser || currentUser.accessLevel < 3) {
-        throw new ActionError({
-          code: 'FORBIDDEN',
-          message:
-            'Hanya koordinator dan administrator yang dapat mengelola pengguna.'
-        })
+      // Determine if this is the scenario for the first admin signup
+      if (isCreatingNewUser && !currentUser) {
+        const existingUsersResult = await getAllUsers(1, 1)
+        const adminExists = existingUsersResult.users.some(
+          (u) => u.accessLevel >= 4
+        )
+        if (!adminExists) {
+          isFirstAdminSignupScenario = true
+        }
       }
 
-      // Additional restrictions for coordinators (level 3)
-      if (currentUser.accessLevel === 3) {
-        // Coordinators cannot create/edit users with higher or equal access level
-        if (input.accessLevel >= 3) {
+      if (isCreatingNewUser && !currentUser) {
+        if (isFirstAdminSignupScenario) {
+          // This is the first admin account creation
+          if (input.accessLevel !== 4) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message:
+                'Akun administrator pertama harus memiliki level akses 4.'
+            })
+          }
+          // Automatically assign the first admin to the KABUPATEN region
+          const kabupatenRegions = await getRegionsByType('KABUPATEN')
+          if (!kabupatenRegions || kabupatenRegions.length === 0) {
+            throw new ActionError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message:
+                'Konfigurasi wilayah KABUPATEN tidak ditemukan. Silakan hubungi administrator sistem.'
+            })
+          }
+          // Safely access the first KABUPATEN region's ID
+          const kabupatenToAssign = kabupatenRegions[0]
+          if (!kabupatenToAssign) {
+            // Additional check for safety, though theoretically covered by above
+            throw new ActionError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message:
+                'Tidak dapat menentukan wilayah KABUPATEN untuk administrator pertama.'
+            })
+          }
+          input.regionId = kabupatenToAssign.id
+        } else {
+          // This is a regular public signup (not the first admin)
+          // Enforce a default access level, e.g., 2 (Editor).
+          if (input.accessLevel !== 2) {
+            // Assuming 2 is the default for public signups (Editor)
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message:
+                'Level akses tidak valid untuk pendaftaran publik. Seharusnya level 2 (Editor).'
+            })
+          }
+          // For regular signups, regionId is optional as per schema.
+          // If it were mandatory, a check like !input.regionId would be needed here.
+        }
+      } else if (currentUser) {
+        // Logged-in user is creating or editing another user
+        if (currentUser.accessLevel < 3) {
+          // Must be Coordinator (3) or Admin (4)
           throw new ActionError({
             code: 'FORBIDDEN',
             message:
-              'Anda tidak dapat membuat atau mengedit pengguna dengan level akses coordinator atau administrator.'
+              'Hanya koordinator dan administrator yang dapat mengelola pengguna.'
           })
         }
 
-        // If editing an existing user, check their current access level
-        if (input.id) {
-          const targetUser = await getUserById(input.id)
-          if (!targetUser) {
-            throw new ActionError({
-              code: 'NOT_FOUND',
-              message: 'Pengguna tidak ditemukan.'
-            })
-          }
-
-          if (targetUser.accessLevel >= 3) {
+        // Additional restrictions for coordinators (level 3) when managing other users
+        if (currentUser.accessLevel === 3) {
+          // Coordinators cannot create/edit users with higher or equal access level (level 3 or 4)
+          if (input.accessLevel >= 3) {
             throw new ActionError({
               code: 'FORBIDDEN',
               message:
-                'Anda tidak dapat mengedit pengguna dengan level akses coordinator atau administrator.'
+                'Anda tidak dapat membuat atau mengedit pengguna dengan level akses koordinator atau administrator.'
             })
           }
 
-          // Check if coordinator can edit this user
-          let currentUserRegion = null
-          let targetUserRegion = null
-
-          if (currentUser.regionId) {
-            currentUserRegion = await getRegionById(currentUser.regionId)
+          if (input.id) {
+            // If editing an existing user
+            const targetUser = await getUserById(input.id)
+            if (!targetUser) {
+              throw new ActionError({
+                code: 'NOT_FOUND',
+                message: 'Pengguna tidak ditemukan.'
+              })
+            }
+            // Coordinator cannot edit another coordinator or admin (already checked by input.accessLevel for new, now for existing)
+            if (targetUser.accessLevel >= 3) {
+              throw new ActionError({
+                code: 'FORBIDDEN',
+                message:
+                  'Anda tidak dapat mengedit pengguna dengan level akses koordinator atau administrator.'
+              })
+            }
+            // Region-based access control for editing by coordinator
+            let currentUserRegion = null
+            let targetUserRegion = null
+            if (currentUser.regionId) {
+              currentUserRegion = await getRegionById(currentUser.regionId)
+            }
+            if (targetUser.regionId) {
+              targetUserRegion = await getRegionById(targetUser.regionId)
+            }
+            if (
+              !canUserEditUser(
+                currentUser,
+                targetUser,
+                currentUserRegion,
+                targetUserRegion
+              )
+            ) {
+              throw new ActionError({
+                code: 'FORBIDDEN',
+                message: 'Anda tidak memiliki izin untuk mengedit pengguna ini.'
+              })
+            }
           }
+        } // End of coordinator specific checks (currentUser.accessLevel === 3)
 
-          if (targetUser.regionId) {
-            targetUserRegion = await getRegionById(targetUser.regionId)
-          }
-
-          if (
-            !canUserEditUser(
-              currentUser,
-              targetUser,
-              currentUserRegion,
-              targetUserRegion
-            )
-          ) {
-            throw new ActionError({
-              code: 'FORBIDDEN',
-              message: 'Anda tidak memiliki izin untuk mengedit pengguna ini.'
-            })
-          }
-        }
-
-        // Check if coordinator can assign user to the specified region
+        // Region assignment checks for privileged users (admin/coordinator creating/editing users)
+        // This applies if a regionId is being set or changed for the target user.
         if (input.regionId) {
           const targetRegion = await getRegionById(input.regionId)
-          let currentUserRegion = null
-
-          if (currentUser.regionId) {
-            currentUserRegion = await getRegionById(currentUser.regionId)
+          if (!targetRegion) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'Wilayah yang dipilih tidak valid.'
+            })
           }
-
+          let userRegionForCheck = null // This is the current (admin/coord) user's region
+          if (currentUser.regionId) {
+            userRegionForCheck = await getRegionById(currentUser.regionId)
+          }
+          // Check if the current admin/coordinator can assign a user to the targetRegion
           if (
-            !targetRegion ||
-            !canUserAssignToRegion(currentUser, targetRegion, currentUserRegion)
+            !canUserAssignToRegion(
+              currentUser,
+              targetRegion,
+              userRegionForCheck
+            )
           ) {
             throw new ActionError({
               code: 'FORBIDDEN',
@@ -180,6 +245,19 @@ const user = {
             })
           }
         }
+      } else if (!isCreatingNewUser && !currentUser) {
+        // Trying to edit a user without being logged in
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Anda harus login untuk melakukan operasi ini.'
+        })
+      } else {
+        // This case should ideally not be reached if logic is correct,
+        // but acts as a fallback for any unhandled unauthenticated/unauthorized state.
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Operasi tidak diizinkan.'
+        })
       }
 
       const existingUser = await getUserByUsername(input.username)
@@ -371,11 +449,11 @@ const user = {
       }
 
       // Get all users first
-      const allUsers = await getAllUsers(page, size)
+      const allUsersResult = await getAllUsers(page, size)
 
       // If admin, return all users
       if (currentUser.accessLevel >= 4) {
-        return allUsers
+        return allUsersResult
       }
 
       // For coordinators, filter users based on access control
@@ -388,7 +466,7 @@ const user = {
 
         // Filter users that the coordinator can access
         const filteredUsers = []
-        for (const user of allUsers) {
+        for (const user of allUsersResult.users) {
           let targetUserRegion = null
           if (user.regionId) {
             targetUserRegion = await getRegionById(user.regionId)
@@ -406,10 +484,10 @@ const user = {
           }
         }
 
-        return filteredUsers
+        return { users: filteredUsers, totalCount: filteredUsers.length }
       }
 
-      return allUsers
+      return allUsersResult
     }
   }),
 
@@ -440,11 +518,11 @@ const user = {
       }
 
       // Get search results first
-      const searchResults = await searchUsers(searchTerm, page, size)
+      const searchResultsData = await searchUsers(searchTerm, page, size)
 
       // If admin, return all results
       if (currentUser.accessLevel >= 4) {
-        return searchResults
+        return searchResultsData
       }
 
       // For coordinators, filter results based on access control
@@ -457,7 +535,7 @@ const user = {
 
         // Filter search results that the coordinator can access
         const filteredResults = []
-        for (const user of searchResults) {
+        for (const user of searchResultsData.users) {
           let targetUserRegion = null
           if (user.regionId) {
             targetUserRegion = await getRegionById(user.regionId)
@@ -475,10 +553,10 @@ const user = {
           }
         }
 
-        return filteredResults
+        return { users: filteredResults, totalCount: filteredResults.length }
       }
 
-      return searchResults
+      return searchResultsData
     }
   }),
 
@@ -681,9 +759,8 @@ const user = {
   checks: {
     isNoAdmin: defineAction({
       handler: async () => {
-        const admins = await getAllUsers().then((users) =>
-          users.filter((user) => user.accessLevel >= 4)
-        )
+        const { users } = await getAllUsers()
+        const admins = users.filter((user) => user.accessLevel >= 4)
         if (admins.length > 0) {
           return false
         } else {

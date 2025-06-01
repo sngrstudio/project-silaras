@@ -1,5 +1,5 @@
 import { useActionState, useEffect, useState, type FC } from 'react'
-import { ModalDialog } from '~/components/common/dialog/dialog'
+import { DialogTemplate } from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
   $currentUser,
@@ -25,11 +25,10 @@ const UserDialog: FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
     undefined
   )
-  const [selectedAccessLevel, setSelectedAccessLevel] = useState<number>(
-    currentUser?.accessLevel || 2
-  )
+  // Initialize with defaults for a new user; useEffect will populate for existing users.
+  const [selectedAccessLevel, setSelectedAccessLevel] = useState<number>(2)
   const [selectedRegionId, setSelectedRegionId] = useState<string | undefined>(
-    currentUser?.regionId || undefined
+    undefined
   )
 
   const isEdit = currentUser && currentUser.id
@@ -39,24 +38,31 @@ const UserDialog: FC = () => {
   const allowedAccessLevels = getAllowedAccessLevels(globalCurrentUser)
 
   useEffect(() => {
-    if (currentUser?.profilePhoto) {
-      actions.image.getPresignedImage
-        .orThrow({ fileName: currentUser.profilePhoto, height: 80, width: 80 })
-        .then((image) => setProfilePhoto(image))
+    if (currentUser) {
+      // User is being edited, or a new user template is provided
+      setSelectedAccessLevel(currentUser.accessLevel || 2) // Use DB value or default to 2
+      setSelectedRegionId(currentUser.regionId || undefined)
+
+      if (currentUser.profilePhoto) {
+        actions.image.getPresignedImage
+          .orThrow({
+            fileName: currentUser.profilePhoto,
+            height: 80,
+            width: 80
+          })
+          .then((image) => setProfilePhoto(image))
+      } else {
+        setProfilePhoto(undefined)
+      }
     } else {
+      // Dialog is closed or opened for a brand new user without a template
+      // Reset form state to defaults for a new user
+      setSelectedAccessLevel(2) // Default access level for a new user
+      setSelectedRegionId(undefined)
       setProfilePhoto(undefined)
     }
-
-    // Reset form state when dialog opens/closes
-    if (currentUser) {
-      setSelectedAccessLevel(currentUser.accessLevel || 2)
-      setSelectedRegionId(currentUser.regionId || undefined)
-    }
-  }, [
-    currentUser?.profilePhoto,
-    currentUser?.accessLevel,
-    currentUser?.regionId
-  ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]) // Depend on the currentUser object itself
 
   const handleSubmit = async (_prev: unknown, formData: FormData) => {
     const { data, error } = await actions.user.upsert(formData)
@@ -214,19 +220,36 @@ const UserDialog: FC = () => {
             id='accessLevel'
             value={selectedAccessLevel}
             onChange={(e) => setSelectedAccessLevel(Number(e.target.value))}
-            disabled={isPending}
+            disabled={isPending || !!isEdit} // Disable if pending or if editing an existing user
             required
           >
-            {allowedAccessLevels.includes(1) && (
+            {/* For new users, filter options based on allowedAccessLevels */}
+            {/* For existing users (isEdit === true), show their current level, but disabled */}
+            {isEdit && currentUser?.accessLevel === 1 && (
               <option value={1}>Viewer</option>
             )}
-            {allowedAccessLevels.includes(2) && (
+            {isEdit && currentUser?.accessLevel === 2 && (
               <option value={2}>Editor</option>
             )}
-            {allowedAccessLevels.includes(3) && (
+            {isEdit && currentUser?.accessLevel === 3 && (
               <option value={3}>Coordinator</option>
             )}
-            {allowedAccessLevels.includes(4) && (
+            {isEdit && currentUser?.accessLevel === 4 && (
+              <option value={4}>Admin</option>
+            )}
+
+            {!isEdit && allowedAccessLevels.includes(1) && (
+              <option value={1}>Viewer</option>
+            )}
+            {!isEdit && allowedAccessLevels.includes(2) && (
+              <option value={2}>Editor</option>
+            )}
+            {!isEdit && allowedAccessLevels.includes(3) && (
+              <option value={3}>Coordinator</option>
+            )}
+            {/* Admin creation (level 4) is typically handled by first signup or by other admins directly */}
+            {/* We might not need to show level 4 here if it's not in allowedAccessLevels for the current globalUser */}
+            {!isEdit && allowedAccessLevels.includes(4) && (
               <option value={4}>Admin</option>
             )}
           </select>

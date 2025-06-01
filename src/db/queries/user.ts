@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { user, session } from '../schemas/user'
-import { eq, or, like } from 'drizzle-orm'
+import { region } from '../schemas/region'
+import { eq, or, like, sql, getTableColumns } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 
 /**
@@ -152,23 +153,31 @@ export const getUserPasswordHashById = async (
  * Get a paginated list of users (safe - excludes password hash).
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
- * @returns Array of users for the page
+ * @returns Object with users array and total count for pagination
  */
 export const getAllUsers = async (page: number = 1, size: number = 10) => {
   const offset = (page - 1) * size
-  return db
+
+  const mainQuery = db
     .select({
-      id: user.id,
-      username: user.username,
-      accessLevel: user.accessLevel,
-      fullName: user.fullName,
-      phoneNumber: user.phoneNumber,
-      profilePhoto: user.profilePhoto,
-      regionId: user.regionId
+      ...getTableColumns(user),
+      regionName: region.name,
+      regionType: region.type,
+      regionSlug: region.slug,
+      regionParentId: region.parentId,
+      totalCount: sql<number>`COUNT(*) OVER()`.as('totalCount')
     })
     .from(user)
+    .leftJoin(region, eq(user.regionId, region.id))
     .limit(size)
     .offset(offset)
+
+  const results = await mainQuery
+
+  return {
+    users: results.map(({ totalCount, passwordHash, ...user }) => user),
+    totalCount: results[0]?.totalCount ?? 0
+  }
 }
 
 /**
@@ -266,7 +275,7 @@ export const deleteSessionsByUserId = async (userId: string): Promise<void> => {
  * @param searchTerm Search term to match against username, full name, or phone number
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
- * @returns Array of users matching the search term
+ * @returns Object with users array and total count for pagination
  */
 export const searchUsers = async (
   searchTerm: string,
@@ -276,17 +285,17 @@ export const searchUsers = async (
   const offset = (page - 1) * size
   const searchPattern = `%${searchTerm}%`
 
-  return db
+  const mainQuery = db
     .select({
-      id: user.id,
-      username: user.username,
-      accessLevel: user.accessLevel,
-      fullName: user.fullName,
-      phoneNumber: user.phoneNumber,
-      profilePhoto: user.profilePhoto,
-      regionId: user.regionId
+      ...getTableColumns(user),
+      regionName: region.name,
+      regionType: region.type,
+      regionSlug: region.slug,
+      regionParentId: region.parentId,
+      totalCount: sql<number>`COUNT(*) OVER()`.as('totalCount')
     })
     .from(user)
+    .leftJoin(region, eq(user.regionId, region.id))
     .where(
       or(
         like(user.username, searchPattern),
@@ -296,4 +305,11 @@ export const searchUsers = async (
     )
     .limit(size)
     .offset(offset)
+
+  const results = await mainQuery
+
+  return {
+    users: results.map(({ totalCount, passwordHash, ...user }) => user),
+    totalCount: results[0]?.totalCount ?? 0
+  }
 }
