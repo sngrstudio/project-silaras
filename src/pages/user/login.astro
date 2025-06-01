@@ -16,7 +16,7 @@ if (isNoAdmins) {
   return Astro.redirect('/user/signup/?first=true')
 }
 
-const userName = Astro.url.searchParams.get('user')
+const userName = Astro.url.searchParams.get('user') ?? undefined
 ---
 
 <Layout>

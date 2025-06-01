@@ -5,7 +5,6 @@ import {
   upsertSiteProperty
 } from '../db/queries/site'
 import { deleteS3, uploadS3 } from '~/lib/s3'
-import { getFileHash } from '~/helper/file-hash'
 import { z } from 'astro:schema'
 
 /**
@@ -70,7 +69,16 @@ const site = {
 
       // Handle logo file if provided
       if (input.siteLogo && input.siteLogo.name) {
-        const hashHex = await getFileHash(input.siteLogo)
+        const hashHex = Array.from(
+          new Uint8Array(
+            await crypto.subtle.digest(
+              'SHA-256',
+              await input.siteLogo.arrayBuffer()
+            )
+          )
+        )
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('')
         const fileName = `site-logo-${hashHex}.${input.siteLogo.name.split('.').pop() || ''}`
 
         if (currentSettings.SITE_LOGO !== fileName) {

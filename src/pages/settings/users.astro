@@ -7,8 +7,8 @@ if (!user) {
   return Astro.redirect('/user/login')
 }
 
-// Check if user has admin access (accessLevel >= 4)
-if (user.accessLevel < 4) {
+// Check if user has coordinator access or above (accessLevel >= 3)
+if (user.accessLevel < 3) {
   return Astro.redirect('/')
 }
 

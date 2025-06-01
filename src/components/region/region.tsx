@@ -12,65 +12,14 @@ import {
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import { $regions, type Regions } from './subregion/region.store'
+import { canUserAccessRegionSync } from '../../utils/access-control'
+import { useUserRegion } from '../../utils/hooks/useUserRegion'
 
 const columnHelper = createColumnHelper<Regions['data'][number]>()
 
-const dColumns = [
-  columnHelper.accessor('name', {
-    header: 'Nama Wilayah',
-    enableSorting: true,
-    cell: (cell) => {
-      const region = cell.row.original
-      return (
-        <div className='flex flex-col'>
-          <a className='link font-bold' href={`/region/${region.slug}`}>
-            {cell.getValue()}
-          </a>
-          <span className='text-sm text-gray-500 capitalize'>
-            {region.type.toLowerCase()}
-          </span>
-        </div>
-      )
-    }
-  }),
-  columnHelper.accessor('type', {
-    header: 'Jenis',
-    enableSorting: true,
-    cell: (cell) => (
-      <span className='badge badge-soft badge-neutral badge-sm'>
-        {cell.getValue()}
-      </span>
-    )
-  }),
-  columnHelper.display({
-    id: 'actions',
-    header: 'Aksi',
-    enableSorting: false,
-    cell: (cell) => {
-      const region = cell.row.original
-      return (
-        <div className='flex gap-2'>
-          <a
-            className='btn btn-soft btn-primary btn-xs'
-            href={`/region/${region.slug}`}
-          >
-            <span>Lihat</span>
-          </a>
-        </div>
-      )
-    }
-  })
-]
-
-const mColumns = [
-  columnHelper.display({
-    id: 'mobile',
-    cell: (cell) => <MobileList cell={cell} />
-  })
-]
-
 const RegionRC: FC = () => {
   const regions = useStore($regions)
+  const { currentUser, userRegion, loading } = useUserRegion()
   const [searchInput, setSearchInput] = useState('')
 
   if (!regions) {
@@ -104,7 +53,12 @@ const RegionRC: FC = () => {
         />
       </div>
 
-      <RegionTableRenderer regions={{ ...regions, data: filteredData }} />
+      <RegionTableRenderer
+        regions={{ ...regions, data: filteredData }}
+        currentUser={currentUser}
+        userRegion={userRegion}
+        loading={loading}
+      />
       <Navigation />
     </>
   )
@@ -112,11 +66,125 @@ const RegionRC: FC = () => {
 
 export default RegionRC
 
-const RegionTableRenderer: FC<{ regions: Regions }> = ({ regions }) => {
+const RegionTableRenderer: FC<{
+  regions: Regions
+  currentUser:
+    | Awaited<
+        ReturnType<
+          typeof import('astro:actions').actions.user.getCurrent.orThrow
+        >
+      >
+    | undefined
+  userRegion: {
+    id: string
+    name: string
+    slug: string
+    type: 'KABUPATEN' | 'KECAMATAN' | 'DESA'
+    parentId?: string | null
+  } | null
+  loading: boolean
+}> = ({ regions, currentUser, userRegion, loading }) => {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'type', desc: false }, // Sort by type first (KABUPATEN, KECAMATAN, DESA)
     { id: 'name', desc: false } // Then by name alphabetically
   ])
+
+  // Create columns with access control
+  const dColumnsWithAccess = useMemo(
+    () => [
+      columnHelper.accessor('name', {
+        header: 'Nama Wilayah',
+        enableSorting: true,
+        cell: (cell) => {
+          const region = cell.row.original
+          const canAccess =
+            userRegion && !loading
+              ? canUserAccessRegionSync(currentUser, region, userRegion)
+              : false
+
+          return (
+            <div className='flex flex-col'>
+              {canAccess ? (
+                <a className='link font-bold' href={`/region/${region.slug}`}>
+                  {cell.getValue()}
+                </a>
+              ) : (
+                <span
+                  className='font-bold text-gray-500'
+                  title='Anda tidak memiliki akses ke wilayah ini'
+                >
+                  {cell.getValue()}
+                </span>
+              )}
+              <span className='text-sm text-gray-500 capitalize'>
+                {region.type.toLowerCase()}
+              </span>
+            </div>
+          )
+        }
+      }),
+      columnHelper.accessor('type', {
+        header: 'Jenis',
+        enableSorting: true,
+        cell: (cell) => (
+          <span className='badge badge-soft badge-neutral badge-sm'>
+            {cell.getValue()}
+          </span>
+        )
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Aksi',
+        enableSorting: false,
+        cell: (cell) => {
+          const region = cell.row.original
+          const canAccess =
+            userRegion && !loading
+              ? canUserAccessRegionSync(currentUser, region, userRegion)
+              : false
+
+          return (
+            <div className='flex gap-2'>
+              {canAccess ? (
+                <a
+                  className='btn btn-soft btn-primary btn-xs'
+                  href={`/region/${region.slug}`}
+                >
+                  <span>Lihat</span>
+                </a>
+              ) : (
+                <button
+                  className='btn btn-soft btn-neutral btn-xs'
+                  disabled
+                  title='Anda tidak memiliki akses ke wilayah ini'
+                >
+                  <span>Lihat</span>
+                </button>
+              )}
+            </div>
+          )
+        }
+      })
+    ],
+    [currentUser, userRegion, loading]
+  )
+
+  const mColumnsWithAccess = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'mobile',
+        cell: (cell) => (
+          <MobileList
+            cell={cell}
+            currentUser={currentUser}
+            userRegion={userRegion}
+            loading={loading}
+          />
+        )
+      })
+    ],
+    [currentUser, userRegion, loading]
+  )
 
   // Sort data manually for mobile table
   const sortedData = useMemo(() => {
@@ -145,7 +213,7 @@ const RegionTableRenderer: FC<{ regions: Regions }> = ({ regions }) => {
   }, [regions.data, sorting])
 
   const dTable = useReactTable({
-    columns: dColumns,
+    columns: dColumnsWithAccess,
     data: regions.data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -154,7 +222,7 @@ const RegionTableRenderer: FC<{ regions: Regions }> = ({ regions }) => {
   })
 
   const mTable = useReactTable({
-    columns: mColumns,
+    columns: mColumnsWithAccess,
     data: sortedData, // Use pre-sorted data for mobile
     getCoreRowModel: getCoreRowModel()
   })

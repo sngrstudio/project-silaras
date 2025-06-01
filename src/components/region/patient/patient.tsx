@@ -20,6 +20,8 @@ import AddPatientIcon from '~icons/lucide/user-plus'
 import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
+import { canUserAccessPatientSync } from '../../../utils/access-control'
+import { useUserRegion } from '../../../utils/hooks/useUserRegion'
 
 type Patient = Patients[number]
 
@@ -34,17 +36,43 @@ const copyToClipboard = async (text: string) => {
 }
 
 const columnHelper = createColumnHelper<Patient>()
-const dColumns = [
+
+// Function to create dynamic columns with access control
+const createDesktopColumns = (
+  currentUser: any,
+  userRegion: any,
+  currentRegion: any,
+  loading: boolean
+) => [
   columnHelper.accessor('name', {
     header: 'Nama',
     enableSorting: true,
     cell: (cell) => {
       const url = `/patient/${cell.row.original.slug}`
-      return (
-        <a className='link font-bold' href={url}>
-          {cell.getValue()}
-        </a>
-      )
+
+      // Check if user can access this patient
+      const canAccess =
+        !loading &&
+        currentRegion &&
+        userRegion &&
+        canUserAccessPatientSync(currentUser, currentRegion, userRegion)
+
+      if (canAccess) {
+        return (
+          <a className='link font-bold' href={url}>
+            {cell.getValue()}
+          </a>
+        )
+      } else {
+        return (
+          <span
+            className='text-base-content/50 cursor-not-allowed font-bold'
+            title='Anda tidak memiliki akses ke pasien ini'
+          >
+            {cell.getValue()}
+          </span>
+        )
+      }
     }
   }),
   columnHelper.accessor('age', {
@@ -113,6 +141,12 @@ const dColumns = [
     header: 'Aksi',
     enableSorting: false,
     cell: (cell) => {
+      const canAccess =
+        !loading &&
+        currentRegion &&
+        userRegion &&
+        canUserAccessPatientSync(currentUser, currentRegion, userRegion)
+
       const handleEditBtn = () => {
         setCurrentPatient(cell.row.original)
       }
@@ -120,8 +154,14 @@ const dColumns = [
       return (
         <div className='flex gap-2'>
           <button
-            className='btn btn-soft btn-primary btn-xs'
+            className={`btn btn-soft btn-primary btn-xs ${!canAccess ? 'btn-disabled' : ''}`}
             onClick={handleEditBtn}
+            disabled={!canAccess}
+            title={
+              !canAccess
+                ? 'Anda tidak memiliki akses ke pasien ini'
+                : 'Edit pasien'
+            }
           >
             <EditIcon />
             <span>Edit</span>
@@ -140,16 +180,31 @@ const dColumns = [
     }
   })
 ]
-const mColumns = [
+
+// Function to create mobile columns with access control
+const createMobileColumns = (
+  currentUser: any,
+  userRegion: any,
+  loading: boolean
+) => [
   columnHelper.display({
     id: 'mobile',
-    cell: (cell) => <MobileList cell={cell} />
+    cell: (cell) => (
+      <MobileList
+        cell={cell}
+        currentUser={currentUser}
+        userRegion={userRegion}
+        loading={loading}
+      />
+    )
   })
 ]
 
 const PatientRC: FC = () => {
   const patients = useStore($patients)
+  const currentRegion = useStore($currentRegion)
   const [searchInput, setSearchInput] = useState('')
+  const { userRegion, loading, currentUser } = useUserRegion()
 
   // Filter patients based on search input
   const filteredData = useMemo(() => {
@@ -183,17 +238,40 @@ const PatientRC: FC = () => {
         <PatientAddButton />
       </div>
 
-      <PatientTableRenderer data={filteredData} />
+      <PatientTableRenderer
+        data={filteredData}
+        currentUser={currentUser}
+        userRegion={userRegion}
+        currentRegion={currentRegion}
+        loading={loading}
+      />
     </>
   )
 }
 
 export default PatientRC
 
-const PatientTableRenderer: FC<{ data: Patients }> = ({ data }) => {
+const PatientTableRenderer: FC<{
+  data: Patients
+  currentUser: any
+  userRegion: any
+  currentRegion: any
+  loading: boolean
+}> = ({ data, currentUser, userRegion, currentRegion, loading }) => {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'name', desc: false } // Default sort by name alphabetically
   ])
+
+  // Create dynamic columns with access control
+  const dColumns = useMemo(
+    () => createDesktopColumns(currentUser, userRegion, currentRegion, loading),
+    [currentUser, userRegion, currentRegion, loading]
+  )
+
+  const mColumns = useMemo(
+    () => createMobileColumns(currentUser, userRegion, loading),
+    [currentUser, userRegion, loading]
+  )
 
   // Sort data manually for mobile table
   const sortedData = useMemo(() => {

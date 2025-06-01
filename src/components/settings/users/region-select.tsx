@@ -12,6 +12,7 @@ interface RegionSelectProps {
   disabled?: boolean
   name?: string
   error?: string[] | undefined
+  currentUser?: any // Current logged in user for access control
 }
 
 const RegionSelect: FC<RegionSelectProps> = ({
@@ -20,7 +21,8 @@ const RegionSelect: FC<RegionSelectProps> = ({
   onChange,
   disabled = false,
   name = 'regionId',
-  error
+  error,
+  currentUser
 }) => {
   const [regions, setRegions] = useState<Region[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -58,9 +60,31 @@ const RegionSelect: FC<RegionSelectProps> = ({
 
       try {
         setLoading(true)
-        const data = await actions.region.getByType.orThrow({
+        let data = await actions.region.getByType.orThrow({
           type: regionType
         })
+
+        // Apply territorial restrictions for coordinators
+        if (
+          currentUser &&
+          currentUser.accessLevel === 3 &&
+          currentUser.regionId
+        ) {
+          const { canUserAssignToRegion } = await import(
+            '~/utils/access-control'
+          )
+
+          // Get current user's region
+          const currentUserRegion = await actions.region.getById.orThrow({
+            id: currentUser.regionId
+          })
+
+          // Filter regions that the coordinator can assign users to
+          data = data.filter((region) =>
+            canUserAssignToRegion(currentUser, region, currentUserRegion)
+          )
+        }
+
         setRegions(data)
       } catch (error) {
         console.error('Failed to load regions:', error)
@@ -71,7 +95,7 @@ const RegionSelect: FC<RegionSelectProps> = ({
     }
 
     loadRegions()
-  }, [accessLevel])
+  }, [accessLevel, currentUser])
 
   // Auto-assign for Admin (Kabupaten - only one exists)
   useEffect(() => {

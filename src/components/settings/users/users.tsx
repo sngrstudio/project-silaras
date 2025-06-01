@@ -20,6 +20,12 @@ import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import UserPlusIcon from '~icons/lucide/user-plus'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
+import {
+  canUserEditUser,
+  canUserDeleteUser,
+  getAllowedAccessLevels
+} from '~/utils/access-control'
+import { useUserRegion } from '~/utils/hooks/useUserRegion'
 
 // Avatar component that handles profile photo fetching
 const UserAvatar: FC<{
@@ -208,6 +214,28 @@ const dColumns = [
     header: 'Aksi',
     enableSorting: false,
     cell: (cell) => {
+      const currentUser = useStore($globalCurrentUser)
+      const { userRegion } = useUserRegion()
+      const user = cell.row.original
+
+      // Create target user region object from available data
+      const targetUserRegion = user.regionId
+        ? {
+            id: user.regionId,
+            name: user.regionName || '',
+            slug: user.regionSlug || '',
+            type: user.regionType as 'KABUPATEN' | 'KECAMATAN' | 'DESA',
+            parentId: user.regionParentId || null
+          }
+        : null
+
+      const canEdit = currentUser
+        ? canUserEditUser(currentUser, user, userRegion, targetUserRegion)
+        : false
+      const canDelete = currentUser
+        ? canUserDeleteUser(currentUser, user, userRegion, targetUserRegion)
+        : false
+
       const handleEditBtn = () => {
         setCurrentUser(cell.row.original)
       }
@@ -239,17 +267,21 @@ const dColumns = [
 
       return (
         <div className='flex gap-2'>
-          <button
-            className='btn btn-soft btn-primary btn-xs'
-            onClick={handleEditBtn}
-          >
-            <EditIcon />
-            <span>Edit</span>
-          </button>
-          <UserDeleteButton
-            user={cell.row.original}
-            onDelete={handleDeleteBtn}
-          />
+          {canEdit && (
+            <button
+              className='btn btn-soft btn-primary btn-xs'
+              onClick={handleEditBtn}
+            >
+              <EditIcon />
+              <span>Edit</span>
+            </button>
+          )}
+          {canDelete && (
+            <UserDeleteButton
+              user={cell.row.original}
+              onDelete={handleDeleteBtn}
+            />
+          )}
         </div>
       )
     }
@@ -259,13 +291,21 @@ const dColumns = [
 const mColumns = [
   columnHelper.display({
     id: 'mobile',
-    cell: (cell) => <MobileList cell={cell} />
+    cell: (cell) => {
+      const currentUser = useStore($globalCurrentUser)
+      return <MobileList cell={cell} currentUser={currentUser} />
+    }
   })
 ]
 
 const UsersRC: FC = () => {
   const users = useStore($users)
+  const currentUser = useStore($globalCurrentUser)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Check if current user can create users
+  const allowedAccessLevels = getAllowedAccessLevels(currentUser)
+  const canCreateUsers = allowedAccessLevels.length > 0
 
   // Filter users based on search term (client-side filtering for now)
   const filteredUsers = useMemo(() => {
@@ -289,13 +329,15 @@ const UsersRC: FC = () => {
       <div className='mb-4'>
         <h2 className='mb-3 text-lg font-semibold'>Daftar Pengguna</h2>
         <div className='flex flex-col gap-3 sm:flex-row-reverse sm:items-center sm:gap-2'>
-          <button
-            className='btn btn-primary btn-sm w-full sm:w-auto'
-            onClick={() => setCurrentUser({} as Users[number])} // Empty user for new user creation
-          >
-            <UserPlusIcon />
-            <span>Tambah Pengguna</span>
-          </button>
+          {canCreateUsers && (
+            <button
+              className='btn btn-primary btn-sm w-full sm:w-auto'
+              onClick={() => setCurrentUser({} as Users[number])} // Empty user for new user creation
+            >
+              <UserPlusIcon />
+              <span>Tambah Pengguna</span>
+            </button>
+          )}
           <div className='relative flex-1 sm:flex-none'>
             <input
               type='text'

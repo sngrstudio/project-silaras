@@ -7,13 +7,16 @@ import {
   setUsers,
   $currentPage
 } from './users.store'
+import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
 import { actions, isInputError } from 'astro:actions'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
 import RegionSelect from './region-select'
+import { getAllowedAccessLevels } from '~/utils/access-control'
 
 const UserDialog: FC = () => {
   const currentUser = useStore($currentUser)
+  const globalCurrentUser = useStore($globalCurrentUser)
   const currentPage = useStore($currentPage)
   const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
     undefined
@@ -27,6 +30,9 @@ const UserDialog: FC = () => {
 
   const isEdit = currentUser && currentUser.id
   const isOpen = !!currentUser
+
+  // Get allowed access levels for current user
+  const allowedAccessLevels = getAllowedAccessLevels(globalCurrentUser)
 
   useEffect(() => {
     if (currentUser?.profilePhoto) {
@@ -156,10 +162,18 @@ const UserDialog: FC = () => {
             disabled={isPending}
             required
           >
-            <option value={1}>Viewer</option>
-            <option value={2}>Editor</option>
-            <option value={3}>Coordinator</option>
-            <option value={4}>Admin</option>
+            {allowedAccessLevels.includes(1) && (
+              <option value={1}>Viewer</option>
+            )}
+            {allowedAccessLevels.includes(2) && (
+              <option value={2}>Editor</option>
+            )}
+            {allowedAccessLevels.includes(3) && (
+              <option value={3}>Coordinator</option>
+            )}
+            {allowedAccessLevels.includes(4) && (
+              <option value={4}>Admin</option>
+            )}
           </select>
           {error?.fields?.accessLevel && (
             <div className='label text-error'>
@@ -174,6 +188,7 @@ const UserDialog: FC = () => {
           onChange={setSelectedRegionId}
           disabled={isPending}
           error={error?.fields?.regionId}
+          currentUser={globalCurrentUser}
         />
 
         <div>

@@ -89,7 +89,7 @@ const ProfileForm: FC = () => {
     return undefined
   }
 
-  const [_error, action, isPending] = useActionState(handleForm, undefined)
+  const [error, action, isPending] = useActionState(handleForm, undefined)
 
   if (!currentUser) {
     return <></>
@@ -134,6 +134,11 @@ const ProfileForm: FC = () => {
           required
           disabled={isPending}
         />
+        {error?.fields?.fullName && (
+          <div className='label text-error'>
+            {error.fields.fullName.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -149,6 +154,11 @@ const ProfileForm: FC = () => {
           onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
           disabled={isPending}
         />
+        {error?.fields?.phoneNumber && (
+          <div className='label text-error'>
+            {error.fields.phoneNumber.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -195,6 +205,11 @@ const ProfileForm: FC = () => {
             onChange={(e) => handleInputChange('password', e.target.value)}
             disabled={isPending}
           />
+          {error?.fields?.password && (
+            <div className='label text-error'>
+              {error.fields.password.join(', ')}
+            </div>
+          )}
         </div>
 
         <div>
@@ -212,6 +227,11 @@ const ProfileForm: FC = () => {
             }
             disabled={isPending}
           />
+          {error?.fields?.confirmPassword && (
+            <div className='label text-error'>
+              {error.fields.confirmPassword.join(', ')}
+            </div>
+          )}
         </div>
       </fieldset>
 

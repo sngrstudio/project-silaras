@@ -30,7 +30,7 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
     return undefined
   }
 
-  const [_error, action, isPending] = useActionState(handleForm, undefined)
+  const [error, action, isPending] = useActionState(handleForm, undefined)
 
   return (
     <form
@@ -50,6 +50,11 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
           required
           disabled={isPending}
         />
+        {error?.fields?.username && (
+          <div className='label text-error'>
+            {error.fields.username.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -65,6 +70,11 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
           minLength={8}
           disabled={isPending}
         />
+        {error?.fields?.password && (
+          <div className='label text-error'>
+            {error.fields.password.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -80,6 +90,11 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
           minLength={8}
           disabled={isPending}
         />
+        {error?.fields?.confirmPassword && (
+          <div className='label text-error'>
+            {error.fields.confirmPassword.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -94,6 +109,11 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
           required
           disabled={isPending}
         />
+        {error?.fields?.fullName && (
+          <div className='label text-error'>
+            {error.fields.fullName.join(', ')}
+          </div>
+        )}
       </div>
 
       <div>
@@ -107,6 +127,11 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
           name='phoneNumber'
           disabled={isPending}
         />
+        {error?.fields?.phoneNumber && (
+          <div className='label text-error'>
+            {error.fields.phoneNumber.join(', ')}
+          </div>
+        )}
       </div>
 
       <input type='hidden' name='accessLevel' value={first ? 4 : 2} />

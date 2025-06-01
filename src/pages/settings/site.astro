@@ -8,6 +8,11 @@ if (!user) {
   return Astro.redirect('/user/login')
 }
 
+// Check if user has admin access (accessLevel >= 4)
+if (user.accessLevel < 4) {
+  return Astro.redirect('/')
+}
+
 const props = {
   title: 'Setelan Situs',
   description: `Setelan dasar situs.`

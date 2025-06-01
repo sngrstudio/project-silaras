@@ -76,6 +76,20 @@ export const getUserByUsername = async (username: string) => {
 }
 
 /**
+ * Get a user by their phone number.
+ * @param phoneNumber Phone number to look up
+ * @returns User object or undefined if not found
+ */
+export const getUserByPhoneNumber = async (phoneNumber: string) => {
+  return db
+    .select()
+    .from(user)
+    .where(eq(user.phoneNumber, phoneNumber))
+    .limit(1)
+    .then((rows) => rows[0] ?? undefined)
+}
+
+/**
  * Get a paginated list of users with region information.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
@@ -93,7 +107,9 @@ export const getAllUsers = async (page: number = 1, size: number = 10) => {
       profilePhoto: user.profilePhoto,
       regionId: user.regionId,
       regionName: region.name,
-      regionType: region.type
+      regionType: region.type,
+      regionSlug: region.slug,
+      regionParentId: region.parentId
     })
     .from(user)
     .leftJoin(region, eq(user.regionId, region.id))
@@ -126,7 +142,9 @@ export const searchUsers = async (
       profilePhoto: user.profilePhoto,
       regionId: user.regionId,
       regionName: region.name,
-      regionType: region.type
+      regionType: region.type,
+      regionSlug: region.slug,
+      regionParentId: region.parentId
     })
     .from(user)
     .leftJoin(region, eq(user.regionId, region.id))

@@ -1,13 +1,21 @@
 import { type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
-import { setCurrentPatient, type Patients } from './patient.store'
+import {
+  setCurrentPatient,
+  type Patients,
+  $currentRegion
+} from './patient.store'
 import EditIcon from '~icons/lucide/pen'
-import LinkIcon from '~icons/lucide/external-link'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
+import { canUserAccessPatientSync } from '../../../utils/access-control'
+import { useStore } from '@nanostores/react'
 
 interface MobileListProps {
   cell: CellContext<Patients[number], unknown>
+  currentUser: any
+  userRegion: any
+  loading: boolean
 }
 
 // Helper function to copy text to clipboard
@@ -20,9 +28,24 @@ const copyToClipboard = async (text: string) => {
   }
 }
 
-const MobileList: FC<MobileListProps> = ({ cell }) => {
-  const name = cell.row.original.name
-  const path = `/patient/${cell.row.original.slug}`
+const MobileList: FC<MobileListProps> = ({
+  cell,
+  currentUser,
+  userRegion,
+  loading
+}) => {
+  const patient = cell.row.original
+  const currentRegion = useStore($currentRegion)
+  const name = patient.name
+  const path = `/patient/${patient.slug}`
+
+  // Check if user can access this patient
+  // Use currentRegion as the patient's region since all patients on this page belong to the current region
+  const canAccess =
+    !loading &&
+    currentRegion &&
+    userRegion &&
+    canUserAccessPatientSync(currentUser, currentRegion, userRegion)
 
   const handleEditBtn = () => {
     setCurrentPatient(cell.row.original)
@@ -39,9 +62,18 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
       <div className='list-col-grow flex flex-col gap-y-2'>
         {/* Patient name and basic info */}
         <div>
-          <a className='link text-base font-bold' href={path}>
-            {name}
-          </a>
+          {canAccess ? (
+            <a className='link text-base font-bold' href={path}>
+              {name}
+            </a>
+          ) : (
+            <span
+              className='text-base-content/50 cursor-not-allowed text-base font-bold'
+              title='Anda tidak memiliki akses ke pasien ini'
+            >
+              {name}
+            </span>
+          )}
           <div className='mt-1 flex items-center gap-2'>
             <span className='badge badge-soft badge-primary badge-xs'>
               {cell.row.original.status}
@@ -80,8 +112,14 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
 
       <div className='list-col-fixed flex flex-col gap-1'>
         <button
-          className='btn btn-soft btn-primary btn-xs'
+          className={`btn btn-soft btn-primary btn-xs ${!canAccess ? 'btn-disabled' : ''}`}
           onClick={handleEditBtn}
+          disabled={!canAccess}
+          title={
+            !canAccess
+              ? 'Anda tidak memiliki akses ke pasien ini'
+              : 'Edit pasien'
+          }
         >
           <EditIcon />
           <span>Edit</span>

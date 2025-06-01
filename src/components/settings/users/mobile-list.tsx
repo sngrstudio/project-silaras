@@ -2,14 +2,16 @@ import { type FC, useState, useEffect } from 'react'
 import type { CellContext } from '@tanstack/react-table'
 import type { Users } from './users.store'
 import { setCurrentUser, setUsers, $currentPage } from './users.store'
-import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
-import { useStore } from '@nanostores/react'
 import { actions } from 'astro:actions'
 import EditIcon from '~icons/lucide/pen'
 import TrashIcon from '~icons/lucide/trash-2'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
+import { canUserEditUser, canUserDeleteUser } from '~/utils/access-control'
+import { useUserRegion } from '~/utils/hooks/useUserRegion'
+
+type CurrentUser = Awaited<ReturnType<typeof actions.user.getCurrent.orThrow>>
 
 // Cache for profile photo URLs to avoid repeated API calls
 const profilePhotoCache = new Map<string, GetImageResult>()
@@ -70,12 +72,31 @@ const UserAvatar: FC<{
 
 interface MobileListProps {
   cell: CellContext<Users[number], unknown>
+  currentUser: CurrentUser | null
 }
 
-const MobileList: FC<MobileListProps> = ({ cell }) => {
+const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
   const user = cell.row.original
-  const currentUser = useStore($globalCurrentUser)
+  const { userRegion } = useUserRegion()
   const isSelf = currentUser && currentUser.id === user.id
+
+  // Create target user region object from available data
+  const targetUserRegion = user.regionId
+    ? {
+        id: user.regionId,
+        name: user.regionName || '',
+        slug: user.regionSlug || '',
+        type: user.regionType as 'KABUPATEN' | 'KECAMATAN' | 'DESA',
+        parentId: user.regionParentId || null
+      }
+    : null
+
+  const canEdit = currentUser
+    ? canUserEditUser(currentUser, user, userRegion, targetUserRegion)
+    : false
+  const canDelete = currentUser
+    ? canUserDeleteUser(currentUser, user, userRegion, targetUserRegion)
+    : false
 
   const handleEditBtn = () => {
     setCurrentUser(user)
@@ -155,31 +176,34 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
         )}
       </div>
       <div className='flex flex-col gap-1'>
-        <button
-          className='btn btn-ghost btn-square btn-sm'
-          onClick={handleEditBtn}
-          aria-label={`Edit ${user.fullName}`}
-        >
-          <EditIcon />
-        </button>
-        {isSelf ? (
+        {canEdit && (
           <button
-            className='btn btn-ghost btn-square btn-sm text-error cursor-not-allowed opacity-50'
-            disabled
-            title='Anda tidak dapat menghapus akun Anda sendiri'
-            aria-label={`Cannot delete own account: ${user.fullName}`}
+            className='btn btn-ghost btn-square btn-sm'
+            onClick={handleEditBtn}
+            aria-label={`Edit ${user.fullName}`}
           >
-            <TrashIcon />
-          </button>
-        ) : (
-          <button
-            className='btn btn-ghost btn-square btn-sm text-error'
-            onClick={handleDeleteBtn}
-            aria-label={`Delete ${user.fullName}`}
-          >
-            <TrashIcon />
+            <EditIcon />
           </button>
         )}
+        {canDelete &&
+          (isSelf ? (
+            <button
+              className='btn btn-ghost btn-square btn-sm text-error cursor-not-allowed opacity-50'
+              disabled
+              title='Anda tidak dapat menghapus akun Anda sendiri'
+              aria-label={`Cannot delete own account: ${user.fullName}`}
+            >
+              <TrashIcon />
+            </button>
+          ) : (
+            <button
+              className='btn btn-ghost btn-square btn-sm text-error'
+              onClick={handleDeleteBtn}
+              aria-label={`Delete ${user.fullName}`}
+            >
+              <TrashIcon />
+            </button>
+          ))}
       </div>
     </>
   )
