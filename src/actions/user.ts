@@ -20,6 +20,13 @@ import {
 import { z } from 'astro:schema'
 import { deleteS3, uploadS3 } from '~/lib/s3'
 import { getFileHash } from '~/utils/file-hash'
+import { getRegionById } from '../db/queries/region'
+import {
+  canUserEditUser,
+  canUserAccessUser,
+  canUserDeleteUser,
+  canUserAssignToRegion
+} from '../utils/access-control'
 
 /**
  * Astro Actions for User table
@@ -125,17 +132,14 @@ const user = {
           }
 
           // Check if coordinator can edit this user
-          const { canUserEditUser } = await import('../utils/access-control')
           let currentUserRegion = null
           let targetUserRegion = null
 
           if (currentUser.regionId) {
-            const { getRegionById } = await import('../db/queries/region')
             currentUserRegion = await getRegionById(currentUser.regionId)
           }
 
           if (targetUser.regionId) {
-            const { getRegionById } = await import('../db/queries/region')
             targetUserRegion = await getRegionById(targetUser.regionId)
           }
 
@@ -156,11 +160,6 @@ const user = {
 
         // Check if coordinator can assign user to the specified region
         if (input.regionId) {
-          const { getRegionById } = await import('../db/queries/region')
-          const { canUserAssignToRegion } = await import(
-            '../utils/access-control'
-          )
-
           const targetRegion = await getRegionById(input.regionId)
           let currentUserRegion = null
 
@@ -337,18 +336,14 @@ const user = {
         // Get current user's region for filtering
         let currentUserRegion = null
         if (currentUser.regionId) {
-          const { getRegionById } = await import('../db/queries/region')
           currentUserRegion = await getRegionById(currentUser.regionId)
         }
 
         // Filter users that the coordinator can access
-        const { canUserAccessUser } = await import('../utils/access-control')
-
         const filteredUsers = []
         for (const user of allUsers) {
           let targetUserRegion = null
           if (user.regionId) {
-            const { getRegionById } = await import('../db/queries/region')
             targetUserRegion = await getRegionById(user.regionId)
           }
 
@@ -410,18 +405,14 @@ const user = {
         // Get current user's region for filtering
         let currentUserRegion = null
         if (currentUser.regionId) {
-          const { getRegionById } = await import('../db/queries/region')
           currentUserRegion = await getRegionById(currentUser.regionId)
         }
 
         // Filter search results that the coordinator can access
-        const { canUserAccessUser } = await import('../utils/access-control')
-
         const filteredResults = []
         for (const user of searchResults) {
           let targetUserRegion = null
           if (user.regionId) {
-            const { getRegionById } = await import('../db/queries/region')
             targetUserRegion = await getRegionById(user.regionId)
           }
 
@@ -481,19 +472,15 @@ const user = {
       }
 
       // Use access control to check if deletion is allowed
-      const { canUserDeleteUser } = await import('../utils/access-control')
-
       // Get region information for access control
       let currentUserRegion = null
       let targetUserRegion = null
 
       if (currentUser.regionId) {
-        const { getRegionById } = await import('../db/queries/region')
         currentUserRegion = await getRegionById(currentUser.regionId)
       }
 
       if (targetUser.regionId) {
-        const { getRegionById } = await import('../db/queries/region')
         targetUserRegion = await getRegionById(targetUser.regionId)
       }
 

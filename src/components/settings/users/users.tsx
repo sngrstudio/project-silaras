@@ -11,7 +11,13 @@ import {
   type SortingState
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import { $users, setCurrentUser, setUsers, type Users } from './users.store'
+import {
+  $users,
+  setCurrentUser,
+  setUsers,
+  type Users,
+  $currentPage
+} from './users.store'
 import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
 import { actions } from 'astro:actions'
 import EditIcon from '~icons/lucide/pen'
@@ -251,9 +257,7 @@ const dColumns = [
             await actions.user.delete({ id: user.id })
 
             // Refresh the users list
-            const currentPage = await import('./users.store').then((m) =>
-              m.$currentPage.get()
-            )
+            const currentPage = $currentPage.get()
             const updatedUsers = await actions.user.getAll.orThrow({
               page: currentPage,
               size: 10
