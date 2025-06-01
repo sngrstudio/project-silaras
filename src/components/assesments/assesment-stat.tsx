@@ -1,5 +1,6 @@
 import { type FC, useActionState, useRef, useState, useEffect } from 'react'
 import { useStore } from '@nanostores/react'
+import clsx from 'clsx'
 import {
   $monthlyAssesments,
   setMonthlyAssesment,
@@ -50,22 +51,23 @@ const DeltaIndicator: FC<{
   const isPositive = delta > 0
   const isZero = delta === 0
 
-  const color = isZero
-    ? 'text-base-content'
-    : type === 'height'
-      ? isPositive
-        ? 'text-success'
-        : 'text-warning' // Height increase is good
-      : type === 'weight'
-        ? isPositive
-          ? 'text-warning'
-          : 'text-success' // Weight loss might be good depending on context
-        : isPositive
-          ? 'text-warning'
-          : 'text-success' // BMI decrease is generally good
+  const getColorClass = () => {
+    if (isZero) return 'text-base-content'
+
+    if (type === 'height') {
+      return isPositive ? 'text-success' : 'text-warning' // Height increase is good
+    }
+
+    if (type === 'weight') {
+      return isPositive ? 'text-warning' : 'text-success' // Weight loss might be good depending on context
+    }
+
+    // type === 'bmi'
+    return isPositive ? 'text-warning' : 'text-success' // BMI decrease is generally good
+  }
 
   return (
-    <div className={`stat-desc flex items-center gap-1 ${color}`}>
+    <div className={clsx('stat-desc flex items-center gap-1', getColorClass())}>
       <span className='text-xs'>{isZero ? '●' : isPositive ? '▲' : '▼'}</span>
       <span className='text-xs'>
         {isZero
@@ -208,7 +210,10 @@ const AssesmentStatRC: FC = () => {
       <div className='stat place-items-center'>
         <span className='stat-title'>Indeks Massa Tubuh</span>
         <span
-          className={`stat-value ${getBMIClassification(Number(monthlyAssesments.bmi)).color}`}
+          className={clsx(
+            'stat-value',
+            getBMIClassification(Number(monthlyAssesments.bmi)).color
+          )}
         >
           {monthlyAssesments.bmi}
         </span>
@@ -218,13 +223,11 @@ const AssesmentStatRC: FC = () => {
           </span>
           {metricsComparison && (
             <span
-              className={`flex items-center gap-1 ${
-                metricsComparison.deltas.bmi === 0
-                  ? 'text-base-content'
-                  : metricsComparison.deltas.bmi > 0
-                    ? 'text-warning'
-                    : 'text-success'
-              }`}
+              className={clsx('flex items-center gap-1', {
+                'text-base-content': metricsComparison.deltas.bmi === 0,
+                'text-warning': metricsComparison.deltas.bmi > 0,
+                'text-success': metricsComparison.deltas.bmi < 0
+              })}
             >
               <span className='text-xs'>
                 {metricsComparison.deltas.bmi === 0
@@ -300,13 +303,11 @@ const AssesmentStatRC: FC = () => {
             ) : (
               <>
                 <span
-                  className={`text-xs ${
-                    metricsComparison.deltas.score === 0
-                      ? 'text-base-content'
-                      : metricsComparison.deltas.score > 0
-                        ? 'text-success'
-                        : 'text-warning'
-                  }`}
+                  className={clsx('text-xs', {
+                    'text-base-content': metricsComparison.deltas.score === 0,
+                    'text-success': metricsComparison.deltas.score > 0,
+                    'text-warning': metricsComparison.deltas.score < 0
+                  })}
                 >
                   {metricsComparison.deltas.score === 0
                     ? '●'
@@ -315,13 +316,11 @@ const AssesmentStatRC: FC = () => {
                       : '▼'}
                 </span>
                 <span
-                  className={`text-xs ${
-                    metricsComparison.deltas.score === 0
-                      ? 'text-base-content'
-                      : metricsComparison.deltas.score > 0
-                        ? 'text-success'
-                        : 'text-warning'
-                  }`}
+                  className={clsx('text-xs', {
+                    'text-base-content': metricsComparison.deltas.score === 0,
+                    'text-success': metricsComparison.deltas.score > 0,
+                    'text-warning': metricsComparison.deltas.score < 0
+                  })}
                 >
                   {metricsComparison.deltas.score === 0
                     ? 'Tidak berubah'

@@ -1,4 +1,5 @@
 import { type FC, useState, useMemo, useEffect } from 'react'
+import clsx from 'clsx'
 import TableTemplate from '../../common/table/desktop'
 import ListTemplate from '../../common/table/mobile'
 import MobileList from './mobile-list'
@@ -47,14 +48,17 @@ const UserAvatar: FC<{
   const sizeClass = size === 'sm' ? 'w-8' : 'w-10'
 
   return (
-    <div className={`avatar ${!profilePhotoUrl ? 'avatar-placeholder' : ''}`}>
+    <div className={clsx('avatar', { 'avatar-placeholder': !profilePhotoUrl })}>
       {profilePhotoUrl ? (
-        <div className={`${sizeClass} mask mask-circle`}>
+        <div className={clsx(sizeClass, 'mask mask-circle')}>
           <Image image={profilePhotoUrl} alt={fullName} />
         </div>
       ) : (
         <div
-          className={`bg-primary text-primary-content aspect-square rounded-full ${sizeClass}`}
+          className={clsx(
+            'bg-primary text-primary-content aspect-square rounded-full',
+            sizeClass
+          )}
         >
           <span className={size === 'sm' ? 'text-xs' : 'text-xl'}>
             {fullName.charAt(0).toUpperCase()}

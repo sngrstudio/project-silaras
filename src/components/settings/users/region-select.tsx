@@ -1,4 +1,5 @@
 import { useState, useEffect, type FC } from 'react'
+import clsx from 'clsx'
 import { actions } from 'astro:actions'
 import type { InferSelectModel } from 'drizzle-orm'
 import type { region } from '~/db/schemas/region'
@@ -176,7 +177,9 @@ const RegionSelect: FC<RegionSelectProps> = ({
           placeholder={getPlaceholder()}
           readOnly
           disabled={isDisabled}
-          className={`input w-full cursor-pointer ${isDisabled ? 'bg-base-200' : ''}`}
+          className={clsx('input w-full cursor-pointer', {
+            'bg-base-200': isDisabled
+          })}
           onClick={() => !isDisabled && setIsOpen(!isOpen)}
         />
 
@@ -197,7 +200,9 @@ const RegionSelect: FC<RegionSelectProps> = ({
         {/* Dropdown arrow */}
         <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 transform'>
           <svg
-            className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={clsx('h-4 w-4 transition-transform', {
+              'rotate-180': isOpen
+            })}
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
@@ -243,11 +248,13 @@ const RegionSelect: FC<RegionSelectProps> = ({
                 <button
                   key={region.id}
                   type='button'
-                  className={`hover:bg-base-200 border-base-200 w-full border-b p-3 text-left last:border-b-0 ${
-                    selectedRegion?.id === region.id
-                      ? 'bg-primary/10 text-primary'
-                      : ''
-                  }`}
+                  className={clsx(
+                    'hover:bg-base-200 border-base-200 w-full border-b p-3 text-left last:border-b-0',
+                    {
+                      'bg-primary/10 text-primary':
+                        selectedRegion?.id === region.id
+                    }
+                  )}
                   onClick={() => handleSelect(region)}
                 >
                   <div className='font-medium'>{region.name}</div>

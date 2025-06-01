@@ -1,4 +1,5 @@
 import { type FC } from 'react'
+import clsx from 'clsx'
 import { type CellContext } from '@tanstack/react-table'
 import {
   setCurrentPatient,
@@ -116,7 +117,9 @@ const MobileList: FC<MobileListProps> = ({
 
       <div className='list-col-fixed flex flex-col gap-1'>
         <button
-          className={`btn btn-soft btn-primary btn-xs ${!canAccess ? 'btn-disabled' : ''}`}
+          className={clsx('btn btn-soft btn-primary btn-xs', {
+            'btn-disabled': !canAccess
+          })}
           onClick={handleEditBtn}
           disabled={!canAccess}
           title={

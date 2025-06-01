@@ -52,6 +52,9 @@
         "editor.quickSuggestions": {
           "strings": "on"
         },
+        "tailwindCSS.experimental.classRegex": [
+          ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+        ],
         "sqltools.connections": [
           {
             "mysqlOptions": {

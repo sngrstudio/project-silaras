@@ -1,6 +1,7 @@
 import { type FC, type ReactNode } from 'react'
 import * as Toast from '@radix-ui/react-toast'
 import { useStore } from '@nanostores/react'
+import clsx from 'clsx'
 import { $toastMessage, $isToastOpen, hideToast } from './toast.store'
 import IconLucideAlertCircle from '~icons/lucide/alert-circle'
 import IconLucideCheckCircle from '~icons/lucide/check-circle'
@@ -38,11 +39,16 @@ const ToastComponent: FC<ToastComponentProps> = ({ children }) => {
     <Toast.Provider swipeDirection='up' duration={5000}>
       {children}
       <Toast.Root
-        className={`fixed bottom-6 left-1/2 z-[9999] flex w-80 -translate-x-1/2 transform items-center gap-3 rounded-full border px-4 py-3 shadow-lg transition-all duration-300 ease-in-out ${isOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'} ${
-          toastMessage?.error
-            ? 'bg-error text-error-content border-error/20'
-            : 'bg-success text-success-content border-success/20'
-        } `}
+        className={clsx(
+          'fixed bottom-6 left-1/2 z-[9999] flex w-80 -translate-x-1/2 transform items-center gap-3 rounded-full border px-4 py-3 shadow-lg transition-all duration-300 ease-in-out',
+          {
+            'translate-y-0 opacity-100': isOpen,
+            'pointer-events-none translate-y-2 opacity-0': !isOpen,
+            'bg-error text-error-content border-error/20': toastMessage?.error,
+            'bg-success text-success-content border-success/20':
+              !toastMessage?.error
+          }
+        )}
         open={isOpen}
         onOpenChange={(open) => {
           if (!open) {

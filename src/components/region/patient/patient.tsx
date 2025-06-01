@@ -1,4 +1,5 @@
 import { type FC, useState, useMemo } from 'react'
+import clsx from 'clsx'
 import TableTemplate from '~/components/common/table/desktop'
 import ListTemplate from '~/components/common/table/mobile'
 import MobileList from './mobile-list'
@@ -158,7 +159,9 @@ const createDesktopColumns = (
       return (
         <div className='flex gap-2'>
           <button
-            className={`btn btn-soft btn-primary btn-xs ${!canAccess ? 'btn-disabled' : ''}`}
+            className={clsx('btn btn-soft btn-primary btn-xs', {
+              'btn-disabled': !canAccess
+            })}
             onClick={handleEditBtn}
             disabled={!canAccess}
             title={
