@@ -228,20 +228,20 @@ export const getAllRegionsWithCounts = async (
       parentId: region.parentId,
       childRegionCount: sql<number>`(
         SELECT COUNT(*) 
-        FROM ${region} r2 
-        WHERE r2.parent_id = ${region.id}
+        FROM region r2 
+        WHERE r2.parent_id = region.id
       )`,
       patientCount: sql<number>`(
         SELECT COUNT(*) 
-        FROM ${patient} p 
+        FROM patient p 
         WHERE p.region_id IN (
-          SELECT ${region.id} as id
+          SELECT region.id as id
           UNION ALL
-          SELECT r1.id FROM ${region} r1 WHERE r1.parent_id = ${region.id}
+          SELECT r1.id FROM region r1 WHERE r1.parent_id = region.id
           UNION ALL  
-          SELECT r2.id FROM ${region} r1 
-          INNER JOIN ${region} r2 ON r2.parent_id = r1.id 
-          WHERE r1.parent_id = ${region.id}
+          SELECT r2.id FROM region r1 
+          INNER JOIN region r2 ON r2.parent_id = r1.id 
+          WHERE r1.parent_id = region.id
         )
       )`,
       totalCount: sql<number>`COUNT(*) OVER()`
