@@ -4,6 +4,7 @@ import Region from '~/components/region/subregion/region.astro'
 import Patient from '~/components/region/patient/patient.astro'
 import { actions } from 'astro:actions'
 import BackIcon from '~icons/lucide/arrow-left'
+import { canUserAccessRegionSync } from '~/utils/access-control'
 
 const { user } = Astro.locals
 if (!user) {
@@ -84,6 +85,19 @@ const parentRegion = await Astro.callAction(actions.region.getById.orThrow, {
   id: page.parentId || ''
 })
 
+// Get user's assigned region for access control checks
+const userRegion = user.regionId
+  ? await Astro.callAction(actions.region.getById.orThrow, {
+      id: user.regionId
+    })
+  : null
+
+// Check if user can access the parent region (for back button visibility)
+const canAccessParent =
+  parentRegion && userRegion
+    ? canUserAccessRegionSync(user, parentRegion, userRegion)
+    : false
+
 const props = {
   title: page.name,
   description: `Selayang Pandang untuk ${page.type.toLowerCase()} ${page.name}`
@@ -103,7 +117,7 @@ const props = {
   }
   {
     /* controls */
-    parentRegion && (
+    parentRegion && canAccessParent && (
       <Fragment slot='controls'>
         <a
           class='btn btn-ghost md:btn-sm'
