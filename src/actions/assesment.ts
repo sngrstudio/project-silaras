@@ -7,6 +7,8 @@ import {
   getMonthlyAssesment,
   upsertPatientMonthlyAssesment,
   getDailyAssesments,
+  getPatientCompletionProgress,
+  getPatientMetricsComparison,
   MONTHS,
   type Month
 } from '../db/queries/assesment'
@@ -85,6 +87,67 @@ const assesment = {
         }
 
         return await upsertPatientMonthlyAssesment(input)
+      }
+    }),
+    /**
+     * Get completion progress for a patient in a specific month.
+     * Requires editor level access or above.
+     *
+     * @param {string} patientSlug - The slug of the patient.
+     * @param {number} monthIndex - The month index (1 = January, 12 = December).
+     * @returns {Promise<Object>} Object containing progress percentage and counts.
+     */
+    getProgress: defineAction({
+      input: z.object({
+        patientSlug: z.string(),
+        monthIndex: z.number().int().min(1).max(12)
+      }),
+      handler: async ({ patientSlug, monthIndex }, ctx) => {
+        const currentUser = ctx.locals.user
+
+        // Only editors (level 2) and above can view patient assessments
+        if (!currentUser || currentUser.accessLevel < 2) {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Anda tidak memiliki izin untuk melihat penilaian pasien.'
+          })
+        }
+
+        const month = MONTHS[monthIndex - 1]
+        if (!month) throw new Error('Invalid month index')
+        return await getPatientCompletionProgress({ patientSlug, month })
+      }
+    }),
+    /**
+     * Get metrics comparison for a patient (current vs previous month).
+     * Requires editor level access or above.
+     *
+     * @param {string} patientSlug - The slug of the patient.
+     * @param {number} monthIndex - The month index (1 = January, 12 = December).
+     * @returns {Promise<Object>} Object containing current, previous, and delta data.
+     */
+    getMetricsComparison: defineAction({
+      input: z.object({
+        patientSlug: z.string(),
+        monthIndex: z.number().int().min(1).max(12)
+      }),
+      handler: async ({ patientSlug, monthIndex }, ctx) => {
+        const currentUser = ctx.locals.user
+
+        // Only editors (level 2) and above can view patient assessments
+        if (!currentUser || currentUser.accessLevel < 2) {
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Anda tidak memiliki izin untuk melihat penilaian pasien.'
+          })
+        }
+
+        const month = MONTHS[monthIndex - 1]
+        if (!month) throw new Error('Invalid month index')
+        return await getPatientMetricsComparison({
+          patientSlug,
+          currentMonth: month
+        })
       }
     })
   },

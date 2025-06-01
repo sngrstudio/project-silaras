@@ -32,6 +32,7 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
         <div className='stats'>
           <div className='stat'>
             <div className='stat-value'>{cell.row.original.score}</div>
+            <div className='stat-desc'>Skor</div>
           </div>
         </div>
       </div>

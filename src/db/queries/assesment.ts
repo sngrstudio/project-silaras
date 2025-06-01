@@ -7,7 +7,7 @@ import {
   patientMonthlyAssesmentWithTotalScore
 } from '../schemas/assesment'
 import { patient } from '../schemas/patient'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 
 export const MONTHS = [
   'JANUARY',
@@ -157,6 +157,32 @@ export async function upsertPatientDailyAssesment({
   containsFruits: boolean
   isFollowingRecipe: boolean
 }) {
+  // Check if any boolean field is true to determine isCompleted
+  const hasAnyTrue =
+    containsStapleFood ||
+    containsSideDish ||
+    containsVegetables ||
+    containsFruits ||
+    isFollowingRecipe
+
+  // Get existing record to check current isCompleted status
+  const existing = await db
+    .select({ isCompleted: patientDailyAssesment.isCompleted })
+    .from(patientDailyAssesment)
+    .where(
+      and(
+        eq(patientDailyAssesment.patientId, patientId),
+        eq(patientDailyAssesment.dailyAssesmentId, dailyAssesmentId)
+      )
+    )
+    .limit(1)
+    .then((rows) => rows[0])
+
+  // isCompleted should be true if:
+  // 1. Any current field is true, OR
+  // 2. It was already true in the existing record (never revert to false)
+  const isCompleted = hasAnyTrue || (existing?.isCompleted ?? false)
+
   // MySQL upsert using onDuplicateKeyUpdate
   await db
     .insert(patientDailyAssesment)
@@ -167,7 +193,8 @@ export async function upsertPatientDailyAssesment({
       containsSideDish,
       containsVegetables,
       containsFruits,
-      isFollowingRecipe
+      isFollowingRecipe,
+      isCompleted
     })
     .onDuplicateKeyUpdate({
       set: {
@@ -175,7 +202,8 @@ export async function upsertPatientDailyAssesment({
         containsSideDish,
         containsVegetables,
         containsFruits,
-        isFollowingRecipe
+        isFollowingRecipe,
+        isCompleted
       }
     })
   // Return the upserted row
@@ -226,7 +254,8 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
       containsVegetables: patientDailyAssesment.containsVegetables,
       containsFruits: patientDailyAssesment.containsFruits,
       isFollowingRecipe: patientDailyAssesment.isFollowingRecipe,
-      score: patientDailyAssesment.score
+      score: patientDailyAssesment.score,
+      isCompleted: patientDailyAssesment.isCompleted
     })
     .from(patientDailyAssesment)
     .innerJoin(
@@ -359,4 +388,170 @@ export async function getDailyAssesments(month: Month) {
           .limit(1)
       )
     )
+}
+
+/**
+ * Get completion progress for a patient in a specific month.
+ * Returns the percentage of completed daily assessments and total/completed counts.
+ *
+ * @param {Object} params - The query parameters.
+ * @param {string} params.patientSlug - The slug of the patient.
+ * @param {Month} params.month - The month name (enum).
+ * @returns {Promise<Object>} Object containing progress percentage and counts.
+ *
+ * @example
+ * await getPatientCompletionProgress({ patientSlug: 'john-doe', month: 'JUNE' })
+ * // Returns: { completed: 15, total: 30, percentage: 50 }
+ */
+export async function getPatientCompletionProgress({
+  patientSlug,
+  month
+}: {
+  patientSlug: string
+  month: Month
+}) {
+  // Get total daily assessments for the month
+  const totalDailyAssessments = await db
+    .select({ count: sql<number>`COUNT(*)`.as('count') })
+    .from(dailyAssesment)
+    .where(
+      eq(
+        dailyAssesment.monthlyAssesmentId,
+        db
+          .select({ id: monthlyAssesment.id })
+          .from(monthlyAssesment)
+          .where(eq(monthlyAssesment.month, month))
+          .limit(1)
+      )
+    )
+
+  // Get completed daily assessments for the patient
+  const completedAssessments = await db
+    .select({ count: sql<number>`COUNT(*)`.as('count') })
+    .from(patientDailyAssesment)
+    .innerJoin(
+      dailyAssesment,
+      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+    )
+    .innerJoin(
+      monthlyAssesment,
+      and(
+        eq(dailyAssesment.monthlyAssesmentId, monthlyAssesment.id),
+        eq(monthlyAssesment.month, month)
+      )
+    )
+    .where(
+      and(
+        eq(
+          patientDailyAssesment.patientId,
+          db
+            .select({ id: patient.id })
+            .from(patient)
+            .where(eq(patient.slug, patientSlug))
+            .limit(1)
+        ),
+        eq(patientDailyAssesment.isCompleted, true)
+      )
+    )
+
+  const total = totalDailyAssessments[0]?.count || 0
+  const completed = completedAssessments[0]?.count || 0
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
+
+  return {
+    completed,
+    total,
+    percentage
+  }
+}
+
+/**
+ * Get comparison data for a patient's current vs previous month metrics.
+ * If it's the first month, compare with initial values.
+ *
+ * @param {Object} params - The query parameters.
+ * @param {string} params.patientSlug - The slug of the patient.
+ * @param {Month} params.currentMonth - The current month name.
+ * @returns {Promise<Object>} Object containing current and comparison metrics.
+ */
+export async function getPatientMetricsComparison({
+  patientSlug,
+  currentMonth
+}: {
+  patientSlug: string
+  currentMonth: Month
+}) {
+  const currentMonthIndex = MONTHS.indexOf(currentMonth)
+  const previousMonth =
+    currentMonthIndex > 0 ? MONTHS[currentMonthIndex - 1] : null
+
+  // Get patient initial data
+  const patientData = await db
+    .select({
+      initialWeight: patient.initialWeight,
+      initialHeight: patient.initialHeight,
+      initialBMI: patient.initialBMI
+    })
+    .from(patient)
+    .where(eq(patient.slug, patientSlug))
+    .limit(1)
+
+  if (!patientData[0]) {
+    throw new Error('Patient not found')
+  }
+
+  // Get current month data
+  const currentData = await getMonthlyAssesment({
+    patientSlug,
+    month: currentMonth
+  })
+
+  // Get previous month data if exists
+  let previousData = null
+  if (previousMonth) {
+    previousData = await getMonthlyAssesment({
+      patientSlug,
+      month: previousMonth
+    })
+  }
+
+  // Calculate deltas
+  const weightDelta = currentData
+    ? currentData.weight -
+      (previousData?.weight || patientData[0].initialWeight)
+    : 0
+  const heightDelta = currentData
+    ? currentData.height -
+      (previousData?.height || patientData[0].initialHeight)
+    : 0
+  const bmiDelta =
+    currentData && currentData.bmi
+      ? currentData.bmi - (previousData?.bmi || patientData[0].initialBMI || 0)
+      : 0
+
+  // Get current month total score
+  const currentScore = Number(currentData?.totalScore || 0)
+
+  // Get previous month total score
+  const previousScore = previousData?.totalScore
+    ? Number(previousData.totalScore)
+    : null
+
+  // Calculate score delta
+  const scoreDelta = previousScore !== null ? currentScore - previousScore : 0
+
+  return {
+    current: currentData,
+    previous: previousData,
+    initial: patientData[0],
+    deltas: {
+      weight: weightDelta,
+      height: heightDelta,
+      bmi: bmiDelta,
+      score: scoreDelta
+    },
+    isFirstMonth: !previousMonth || !previousData,
+    currentScore: currentScore,
+    previousScore: previousScore
+  }
 }

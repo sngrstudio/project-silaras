@@ -1,9 +1,10 @@
-import { type FC, useActionState, useRef } from 'react'
+import { type FC, useActionState, useRef, useState, useEffect } from 'react'
 import { useStore } from '@nanostores/react'
 import {
   $monthlyAssesments,
   setMonthlyAssesment,
-  $currentMonthIndex
+  $currentMonthIndex,
+  $dailyAssesments
 } from './assesment.store'
 import { actions } from 'astro:actions'
 import {
@@ -11,12 +12,111 @@ import {
   showSuccessToast
 } from '~/components/common/toast/toast.store'
 
+interface CompletionProgress {
+  completed: number
+  total: number
+  percentage: number
+}
+
+interface MetricsComparison {
+  current: any
+  previous: any
+  initial: any
+  deltas: {
+    weight: number
+    height: number
+    bmi: number
+    score: number
+  }
+  isFirstMonth: boolean
+  currentScore: number
+  previousScore: number | null
+}
+
+// BMI classification according to WHO standards
+const getBMIClassification = (bmi: number) => {
+  if (bmi < 18.5) return { category: 'Kurus', color: 'text-warning' }
+  if (bmi < 25) return { category: 'Normal', color: 'text-success' }
+  if (bmi < 30) return { category: 'Kegemukan', color: 'text-warning' }
+  return { category: 'Obesitas', color: 'text-error' }
+}
+
+// Delta indicator component
+const DeltaIndicator: FC<{
+  delta: number
+  unit: string
+  type: 'weight' | 'height' | 'bmi'
+}> = ({ delta, unit, type }) => {
+  const isPositive = delta > 0
+  const isZero = delta === 0
+
+  const color = isZero
+    ? 'text-base-content'
+    : type === 'height'
+      ? isPositive
+        ? 'text-success'
+        : 'text-warning' // Height increase is good
+      : type === 'weight'
+        ? isPositive
+          ? 'text-warning'
+          : 'text-success' // Weight loss might be good depending on context
+        : isPositive
+          ? 'text-warning'
+          : 'text-success' // BMI decrease is generally good
+
+  return (
+    <div className={`stat-desc flex items-center gap-1 ${color}`}>
+      <span className='text-xs'>{isZero ? '●' : isPositive ? '▲' : '▼'}</span>
+      <span className='text-xs'>
+        {isZero
+          ? 'Tidak berubah'
+          : `${isPositive ? '+' : ''}${delta.toFixed(type === 'height' ? 1 : 2)} ${unit}`}
+      </span>
+    </div>
+  )
+}
+
 const AssesmentStatRC: FC = () => {
   const monthlyAssesments = useStore($monthlyAssesments)
   const currentMonthIndex = useStore($currentMonthIndex)
+  const dailyAssesments = useStore($dailyAssesments)
   const formRef = useRef<HTMLFormElement>(null)
+  const [completionProgress, setCompletionProgress] =
+    useState<CompletionProgress | null>(null)
+  const [metricsComparison, setMetricsComparison] =
+    useState<MetricsComparison | null>(null)
 
   const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+
+  // Fetch completion progress and metrics comparison when monthIndex, monthlyAssesments, or dailyAssesments change
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!monthlyAssesments) return
+
+      try {
+        // Fetch completion progress
+        const progress = await actions.assesment.monthly.getProgress.orThrow({
+          patientSlug: getPatientSlug(),
+          monthIndex: currentMonthIndex
+        })
+        setCompletionProgress(progress)
+
+        // Fetch metrics comparison
+        const comparison =
+          await actions.assesment.monthly.getMetricsComparison.orThrow({
+            patientSlug: getPatientSlug(),
+            monthIndex: currentMonthIndex
+          })
+        setMetricsComparison(comparison)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        setCompletionProgress(null)
+        setMetricsComparison(null)
+      }
+    }
+
+    fetchData()
+  }, [currentMonthIndex, monthlyAssesments, dailyAssesments])
 
   const handleUpdate = async (_prev: unknown, formData: FormData) => {
     const { error } = await actions.assesment.monthly.set(formData)
@@ -73,6 +173,13 @@ const AssesmentStatRC: FC = () => {
           disabled={isPending}
           defaultValue={monthlyAssesments.height}
         />
+        {metricsComparison && (
+          <DeltaIndicator
+            delta={metricsComparison.deltas.height}
+            unit='cm'
+            type='height'
+          />
+        )}
       </div>
 
       <div className='stat place-items-center'>
@@ -89,11 +196,143 @@ const AssesmentStatRC: FC = () => {
           disabled={isPending}
           defaultValue={monthlyAssesments.weight}
         />
+        {metricsComparison && (
+          <DeltaIndicator
+            delta={metricsComparison.deltas.weight}
+            unit='kg'
+            type='weight'
+          />
+        )}
       </div>
 
       <div className='stat place-items-center'>
         <span className='stat-title'>Indeks Massa Tubuh</span>
-        <span className='stat-value'>{monthlyAssesments.bmi}</span>
+        <span
+          className={`stat-value ${getBMIClassification(Number(monthlyAssesments.bmi)).color}`}
+        >
+          {monthlyAssesments.bmi}
+        </span>
+        <div className='stat-desc flex items-center gap-2'>
+          <span>
+            {getBMIClassification(Number(monthlyAssesments.bmi)).category}
+          </span>
+          {metricsComparison && (
+            <span
+              className={`flex items-center gap-1 ${
+                metricsComparison.deltas.bmi === 0
+                  ? 'text-base-content'
+                  : metricsComparison.deltas.bmi > 0
+                    ? 'text-warning'
+                    : 'text-success'
+              }`}
+            >
+              <span className='text-xs'>
+                {metricsComparison.deltas.bmi === 0
+                  ? '●'
+                  : metricsComparison.deltas.bmi > 0
+                    ? '▲'
+                    : '▼'}
+              </span>
+              <span className='text-xs'>
+                {metricsComparison.deltas.bmi === 0
+                  ? 'Tidak berubah'
+                  : `${metricsComparison.deltas.bmi > 0 ? '+' : ''}${metricsComparison.deltas.bmi.toFixed(2)}`}
+              </span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className='stat place-items-center'>
+        <span className='stat-title'>Progress Bulan Ini</span>
+        <span className='stat-value'>
+          {completionProgress ? `${completionProgress.percentage}%` : '0%'}
+        </span>
+        <div className='stat-figure'>
+          {completionProgress ? (
+            <div
+              className='radial-progress text-success'
+              style={
+                {
+                  '--value': completionProgress.percentage,
+                  '--size': '4rem',
+                  '--thickness': '4px'
+                } as React.CSSProperties
+              }
+              role='progressbar'
+              aria-valuenow={completionProgress.percentage}
+            >
+              {completionProgress.percentage}%
+            </div>
+          ) : (
+            <div
+              className='radial-progress'
+              style={
+                {
+                  '--value': 0,
+                  '--size': '4rem',
+                  '--thickness': '4px'
+                } as React.CSSProperties
+              }
+              role='progressbar'
+              aria-valuenow={0}
+            >
+              0%
+            </div>
+          )}
+        </div>
+        {completionProgress && (
+          <div className='stat-desc'>
+            {completionProgress.completed} dari {completionProgress.total} hari
+          </div>
+        )}
+      </div>
+
+      <div className='stat place-items-center'>
+        <span className='stat-title'>Skor Bulan Ini</span>
+        <span className='stat-value'>
+          {metricsComparison ? metricsComparison.currentScore : '0'}
+        </span>
+        <div className='stat-desc flex items-center gap-1'>
+          {metricsComparison ? (
+            metricsComparison.isFirstMonth ? (
+              <span className='text-base-content text-xs'>Bulan pertama</span>
+            ) : (
+              <>
+                <span
+                  className={`text-xs ${
+                    metricsComparison.deltas.score === 0
+                      ? 'text-base-content'
+                      : metricsComparison.deltas.score > 0
+                        ? 'text-success'
+                        : 'text-warning'
+                  }`}
+                >
+                  {metricsComparison.deltas.score === 0
+                    ? '●'
+                    : metricsComparison.deltas.score > 0
+                      ? '▲'
+                      : '▼'}
+                </span>
+                <span
+                  className={`text-xs ${
+                    metricsComparison.deltas.score === 0
+                      ? 'text-base-content'
+                      : metricsComparison.deltas.score > 0
+                        ? 'text-success'
+                        : 'text-warning'
+                  }`}
+                >
+                  {metricsComparison.deltas.score === 0
+                    ? 'Tidak berubah'
+                    : `${metricsComparison.deltas.score > 0 ? '+' : ''}${metricsComparison.deltas.score}`}
+                </span>
+              </>
+            )
+          ) : (
+            <span className='text-base-content text-xs'>-</span>
+          )}
+        </div>
       </div>
 
       {/* hidden */}

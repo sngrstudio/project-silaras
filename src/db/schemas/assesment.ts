@@ -130,7 +130,8 @@ export const patientDailyAssesment = mysqlTable(
       (): SQL =>
         sql<number>`${patientDailyAssesment.containsStapleFood} + ${patientDailyAssesment.containsSideDish} + ${patientDailyAssesment.containsVegetables} + ${patientDailyAssesment.containsFruits} + ${patientDailyAssesment.isFollowingRecipe}`,
       { mode: 'stored' }
-    )
+    ),
+    isCompleted: boolean('is_completed').default(false).notNull()
   },
   (table) => [
     primaryKey({ columns: [table.patientId, table.dailyAssesmentId] }),
