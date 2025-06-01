@@ -1,104 +1,65 @@
-import { Dialog as RadixDialog } from 'radix-ui'
+import {
+  useEffect,
+  useRef,
+  type DialogHTMLAttributes,
+  type FC,
+  type PropsWithChildren
+} from 'react'
 import { clsx } from 'clsx/lite'
-import type { FC, PropsWithChildren } from 'react'
 
-export interface DialogProps {
+// Export the new modal dialog as well
+export { ModalDialog } from './modal-dialog'
+
+export interface DialogTemplateProps
+  extends DialogHTMLAttributes<HTMLDialogElement> {
   title?: string | undefined
   open: boolean
-  onOpenChange?: (open: boolean) => void
   closeAction?: () => void
-  className?: string
-  trigger?: React.ReactNode
 }
 
 /**
- * Dialog component using Radix UI with proper z-index layering
- * This component allows toast notifications to appear above modals
- * and provides excellent accessibility features.
+ * Dialog component using native <dialog> element
+ *
+ * Note: The native dialog element creates a "top layer" that appears above all other content
+ * regardless of z-index values. This means toast notifications will appear behind the modal.
+ *
+ * For cases where you need toast notifications to appear above the modal,
+ * use ModalDialog from './modal-dialog' instead.
  */
-export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
+
+export const DialogTemplate: FC<PropsWithChildren<DialogTemplateProps>> = ({
   children,
   title,
   open = false,
-  onOpenChange,
   closeAction,
   className,
-  trigger
+  ...props
 }) => {
-  const handleOpenChange = (newOpen: boolean) => {
-    if (onOpenChange) {
-      onOpenChange(newOpen)
+  const ref = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    if (ref.current) {
+      if (open) {
+        ref.current.showModal()
+      } else {
+        ref.current.close()
+      }
     }
-    if (!newOpen && closeAction) {
-      closeAction()
-    }
-  }
+  }, [open])
 
   return (
-    <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
-      {trigger && <RadixDialog.Trigger asChild>{trigger}</RadixDialog.Trigger>}
-
-      <RadixDialog.Portal>
-        <RadixDialog.Overlay
-          className={clsx(
-            'fixed inset-0 bg-black/50 backdrop-blur-sm',
-            'z-[9998]', // Below toast notifications (z-[9999]) but above other content
-            'data-[state=open]:animate-in data-[state=closed]:animate-out',
-            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
-          )}
-        />
-
-        <RadixDialog.Content
-          className={clsx(
-            'fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
-            'z-[9998]', // Same z-index as overlay, below toast notifications
-            'bg-base-100 border-base-300 rounded-2xl border shadow-xl',
-            'mx-4 max-h-[90vh] w-full max-w-[75vh] overflow-y-auto',
-            'max-md:top-auto max-md:bottom-0 max-md:left-0 max-md:translate-x-0 max-md:translate-y-0',
-            'max-md:max-h-[85vh] max-md:w-full max-md:rounded-b-none', // Mobile bottom modal styling
-            'data-[state=open]:animate-in data-[state=closed]:animate-out',
-            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-            'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
-            'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-            'max-md:data-[state=closed]:slide-out-to-bottom-8 max-md:data-[state=open]:slide-in-from-bottom-8',
-            className
-          )}
-        >
-          <div className='p-6'>
-            {title && (
-              <RadixDialog.Title className='mb-4 text-lg font-bold'>
-                {title}
-              </RadixDialog.Title>
-            )}
-            {children}
-          </div>
-
-          {/* Close button - accessible by screen readers */}
-          <RadixDialog.Close asChild>
-            <button
-              className='ring-offset-base-100 focus:ring-primary absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
-              aria-label='Close dialog'
-            >
-              <svg
-                width='15'
-                height='15'
-                viewBox='0 0 15 15'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-                className='h-4 w-4'
-              >
-                <path
-                  d='m11.7816 4.03157c.0824-.08241.0824-.21569 0-.2981L11.4835 3.43548c-.0824-.08241-.2157-.08241-.2981 0L7.50002 7.12148L3.81496 3.43548c-.08241-.08241-.21569-.08241-.2981 0L3.21887 3.73357c-.08241.08241-.08241.21569 0 .2981L6.90393 7.72157L3.21887 11.4066c-.08241.0824-.08241.2157 0 .2981l.29809.2981c.08241.0824.21569.0824.2981 0L7.50002 8.32167l3.68506 3.68503c.0824.0824.2157.0824.2981 0l.2981-.2981c.0824-.0824.0824-.2157 0-.2981L8.09611 7.72157l3.68549-3.69z'
-                  fill='currentColor'
-                  fillRule='evenodd'
-                  clipRule='evenodd'
-                />
-              </svg>
-            </button>
-          </RadixDialog.Close>
-        </RadixDialog.Content>
-      </RadixDialog.Portal>
-    </RadixDialog.Root>
+    <dialog
+      className={clsx('modal max-md:modal-bottom', className)}
+      ref={ref}
+      {...props}
+    >
+      <div className='modal-box md:max-h-[90vh] md:w-[75vh]'>
+        {title && <h3 className='mb-4 text-lg font-bold'>{title}</h3>}
+        {children}
+      </div>
+      <form className='modal-backdrop' method='dialog' onSubmit={closeAction}>
+        <button>close</button>
+      </form>
+    </dialog>
   )
 }

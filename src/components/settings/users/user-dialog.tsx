@@ -1,5 +1,5 @@
 import { useActionState, useEffect, useState, type FC } from 'react'
-import { Dialog } from '~/components/common/dialog/dialog'
+import { ModalDialog } from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
   $currentUser,
@@ -137,7 +137,7 @@ const UserDialog: FC = () => {
   }
 
   return (
-    <Dialog
+    <DialogTemplate
       title={isEdit ? 'Edit Pengguna' : 'Tambah Pengguna'}
       open={isOpen}
       closeAction={() => setCurrentUser(undefined)}
@@ -340,7 +340,7 @@ const UserDialog: FC = () => {
           </button>
         </div>
       </form>
-    </Dialog>
+    </DialogTemplate>
   )
 }
 

@@ -1,6 +1,5 @@
 import { db } from '../db'
 import { user, session } from '../schemas/user'
-import { region } from '../schemas/region'
 import { eq, or, like } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 
@@ -50,11 +49,19 @@ export const upsertUser = async (data: {
 /**
  * Get a user by their id.
  * @param id User id
- * @returns User object or null if not found
+ * @returns User object (without password hash) or undefined if not found
  */
 export const getUserById = async (id: string) => {
   return db
-    .select()
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId
+    })
     .from(user)
     .where(eq(user.id, id))
     .limit(1)
@@ -62,11 +69,34 @@ export const getUserById = async (id: string) => {
 }
 
 /**
- * Get a user by their username.
+ * Get a user by their username (safe - excludes password hash).
  * @param username Username to look up
- * @returns User object or null if not found
+ * @returns User object (without password hash) or undefined if not found
  */
 export const getUserByUsername = async (username: string) => {
+  return db
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId
+    })
+    .from(user)
+    .where(eq(user.username, username))
+    .limit(1)
+    .then((rows) => rows[0] ?? undefined)
+}
+
+/**
+ * Get a user by their username for authentication purposes (includes password hash).
+ * This function should only be used for authentication operations.
+ * @param username Username to look up
+ * @returns User object (with password hash) or undefined if not found
+ */
+export const getUserByUsernameForAuth = async (username: string) => {
   return db
     .select()
     .from(user)
@@ -76,13 +106,21 @@ export const getUserByUsername = async (username: string) => {
 }
 
 /**
- * Get a user by their phone number.
+ * Get a user by their phone number (safe - excludes password hash).
  * @param phoneNumber Phone number to look up
- * @returns User object or undefined if not found
+ * @returns User object (without password hash) or undefined if not found
  */
 export const getUserByPhoneNumber = async (phoneNumber: string) => {
   return db
-    .select()
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId
+    })
     .from(user)
     .where(eq(user.phoneNumber, phoneNumber))
     .limit(1)
@@ -90,7 +128,28 @@ export const getUserByPhoneNumber = async (phoneNumber: string) => {
 }
 
 /**
- * Get a paginated list of users with region information.
+ * Get a user's password hash by their ID.
+ * This function should only be used when specifically needed for password operations.
+ * @param id User id
+ * @returns Password hash or undefined if not found
+ */
+export const getUserPasswordHashById = async (
+  id: string
+): Promise<string | undefined> => {
+  const result = await db
+    .select({
+      passwordHash: user.passwordHash
+    })
+    .from(user)
+    .where(eq(user.id, id))
+    .limit(1)
+    .then((rows) => rows[0] ?? undefined)
+
+  return result?.passwordHash ?? undefined
+}
+
+/**
+ * Get a paginated list of users (safe - excludes password hash).
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
  * @returns Array of users for the page
@@ -105,56 +164,9 @@ export const getAllUsers = async (page: number = 1, size: number = 10) => {
       fullName: user.fullName,
       phoneNumber: user.phoneNumber,
       profilePhoto: user.profilePhoto,
-      regionId: user.regionId,
-      regionName: region.name,
-      regionType: region.type,
-      regionSlug: region.slug,
-      regionParentId: region.parentId
+      regionId: user.regionId
     })
     .from(user)
-    .leftJoin(region, eq(user.regionId, region.id))
-    .limit(size)
-    .offset(offset)
-}
-
-/**
- * Search users by name, village/region, or phone number.
- * @param searchTerm Search term to filter by
- * @param page Page number (1-based, defaults to 1)
- * @param size Page size (defaults to 10)
- * @returns Array of users matching the search term
- */
-export const searchUsers = async (
-  searchTerm: string,
-  page: number = 1,
-  size: number = 10
-) => {
-  const offset = (page - 1) * size
-  const searchPattern = `%${searchTerm}%`
-
-  return db
-    .select({
-      id: user.id,
-      username: user.username,
-      accessLevel: user.accessLevel,
-      fullName: user.fullName,
-      phoneNumber: user.phoneNumber,
-      profilePhoto: user.profilePhoto,
-      regionId: user.regionId,
-      regionName: region.name,
-      regionType: region.type,
-      regionSlug: region.slug,
-      regionParentId: region.parentId
-    })
-    .from(user)
-    .leftJoin(region, eq(user.regionId, region.id))
-    .where(
-      or(
-        like(user.fullName, searchPattern),
-        like(region.name, searchPattern),
-        like(user.phoneNumber, searchPattern)
-      )
-    )
     .limit(size)
     .offset(offset)
 }
@@ -204,7 +216,15 @@ export const getSessionById = async (id: string) => {
   const result = await db
     .select({
       session: session,
-      user: user
+      user: {
+        id: user.id,
+        username: user.username,
+        accessLevel: user.accessLevel,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        profilePhoto: user.profilePhoto,
+        regionId: user.regionId
+      }
     })
     .from(session)
     .innerJoin(user, eq(session.userId, user.id))
@@ -239,4 +259,41 @@ export const deleteSessionById = async (id: string): Promise<void> => {
  */
 export const deleteSessionsByUserId = async (userId: string): Promise<void> => {
   await db.delete(session).where(eq(session.userId, userId))
+}
+
+/**
+ * Search users by username, full name, or phone number (safe - excludes password hash).
+ * @param searchTerm Search term to match against username, full name, or phone number
+ * @param page Page number (1-based, defaults to 1)
+ * @param size Page size (defaults to 10)
+ * @returns Array of users matching the search term
+ */
+export const searchUsers = async (
+  searchTerm: string,
+  page: number = 1,
+  size: number = 10
+) => {
+  const offset = (page - 1) * size
+  const searchPattern = `%${searchTerm}%`
+
+  return db
+    .select({
+      id: user.id,
+      username: user.username,
+      accessLevel: user.accessLevel,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      profilePhoto: user.profilePhoto,
+      regionId: user.regionId
+    })
+    .from(user)
+    .where(
+      or(
+        like(user.username, searchPattern),
+        like(user.fullName, searchPattern),
+        like(user.phoneNumber, searchPattern)
+      )
+    )
+    .limit(size)
+    .offset(offset)
 }

@@ -3,7 +3,9 @@ import {
   upsertUser,
   getUserById,
   getUserByUsername,
+  getUserByUsernameForAuth,
   getUserByPhoneNumber,
+  getUserPasswordHashById,
   getAllUsers,
   searchUsers,
   deleteUser
@@ -239,8 +241,8 @@ const user = {
         userData.passwordHash = await hashPassword(input.password)
       } else if (input.id) {
         // Editing existing user without new password - preserve existing passwordHash
-        const existingUser = await getUserById(input.id)
-        userData.passwordHash = existingUser?.passwordHash ?? null
+        const existingPasswordHash = await getUserPasswordHashById(input.id)
+        userData.passwordHash = existingPasswordHash ?? null
       } else {
         // New user without password - this should not happen due to validation
         userData.passwordHash = null
@@ -607,8 +609,8 @@ const user = {
           })
         }
 
-        // 2. Get user by username
-        const user = await getUserByUsername(username)
+        // 2. Get user by username (with password hash for authentication)
+        const user = await getUserByUsernameForAuth(username)
         if (!user) {
           // Record failed attempt for rate limiting
           recordLoginAttempt(clientIp, username, false)
