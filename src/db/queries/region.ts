@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { region } from '../schemas/region'
-import { eq } from 'drizzle-orm'
+import { patient } from '../schemas/patient'
+import { eq, count, inArray } from 'drizzle-orm'
 
 /**
  * Region table query functions.
@@ -142,4 +143,123 @@ export const getRegionBySlug = async (slug: string) => {
     .where(eq(region.slug, slug))
     .limit(1)
     .then((rows) => rows[0] ?? null)
+}
+
+/**
+ * Get count of child regions for a given region
+ * @param regionId Parent region id
+ * @returns Number of child regions
+ */
+export const getChildRegionCount = async (regionId: string) => {
+  const result = await db
+    .select({ count: count() })
+    .from(region)
+    .where(eq(region.parentId, regionId))
+  return result[0]?.count ?? 0
+}
+
+/**
+ * Get count of patients in a given region (including all descendant regions)
+ * @param regionId Region id
+ * @returns Number of patients in the region and all its descendants
+ */
+export const getPatientCountByRegion = async (
+  regionId: string
+): Promise<number> => {
+  // Get all descendant regions recursively
+  const getAllDescendantRegions = async (
+    parentId: string
+  ): Promise<string[]> => {
+    const children = await db
+      .select({ id: region.id })
+      .from(region)
+      .where(eq(region.parentId, parentId))
+
+    let allDescendants = [parentId]
+
+    for (const child of children) {
+      const childDescendants = await getAllDescendantRegions(child.id)
+      allDescendants.push(...childDescendants)
+    }
+
+    return allDescendants
+  }
+
+  // Get all region IDs (current region + all descendants)
+  const allRegionIds = await getAllDescendantRegions(regionId)
+
+  // Count patients in all these regions
+  if (allRegionIds.length === 0) {
+    return 0
+  }
+
+  // Use inArray for better performance with multiple region IDs
+  const result = await db
+    .select({ count: count() })
+    .from(patient)
+    .where(inArray(patient.regionId, allRegionIds))
+
+  return result[0]?.count ?? 0
+}
+
+/**
+ * Get regions with their child region and patient counts
+ * @param page Page number (1-based, defaults to 1)
+ * @param size Page size (defaults to 8)
+ * @param parentSlug Optional parent slug to filter regions by
+ * @returns Array of regions with counts
+ */
+export const getAllRegionsWithCounts = async (
+  page: number = 1,
+  size: number = 8,
+  parentSlug?: string
+) => {
+  const offset = (page - 1) * size
+
+  // If parentSlug is provided, look up the parent region's ID
+  let parentId: string | undefined = undefined
+  if (parentSlug) {
+    parentId = await db
+      .select({ id: region.id })
+      .from(region)
+      .where(eq(region.slug, parentSlug))
+      .limit(1)
+      .then((rows) => rows[0]?.id)
+  }
+
+  const totalRegions = await db.$count(
+    region,
+    eq(region.parentId, parentId || '')
+  )
+
+  const regions = await db
+    .select()
+    .from(region)
+    .where(eq(region.parentId, parentId || ''))
+    .limit(size)
+    .offset(offset)
+    .orderBy(region.name)
+
+  // Get counts for each region
+  const regionsWithCounts = await Promise.all(
+    regions.map(async (reg) => {
+      const childRegionCount = await getChildRegionCount(reg.id)
+      const patientCount = await getPatientCountByRegion(reg.id)
+
+      return {
+        ...reg,
+        childRegionCount,
+        patientCount
+      }
+    })
+  )
+
+  return {
+    data: regionsWithCounts,
+    pageProps: {
+      page,
+      size,
+      total: Math.ceil(totalRegions / size)
+    }
+  }
 }

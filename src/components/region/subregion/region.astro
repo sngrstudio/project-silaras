@@ -16,7 +16,7 @@ import CardTemplateRC from '~/components/common/card/card'
 
   onMount($regions, () => {
     task(async () => {
-      const state = await actions.region.getAll.orThrow({
+      const state = await actions.region.getAllWithCounts.orThrow({
         parentSlug
       })
       setRegions(state)
@@ -28,7 +28,7 @@ import CardTemplateRC from '~/components/common/card/card'
 
   document.addEventListener('astro:page-load', async () => {
     const newParentSlug = window.location.pathname.split('/').at(-1) ?? ''
-    const state = await actions.region.getAll.orThrow({
+    const state = await actions.region.getAllWithCounts.orThrow({
       parentSlug: newParentSlug
     })
     setRegions(state)

@@ -15,7 +15,7 @@ const Navigation: FC = () => {
   }
 
   const handlePrevPage = async () => {
-    const prevPage = await actions.region.getAll.orThrow({
+    const prevPage = await actions.region.getAllWithCounts.orThrow({
       parentSlug,
       page: regions.pageProps.page - 1
     })
@@ -24,7 +24,7 @@ const Navigation: FC = () => {
   }
 
   const handleNextPage = async () => {
-    const nextPage = await actions.region.getAll.orThrow({
+    const nextPage = await actions.region.getAllWithCounts.orThrow({
       parentSlug,
       page: regions.pageProps.page + 1
     })

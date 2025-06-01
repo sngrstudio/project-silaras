@@ -1,36 +1,7 @@
 import { type FC } from 'react'
-import TableTemplate from '../../common/table/desktop'
-import ListTemplate from '../../common/table/mobile'
-import MobileList from './mobile-list'
 import Navigation from './navigation'
-import {
-  useReactTable,
-  createColumnHelper,
-  getCoreRowModel
-} from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import { $regions, type Regions } from './region.store'
-
-const columnHelper = createColumnHelper<Regions['data'][number]>()
-const dColumns = [
-  columnHelper.accessor('name', {
-    header: 'Daerah',
-    cell: (cell) => {
-      const url = `/region/${cell.row.original.slug}`
-      return (
-        <a className='link font-bold' href={url}>
-          {cell.getValue()}
-        </a>
-      )
-    }
-  })
-]
-const mColumns = [
-  columnHelper.display({
-    id: 'mobile',
-    cell: (cell) => <MobileList cell={cell} />
-  })
-]
 
 const RegionRC: FC = () => {
   const regions = useStore($regions)
@@ -41,7 +12,7 @@ const RegionRC: FC = () => {
 
   return (
     <>
-      <RegionTableRenderer regions={regions} />
+      <RegionCardGrid regions={regions} />
       <Navigation />
     </>
   )
@@ -49,23 +20,60 @@ const RegionRC: FC = () => {
 
 export default RegionRC
 
-const RegionTableRenderer: FC<{ regions: Regions }> = ({ regions }) => {
-  const dTable = useReactTable({
-    columns: dColumns,
-    data: regions.data,
-    getCoreRowModel: getCoreRowModel()
-  })
+const RegionCardGrid: FC<{ regions: Regions }> = ({ regions }) => {
+  return (
+    <div className='grid grid-cols-1 gap-4 p-4 max-sm:-mx-[1.5rem] max-sm:w-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+      {regions.data.map((region) => (
+        <RegionCard key={region.id} region={region} />
+      ))}
+    </div>
+  )
+}
 
-  const mTable = useReactTable({
-    columns: mColumns,
-    data: regions.data,
-    getCoreRowModel: getCoreRowModel()
-  })
+const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
+  const isDesaType = region.type === 'DESA'
+  const getSubRegionLabel = () => {
+    if (region.type === 'KABUPATEN') return 'Kecamatan'
+    if (region.type === 'KECAMATAN') return 'Desa'
+    return 'Sub Wilayah'
+  }
 
   return (
-    <>
-      <ListTemplate table={mTable} className='-mx-6 md:hidden' />
-      <TableTemplate table={dTable} className='max-md:hidden' />
-    </>
+    <a
+      href={`/region/${region.slug}`}
+      className='block rounded-lg border border-gray-200 bg-white shadow-md transition-shadow duration-200 hover:border-blue-300 hover:shadow-lg'
+    >
+      <div className='p-6'>
+        <h3 className='mb-3 line-clamp-2 text-lg font-semibold text-gray-900'>
+          {region.name}
+        </h3>
+
+        <div className='space-y-2'>
+          {!isDesaType && (
+            <div className='flex items-center justify-between'>
+              <span className='text-sm text-gray-600'>
+                {getSubRegionLabel()}:
+              </span>
+              <span className='text-sm font-medium text-blue-600'>
+                {region.childRegionCount}
+              </span>
+            </div>
+          )}
+
+          <div className='flex items-center justify-between'>
+            <span className='text-sm text-gray-600'>Jumlah Pasien:</span>
+            <span className='text-sm font-medium text-green-600'>
+              {region.patientCount}
+            </span>
+          </div>
+        </div>
+
+        <div className='mt-4 border-t border-gray-100 pt-3'>
+          <span className='inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800'>
+            {region.type}
+          </span>
+        </div>
+      </div>
+    </a>
   )
 }

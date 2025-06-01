@@ -4,6 +4,7 @@ import {
   getRegionById,
   getRegionBySlug,
   getAllRegions,
+  getAllRegionsWithCounts,
   getRegionsByType,
   deleteRegion
 } from '../db/queries/region'
@@ -73,6 +74,23 @@ const region = {
     }),
     handler: async ({ page, size, parentSlug }) =>
       getAllRegions(page, size, parentSlug)
+  }),
+
+  /**
+   * Get a paginated list of regions with count data.
+   * @param page Page number (1-based, defaults to 1)
+   * @param size Page size (defaults to 8)
+   * @param parentSlug Optional parent slug to filter regions by
+   * @returns Array of regions with child region and patient counts
+   */
+  getAllWithCounts: defineAction({
+    input: z.object({
+      page: z.number().optional(),
+      size: z.number().optional(),
+      parentSlug: z.string().optional()
+    }),
+    handler: async ({ page, size, parentSlug }) =>
+      getAllRegionsWithCounts(page, size, parentSlug)
   }),
 
   /**
