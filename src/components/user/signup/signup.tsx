@@ -1,6 +1,10 @@
 import { useActionState, useRef, useEffect, useState, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
   const formRef = useRef<HTMLFormElement>(null)
@@ -22,11 +26,43 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
       if (isInputError(error)) {
         return error
       }
-      console.error(error)
+
+      // Handle specific error codes with user-friendly messages
+      switch (error.code) {
+        case 'BAD_REQUEST':
+          if (error.message.includes('Username')) {
+            showErrorToast(
+              'Username yang Anda pilih sudah digunakan. Silakan pilih username lain.'
+            )
+          } else if (error.message.includes('Nomor telepon')) {
+            showErrorToast(
+              'Nomor telepon yang Anda masukkan sudah digunakan oleh pengguna lain.'
+            )
+          } else {
+            showErrorToast(
+              error.message ||
+                'Data yang dimasukkan tidak valid. Silakan periksa kembali.'
+            )
+          }
+          break
+        case 'FORBIDDEN':
+          showErrorToast(
+            'Anda tidak memiliki izin untuk melakukan pendaftaran ini.'
+          )
+          break
+        case 'INTERNAL_SERVER_ERROR':
+          showErrorToast(
+            'Terjadi masalah pada server. Silakan coba lagi nanti.'
+          )
+          break
+        default:
+          showErrorToast('Terjadi kesalahan saat mendaftar. Silakan coba lagi.')
+      }
       return undefined
     }
 
-    navigate(`/user/login/?user=${data?.username}`)
+    showSuccessToast('Pendaftaran berhasil! Mengarahkan ke halaman login...')
+    setTimeout(() => navigate(`/user/login/?user=${data?.username}`), 1000)
     return undefined
   }
 

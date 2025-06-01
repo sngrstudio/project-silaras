@@ -10,6 +10,10 @@ import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
 import { canUserEditUser, canUserDeleteUser } from '~/utils/access-control'
 import { useUserRegion } from '~/utils/hooks/useUserRegion'
+import {
+  showSuccessToast,
+  showErrorToast
+} from '~/components/common/toast/toast.store'
 
 type CurrentUser = Awaited<ReturnType<typeof actions.user.getCurrent.orThrow>>
 
@@ -118,8 +122,41 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
           size: 10
         })
         setUsers(updatedUsers)
+        showSuccessToast(`Pengguna "${user.fullName}" berhasil dihapus.`)
       } catch (error: any) {
-        alert(error.message || 'Terjadi kesalahan saat menghapus pengguna.')
+        // Handle specific error codes with user-friendly messages
+        if (error.code === 'FORBIDDEN') {
+          if (error.message.includes('akun Anda sendiri')) {
+            showErrorToast('Anda tidak dapat menghapus akun Anda sendiri.')
+          } else if (error.message.includes('administrator')) {
+            showErrorToast('Hanya administrator yang dapat menghapus pengguna.')
+          } else {
+            showErrorToast(
+              'Anda tidak memiliki izin untuk menghapus pengguna ini.'
+            )
+          }
+        } else if (error.code === 'NOT_FOUND') {
+          showErrorToast('Pengguna yang akan dihapus tidak ditemukan.')
+        } else if (error.code === 'BAD_REQUEST') {
+          if (
+            error.message.includes('dependensi') ||
+            error.message.includes('terkait')
+          ) {
+            showErrorToast(
+              'Pengguna tidak dapat dihapus karena masih memiliki data terkait di sistem.'
+            )
+          } else {
+            showErrorToast('Permintaan penghapusan tidak valid.')
+          }
+        } else if (error.code === 'INTERNAL_SERVER_ERROR') {
+          showErrorToast(
+            'Terjadi masalah pada server saat menghapus pengguna. Silakan coba lagi nanti.'
+          )
+        } else {
+          showErrorToast(
+            error.message || 'Terjadi kesalahan saat menghapus pengguna.'
+          )
+        }
       }
     }
   }

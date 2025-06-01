@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useStore } from '@nanostores/react'
 import { $currentUser } from '../../components/layout/drawer/drawer.store'
 import { actions } from 'astro:actions'
+import { showErrorToast } from '~/components/common/toast/toast.store'
 
 type Region = {
   id: string
@@ -38,7 +39,7 @@ export function useUserRegion() {
         })
         setUserRegion(region)
       } catch (err) {
-        console.error('Failed to fetch user region:', err)
+        showErrorToast('Gagal memuat data wilayah pengguna.')
         setError('Failed to fetch user region')
         setUserRegion(null)
       } finally {

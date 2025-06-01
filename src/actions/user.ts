@@ -182,6 +182,14 @@ const user = {
 
       const existingUser = await getUserByUsername(input.username)
 
+      // Check for username uniqueness
+      if (existingUser && existingUser.id !== input.id) {
+        throw new ActionError({
+          code: 'BAD_REQUEST',
+          message: `Username "${input.username}" sudah digunakan oleh pengguna lain. Silakan gunakan username yang berbeda.`
+        })
+      }
+
       // Check for phone number uniqueness if phone number is provided
       if (input.phoneNumber && input.phoneNumber.trim() !== '') {
         const existingPhoneUser = await getUserByPhoneNumber(input.phoneNumber)
@@ -238,7 +246,44 @@ const user = {
         userData.passwordHash = null
       }
 
-      return await upsertUser(userData)
+      try {
+        return await upsertUser(userData)
+      } catch (dbError: any) {
+        // Handle database constraint violations
+        if (dbError.code === 'ER_DUP_ENTRY' || dbError.errno === 1062) {
+          if (dbError.message.includes('username')) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: `Username "${input.username}" sudah digunakan oleh pengguna lain. Silakan gunakan username yang berbeda.`
+            })
+          } else if (dbError.message.includes('phone_number')) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: `Nomor telepon ${input.phoneNumber} sudah digunakan oleh pengguna lain. Silakan gunakan nomor telepon yang berbeda.`
+            })
+          } else {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message:
+                'Data yang dimasukkan sudah ada di sistem. Silakan periksa kembali.'
+            })
+          }
+        }
+
+        // Handle foreign key constraint violations
+        if (
+          dbError.code === 'ER_NO_REFERENCED_ROW_2' ||
+          dbError.errno === 1452
+        ) {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message: 'Wilayah yang dipilih tidak valid atau tidak tersedia.'
+          })
+        }
+
+        // Re-throw the original error if it's not a constraint violation
+        throw dbError
+      }
     }
   }),
 
@@ -498,8 +543,34 @@ const user = {
         })
       }
 
-      await invalidateAllSession(id) // First delete all user sessions
-      await deleteUser(id) // Then delete the user
+      try {
+        await invalidateAllSession(id) // First delete all user sessions
+        await deleteUser(id) // Then delete the user
+      } catch (dbError: any) {
+        // Handle foreign key constraint violations
+        if (
+          dbError.code === 'ER_ROW_IS_REFERENCED_2' ||
+          dbError.errno === 1451
+        ) {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message:
+              'Pengguna tidak dapat dihapus karena masih memiliki data terkait di sistem (seperti pasien atau data penilaian). Silakan hapus data terkait terlebih dahulu.'
+          })
+        }
+
+        // Handle other database errors
+        if (dbError.code && dbError.code.startsWith('ER_')) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message:
+              'Terjadi masalah database saat menghapus pengguna. Silakan hubungi administrator.'
+          })
+        }
+
+        // Re-throw the original error if it's not a database constraint
+        throw dbError
+      }
     }
   }),
 
@@ -522,25 +593,56 @@ const user = {
           message: 'Username dan/atau password yang anda masukkan salah.'
         })
 
-        // 1. Get user by username
+        // 1. Check rate limiting
+        const clientIp =
+          ctx.request.headers.get('x-forwarded-for') ||
+          ctx.request.headers.get('x-real-ip') ||
+          'unknown'
+
+        if (isRateLimited(clientIp, username)) {
+          throw new ActionError({
+            code: 'TOO_MANY_REQUESTS',
+            message:
+              'Terlalu banyak percobaan login. Silakan tunggu beberapa menit.'
+          })
+        }
+
+        // 2. Get user by username
         const user = await getUserByUsername(username)
         if (!user) {
+          // Record failed attempt for rate limiting
+          recordLoginAttempt(clientIp, username, false)
           throw InvalidUsernameAndOrPassword
         }
 
-        // 2. Verify password
+        // 3. Check if user account is accessible
+        // Users with access level 1 (viewers) are restricted for now as per existing logic
+        if (user.accessLevel < 2) {
+          recordLoginAttempt(clientIp, username, false)
+          throw new ActionError({
+            code: 'FORBIDDEN',
+            message: 'Akun Anda tidak memiliki izin untuk mengakses sistem.'
+          })
+        }
+
+        // 4. Verify password
         if (
           !user.passwordHash ||
           !(await verifyPassword(password, user.passwordHash))
         ) {
+          // Record failed attempt for rate limiting
+          recordLoginAttempt(clientIp, username, false)
           throw InvalidUsernameAndOrPassword
         }
 
-        // 3. Generate session token and create session
+        // 5. Record successful attempt and clear failed attempts
+        recordLoginAttempt(clientIp, username, true)
+
+        // 6. Generate session token and create session
         const token = generateSessionToken()
         const session = await createSession(token, user.id)
 
-        // 4. Set session token in cookie if session was created
+        // 7. Set session token in cookie if session was created
         if (!session || !session.session) {
           throw new ActionError({
             code: 'INTERNAL_SERVER_ERROR',
@@ -591,6 +693,110 @@ const user = {
 }
 
 export default user
+
+// In-memory rate limiting for login attempts
+// In production, consider using Redis or a database table for persistent rate limiting
+interface LoginAttempt {
+  timestamp: number
+  count: number
+  lastAttempt: number
+}
+
+const loginAttempts = new Map<string, LoginAttempt>()
+const MAX_ATTEMPTS = 5
+const LOCKOUT_DURATION = 15 * 60 * 1000 // 15 minutes in milliseconds
+const ATTEMPT_WINDOW = 60 * 1000 // 1 minute window for counting attempts
+
+/**
+ * Check if a client IP + username combination is rate limited
+ * @param clientIp The client IP address
+ * @param username The username being attempted
+ * @returns true if rate limited, false otherwise
+ */
+function isRateLimited(clientIp: string, username: string): boolean {
+  const key = `${clientIp}:${username}`
+  const attempt = loginAttempts.get(key)
+
+  if (!attempt) {
+    return false
+  }
+
+  const now = Date.now()
+
+  // If we're still in lockout period, check if enough time has passed
+  if (attempt.count >= MAX_ATTEMPTS) {
+    if (now - attempt.lastAttempt < LOCKOUT_DURATION) {
+      return true
+    } else {
+      // Lockout period has expired, clear the record
+      loginAttempts.delete(key)
+      return false
+    }
+  }
+
+  return false
+}
+
+/**
+ * Record a login attempt (successful or failed)
+ * @param clientIp The client IP address
+ * @param username The username being attempted
+ * @param success Whether the login was successful
+ */
+function recordLoginAttempt(
+  clientIp: string,
+  username: string,
+  success: boolean
+): void {
+  const key = `${clientIp}:${username}`
+  const now = Date.now()
+
+  if (success) {
+    // Clear failed attempts on successful login
+    loginAttempts.delete(key)
+    return
+  }
+
+  const attempt = loginAttempts.get(key)
+
+  if (!attempt) {
+    // First failed attempt
+    loginAttempts.set(key, {
+      timestamp: now,
+      count: 1,
+      lastAttempt: now
+    })
+  } else {
+    // Check if this attempt is within the attempt window
+    if (now - attempt.timestamp > ATTEMPT_WINDOW) {
+      // Reset counter if outside attempt window
+      loginAttempts.set(key, {
+        timestamp: now,
+        count: 1,
+        lastAttempt: now
+      })
+    } else {
+      // Increment counter within attempt window
+      attempt.count++
+      attempt.lastAttempt = now
+      loginAttempts.set(key, attempt)
+    }
+  }
+}
+
+// Cleanup old entries periodically (every 30 minutes)
+setInterval(
+  () => {
+    const now = Date.now()
+    for (const [key, attempt] of loginAttempts.entries()) {
+      // Remove entries older than lockout duration
+      if (now - attempt.lastAttempt > LOCKOUT_DURATION) {
+        loginAttempts.delete(key)
+      }
+    }
+  },
+  30 * 60 * 1000
+)
 
 // password tools
 const hashPassword = async (password: string) =>

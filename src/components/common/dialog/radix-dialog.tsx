@@ -1,8 +1,8 @@
-import { Dialog as RadixDialog } from 'radix-ui'
+import { Dialog } from 'radix-ui'
 import { clsx } from 'clsx/lite'
 import type { FC, PropsWithChildren } from 'react'
 
-export interface DialogProps {
+export interface RadixDialogProps {
   title?: string | undefined
   open: boolean
   onOpenChange?: (open: boolean) => void
@@ -12,11 +12,11 @@ export interface DialogProps {
 }
 
 /**
- * Dialog component using Radix UI with proper z-index layering
+ * Radix UI Dialog component with proper z-index layering
  * This component allows toast notifications to appear above modals
- * and provides excellent accessibility features.
+ * and provides better accessibility than native dialog elements.
  */
-export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
+export const RadixDialog: FC<PropsWithChildren<RadixDialogProps>> = ({
   children,
   title,
   open = false,
@@ -35,11 +35,11 @@ export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
   }
 
   return (
-    <RadixDialog.Root open={open} onOpenChange={handleOpenChange}>
-      {trigger && <RadixDialog.Trigger asChild>{trigger}</RadixDialog.Trigger>}
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
+      {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
 
-      <RadixDialog.Portal>
-        <RadixDialog.Overlay
+      <Dialog.Portal>
+        <Dialog.Overlay
           className={clsx(
             'fixed inset-0 bg-black/50 backdrop-blur-sm',
             'z-[9998]', // Below toast notifications (z-[9999]) but above other content
@@ -48,7 +48,7 @@ export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
           )}
         />
 
-        <RadixDialog.Content
+        <Dialog.Content
           className={clsx(
             'fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
             'z-[9998]', // Same z-index as overlay, below toast notifications
@@ -67,15 +67,15 @@ export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
         >
           <div className='p-6'>
             {title && (
-              <RadixDialog.Title className='mb-4 text-lg font-bold'>
+              <Dialog.Title className='mb-4 text-lg font-bold'>
                 {title}
-              </RadixDialog.Title>
+              </Dialog.Title>
             )}
             {children}
           </div>
 
           {/* Close button - accessible by screen readers */}
-          <RadixDialog.Close asChild>
+          <Dialog.Close asChild>
             <button
               className='ring-offset-base-100 focus:ring-primary absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
               aria-label='Close dialog'
@@ -96,9 +96,9 @@ export const Dialog: FC<PropsWithChildren<DialogProps>> = ({
                 />
               </svg>
             </button>
-          </RadixDialog.Close>
-        </RadixDialog.Content>
-      </RadixDialog.Portal>
-    </RadixDialog.Root>
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }

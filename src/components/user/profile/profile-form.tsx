@@ -7,6 +7,10 @@ import {
 } from '~/components/layout/drawer/drawer.store'
 import { actions, isInputError } from 'astro:actions'
 import Image from '~/components/common/image/image'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const ProfileForm: FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
@@ -79,12 +83,46 @@ const ProfileForm: FC = () => {
       if (isInputError(error)) {
         return error
       }
-      console.error(error)
+
+      // Handle specific error codes with user-friendly messages
+      switch (error.code) {
+        case 'BAD_REQUEST':
+          if (error.message.includes('Username')) {
+            showErrorToast(
+              'Username yang dipilih sudah digunakan oleh pengguna lain.'
+            )
+          } else if (error.message.includes('Nomor telepon')) {
+            showErrorToast(
+              'Nomor telepon yang dimasukkan sudah digunakan oleh pengguna lain.'
+            )
+          } else {
+            showErrorToast(
+              error.message ||
+                'Data yang dimasukkan tidak valid. Silakan periksa kembali.'
+            )
+          }
+          break
+        case 'FORBIDDEN':
+          showErrorToast(
+            'Anda tidak memiliki izin untuk mengubah data profil ini.'
+          )
+          break
+        case 'INTERNAL_SERVER_ERROR':
+          showErrorToast(
+            'Terjadi masalah pada server. Silakan coba lagi nanti.'
+          )
+          break
+        default:
+          showErrorToast(
+            'Terjadi kesalahan saat menyimpan profil. Silakan coba lagi.'
+          )
+      }
       return undefined
     }
 
     if (data) {
       setCurrentUser(data)
+      showSuccessToast('Profil berhasil diperbarui!')
     }
     return undefined
   }

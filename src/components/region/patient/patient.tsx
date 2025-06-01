@@ -22,6 +22,10 @@ import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
 import { canUserAccessPatientSync } from '../../../utils/access-control'
 import { useUserRegion } from '../../../utils/hooks/useUserRegion'
+import {
+  showSuccessToast,
+  showErrorToast
+} from '~/components/common/toast/toast.store'
 
 type Patient = Patients[number]
 
@@ -29,9 +33,9 @@ type Patient = Patients[number]
 const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    // You could add a toast notification here if available
+    showSuccessToast('Nomor telepon berhasil disalin!')
   } catch (err) {
-    console.error('Failed to copy text: ', err)
+    showErrorToast('Gagal menyalin nomor telepon.')
   }
 }
 

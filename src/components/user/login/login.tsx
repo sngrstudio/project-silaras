@@ -1,6 +1,10 @@
 import { useActionState, useRef, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
   const formRef = useRef<HTMLFormElement>(null)
@@ -12,12 +16,36 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
       if (isInputError(error)) {
         return error
       }
-      console.error(error)
+
+      // Handle specific error types
+      switch (error.code) {
+        case 'UNAUTHORIZED':
+          showErrorToast('Username dan/atau password yang Anda masukkan salah.')
+          break
+        case 'INTERNAL_SERVER_ERROR':
+          showErrorToast(
+            'Terjadi masalah pada server. Silakan coba lagi nanti.'
+          )
+          break
+        case 'TOO_MANY_REQUESTS':
+          showErrorToast(
+            'Terlalu banyak percobaan login. Silakan tunggu beberapa menit.'
+          )
+          break
+        case 'FORBIDDEN':
+          showErrorToast(
+            'Akun Anda tidak memiliki izin untuk mengakses sistem.'
+          )
+          break
+        default:
+          showErrorToast('Terjadi kesalahan saat login. Silakan coba lagi.')
+      }
       return undefined
     }
 
-    // Redirect to dashboard on successful login
-    navigate('/')
+    // Show success message and redirect to dashboard on successful login
+    showSuccessToast('Login berhasil! Mengarahkan ke dashboard...')
+    setTimeout(() => navigate('/'), 1000) // Small delay to show toast
     return undefined
   }
 

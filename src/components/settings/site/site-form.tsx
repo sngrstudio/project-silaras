@@ -4,6 +4,10 @@ import { $siteSettings, setSiteSettings } from './site.store'
 import { actions, isInputError } from 'astro:actions'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const SiteForm: FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
@@ -68,12 +72,13 @@ const SiteForm: FC = () => {
       if (isInputError(error)) {
         return error
       }
-      console.error(error)
+      showErrorToast('Terjadi kesalahan saat menyimpan pengaturan situs.')
       return undefined
     }
 
     setSiteSettings(data)
-    window.location.reload()
+    showSuccessToast('Pengaturan situs berhasil disimpan!')
+    setTimeout(() => window.location.reload(), 1000) // Small delay to show toast
     return undefined
   }
 

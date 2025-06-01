@@ -6,6 +6,10 @@ import {
   $currentMonthIndex
 } from './assesment.store'
 import { actions } from 'astro:actions'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const AssesmentStatRC: FC = () => {
   const monthlyAssesments = useStore($monthlyAssesments)
@@ -17,7 +21,7 @@ const AssesmentStatRC: FC = () => {
   const handleUpdate = async (_prev: unknown, formData: FormData) => {
     const { error } = await actions.assesment.monthly.set(formData)
     if (error) {
-      console.log(error)
+      showErrorToast('Terjadi kesalahan saat menyimpan data asesmen bulanan.')
       return undefined
     }
 
@@ -26,6 +30,7 @@ const AssesmentStatRC: FC = () => {
       monthIndex: currentMonthIndex
     })
     setMonthlyAssesment(state)
+    showSuccessToast('Data asesmen bulanan berhasil disimpan!')
     return undefined
   }
 

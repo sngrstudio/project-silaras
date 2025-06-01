@@ -2,6 +2,7 @@ import { useState, useEffect, type FC } from 'react'
 import { actions } from 'astro:actions'
 import type { InferSelectModel } from 'drizzle-orm'
 import type { region } from '~/db/schemas/region'
+import { showErrorToast } from '~/components/common/toast/toast.store'
 
 type Region = InferSelectModel<typeof region>
 
@@ -87,7 +88,7 @@ const RegionSelect: FC<RegionSelectProps> = ({
 
         setRegions(data)
       } catch (error) {
-        console.error('Failed to load regions:', error)
+        showErrorToast('Gagal memuat daftar wilayah.')
         setRegions([])
       } finally {
         setLoading(false)

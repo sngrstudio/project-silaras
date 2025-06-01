@@ -1,5 +1,5 @@
 import { useActionState, useEffect, useState, type FC } from 'react'
-import { DialogTemplate } from '~/components/common/dialog/dialog'
+import { Dialog } from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
   $currentUser,
@@ -13,6 +13,10 @@ import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
 import RegionSelect from './region-select'
 import { getAllowedAccessLevels } from '~/utils/access-control'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const UserDialog: FC = () => {
   const currentUser = useStore($currentUser)
@@ -61,7 +65,53 @@ const UserDialog: FC = () => {
         return error
       }
 
-      console.error(error)
+      // Handle specific error codes with user-friendly messages
+      switch (error.code) {
+        case 'BAD_REQUEST':
+          if (error.message.includes('Username')) {
+            showErrorToast(
+              'Username yang dipilih sudah digunakan oleh pengguna lain. Silakan pilih username yang berbeda.'
+            )
+          } else if (error.message.includes('Nomor telepon')) {
+            showErrorToast(
+              'Nomor telepon yang dimasukkan sudah digunakan oleh pengguna lain. Silakan gunakan nomor telepon yang berbeda.'
+            )
+          } else {
+            showErrorToast(
+              error.message ||
+                'Data yang dimasukkan tidak valid. Silakan periksa kembali.'
+            )
+          }
+          break
+        case 'FORBIDDEN':
+          if (error.message.includes('level akses')) {
+            showErrorToast(
+              'Anda tidak memiliki izin untuk membuat atau mengedit pengguna dengan level akses tersebut.'
+            )
+          } else if (error.message.includes('wilayah')) {
+            showErrorToast(
+              'Anda tidak memiliki izin untuk menugaskan pengguna ke wilayah tersebut.'
+            )
+          } else {
+            showErrorToast(
+              error.message ||
+                'Anda tidak memiliki izin untuk melakukan tindakan ini.'
+            )
+          }
+          break
+        case 'NOT_FOUND':
+          showErrorToast('Pengguna atau data yang dicari tidak ditemukan.')
+          break
+        case 'INTERNAL_SERVER_ERROR':
+          showErrorToast(
+            'Terjadi masalah pada server. Silakan coba lagi nanti.'
+          )
+          break
+        default:
+          showErrorToast(
+            'Terjadi kesalahan saat menyimpan data pengguna. Silakan coba lagi.'
+          )
+      }
       return undefined
     }
 
@@ -72,6 +122,11 @@ const UserDialog: FC = () => {
     })
     setUsers(updatedUsers)
     setCurrentUser(undefined)
+    showSuccessToast(
+      currentUser?.id
+        ? 'Data pengguna berhasil diperbarui!'
+        : 'Pengguna baru berhasil ditambahkan!'
+    )
     return undefined
   }
 
@@ -82,7 +137,7 @@ const UserDialog: FC = () => {
   }
 
   return (
-    <DialogTemplate
+    <Dialog
       title={isEdit ? 'Edit Pengguna' : 'Tambah Pengguna'}
       open={isOpen}
       closeAction={() => setCurrentUser(undefined)}
@@ -285,7 +340,7 @@ const UserDialog: FC = () => {
           </button>
         </div>
       </form>
-    </DialogTemplate>
+    </Dialog>
   )
 }
 

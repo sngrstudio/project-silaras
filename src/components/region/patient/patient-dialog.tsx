@@ -6,7 +6,7 @@ import {
   type FC,
   type SetStateAction
 } from 'react'
-import { DialogTemplate } from '~/components/common/dialog/dialog'
+import { Dialog } from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
   $currentPatient,
@@ -19,6 +19,10 @@ import { actions, isInputError } from 'astro:actions'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 const PatientDialog: FC = () => {
   const currentRegion = useStore($currentRegion)
@@ -42,7 +46,7 @@ const PatientDialog: FC = () => {
         return error
       }
 
-      console.log(error)
+      showErrorToast('Terjadi kesalahan saat menyimpan data pasien.')
       return undefined
     }
 
@@ -51,6 +55,11 @@ const PatientDialog: FC = () => {
     })
     setPatients(updatedPatients)
     setCurrentPatient(undefined)
+    showSuccessToast(
+      currentPatient?.id
+        ? 'Data pasien berhasil diperbarui!'
+        : 'Pasien baru berhasil ditambahkan!'
+    )
     return undefined
   }
 
@@ -62,7 +71,7 @@ const PatientDialog: FC = () => {
   }
 
   return (
-    <DialogTemplate
+    <Dialog
       title='Tambah atau Ubah Pasien'
       open={openPatientModal}
       closeAction={() => setCurrentPatient(undefined)}
@@ -298,7 +307,7 @@ const PatientDialog: FC = () => {
           </button>
         </div>
       </form>
-    </DialogTemplate>
+    </Dialog>
   )
 }
 

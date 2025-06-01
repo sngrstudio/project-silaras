@@ -7,6 +7,10 @@ import {
   $currentMonthIndex
 } from './menu.store'
 import { actions, isInputError } from 'astro:actions'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 interface MenuFormProps {
   cell: CellContext<DailyAssesmentsSettings[number], unknown>
@@ -23,7 +27,7 @@ const MenuForm: FC<MenuFormProps> = ({ cell }) => {
         return error
       }
 
-      console.log(error)
+      showErrorToast('Terjadi kesalahan saat menyimpan pengaturan menu.')
       return undefined
     }
 
@@ -31,6 +35,7 @@ const MenuForm: FC<MenuFormProps> = ({ cell }) => {
       monthIndex: currentMonthIndex
     })
     setDailyAssesmentsSettings(updatedState)
+    showSuccessToast('Pengaturan menu berhasil disimpan!')
     return undefined
   }
 

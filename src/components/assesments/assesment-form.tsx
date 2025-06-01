@@ -7,6 +7,10 @@ import {
   $currentMonthIndex
 } from './assesment.store'
 import { actions, isInputError } from 'astro:actions'
+import {
+  showErrorToast,
+  showSuccessToast
+} from '~/components/common/toast/toast.store'
 
 interface AssesmentFormProps {
   cell: CellContext<DailyAssesments[number], unknown>
@@ -23,7 +27,7 @@ const AssesmentForm: FC<AssesmentFormProps> = ({ cell }) => {
         return error
       }
 
-      console.log(error)
+      showErrorToast('Terjadi kesalahan saat menyimpan data asesmen.')
       return undefined
     }
 
@@ -32,6 +36,7 @@ const AssesmentForm: FC<AssesmentFormProps> = ({ cell }) => {
       monthIndex: currentMonthIndex
     })
     setDailyAssesments(updatedState)
+    showSuccessToast('Data asesmen berhasil disimpan!')
     return undefined
   }
 

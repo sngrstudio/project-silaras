@@ -9,6 +9,10 @@ import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
 import { canUserAccessPatientSync } from '../../../utils/access-control'
+import {
+  showSuccessToast,
+  showErrorToast
+} from '~/components/common/toast/toast.store'
 import { useStore } from '@nanostores/react'
 
 interface MobileListProps {
@@ -22,9 +26,9 @@ interface MobileListProps {
 const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text)
-    // You could add a toast notification here if available
+    showSuccessToast('Nomor telepon berhasil disalin!')
   } catch (err) {
-    console.error('Failed to copy text: ', err)
+    showErrorToast('Gagal menyalin nomor telepon.')
   }
 }
 
