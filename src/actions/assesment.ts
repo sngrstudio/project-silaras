@@ -12,6 +12,8 @@ import {
   MONTHS,
   type Month
 } from '../db/queries/assesment'
+import { getPatientById } from '../db/queries/patient'
+import { getFileHash } from '../utils/file-hash'
 import { uploadS3 } from '../lib/s3'
 import { z } from 'astro:schema'
 
@@ -244,6 +246,15 @@ const assesment = {
             })
           }
 
+          // Fetch patient data to get the slug
+          const patient = await getPatientById(input.patientId)
+          if (!patient) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'Pasien tidak ditemukan.'
+            })
+          }
+
           // Validate file name exists
           if (!input.imageFile.name || input.imageFile.name.trim() === '') {
             throw new ActionError({
@@ -271,8 +282,8 @@ const assesment = {
             })
           }
 
-          // Generate filename with timestamp
-          const timestamp = Date.now()
+          // Generate file hash for unique filename
+          const fileHash = await getFileHash(input.imageFile)
           const fileNameParts = input.imageFile.name.split('.')
           const lastPart =
             fileNameParts.length > 1
@@ -291,20 +302,13 @@ const assesment = {
             })
           }
 
-          // Sanitize patientId for filename (remove non-alphanumeric characters except hyphens and underscores)
-          const sanitizedPatientId = input.patientId.replace(
+          // Generate filename using patient slug, sanitized daily assessment ID, and file hash (first 8 characters)
+          const sanitizedDailyAssesmentId = input.dailyAssesmentId.replace(
             /[^a-zA-Z0-9\-_]/g,
             ''
           )
-          if (!sanitizedPatientId) {
-            throw new ActionError({
-              code: 'BAD_REQUEST',
-              message:
-                'ID pasien mengandung karakter yang tidak valid untuk nama file.'
-            })
-          }
-
-          imageFileName = `assesment-${sanitizedPatientId}-${timestamp}.${extension}`
+          const shortHash = fileHash.substring(0, 8)
+          imageFileName = `assesment-${patient.slug}-${sanitizedDailyAssesmentId}-${shortHash}.${extension}`
 
           try {
             await uploadS3(input.imageFile, imageFileName)

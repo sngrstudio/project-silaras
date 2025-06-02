@@ -34,12 +34,64 @@ interface MetricsComparison {
   previousScore: number | null
 }
 
+interface PatientData {
+  id: string
+  name: string
+  age: number | null // age in months
+}
+
 // BMI classification according to WHO standards
 const getBMIClassification = (bmi: number) => {
   if (bmi < 18.5) return { category: 'Kurus', color: 'text-warning' }
   if (bmi < 25) return { category: 'Normal', color: 'text-success' }
   if (bmi < 30) return { category: 'Kegemukan', color: 'text-warning' }
   return { category: 'Obesitas', color: 'text-error' }
+}
+
+// Score classification based on completion and score
+const getScoreClassification = (
+  score: number,
+  completionPercentage: number
+) => {
+  // If completion is under 75%, show "On Progress"
+  if (completionPercentage < 75) {
+    return { category: 'On Progress', color: 'text-base-content' }
+  }
+
+  // Calculate adjusted thresholds based on completion percentage
+  // At 100% completion: >=120 = Terbiasa, >=90 = Pendampingan, <90 = Pendampingan & Penguatan
+  const completionRatio = completionPercentage / 100
+  const adjustedHighThreshold = 120 * completionRatio // 120 at 100% completion, 90 at 75% completion
+  const adjustedMidThreshold = 90 * completionRatio // 90 at 100% completion, 67.5 at 75% completion
+
+  if (score >= adjustedHighThreshold) {
+    return { category: 'Terbiasa', color: 'text-success' }
+  }
+  if (score >= adjustedMidThreshold) {
+    return { category: 'Butuh Pendampingan', color: 'text-warning' }
+  }
+  return { category: 'Butuh Pendampingan dan Penguatan', color: 'text-error' }
+}
+
+// Format age display based on age in months
+const formatAge = (ageInMonths: number | null) => {
+  if (!ageInMonths || ageInMonths < 0) {
+    return '-'
+  }
+
+  if (ageInMonths < 24) {
+    return ageInMonths.toString()
+  }
+
+  const years = Math.floor(ageInMonths / 12)
+  const remainingMonths = ageInMonths % 12
+
+  // For 2yo and above, only show years if no remaining months
+  if (remainingMonths === 0) {
+    return years.toString()
+  }
+
+  return `${years}.${remainingMonths}`
 }
 
 // Delta indicator component
@@ -87,6 +139,7 @@ const AssesmentStatRC: FC = () => {
     useState<CompletionProgress | null>(null)
   const [metricsComparison, setMetricsComparison] =
     useState<MetricsComparison | null>(null)
+  const [patientData, setPatientData] = useState<PatientData | null>(null)
 
   const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
 
@@ -96,6 +149,12 @@ const AssesmentStatRC: FC = () => {
       if (!monthlyAssesments) return
 
       try {
+        // Fetch patient data
+        const patient = await actions.patient.getBySlug.orThrow({
+          slug: getPatientSlug()
+        })
+        setPatientData(patient)
+
         // Fetch completion progress
         const progress = await actions.assesment.monthly.getProgress.orThrow({
           patientSlug: getPatientSlug(),
@@ -114,6 +173,7 @@ const AssesmentStatRC: FC = () => {
         console.error('Error fetching data:', error)
         setCompletionProgress(null)
         setMetricsComparison(null)
+        setPatientData(null)
       }
     }
 
@@ -155,7 +215,7 @@ const AssesmentStatRC: FC = () => {
 
   return (
     <form
-      className='stats max-md:stats-vertical border-base-300 border max-md:w-full'
+      className='stats max-md:stats-vertical border-base-300 w-full border'
       action={action}
       ref={formRef}
       onBlur={handleSave}
@@ -182,6 +242,25 @@ const AssesmentStatRC: FC = () => {
             type='height'
           />
         )}
+      </div>
+
+      <div className='stat place-items-center'>
+        <span className='stat-title'>Usia</span>
+        <span className='stat-value'>
+          {patientData ? formatAge(patientData.age) : '-'}
+        </span>
+        <div className='stat-desc'>
+          {patientData && patientData.age
+            ? patientData.age < 24
+              ? 'bulan'
+              : (() => {
+                  const remainingMonths = patientData.age % 12
+                  return remainingMonths === 0
+                    ? 'tahun'
+                    : `tahun ${remainingMonths} bulan`
+                })()
+            : 'Usia saat ini'}
+        </div>
       </div>
 
       <div className='stat place-items-center'>
@@ -296,40 +375,59 @@ const AssesmentStatRC: FC = () => {
         <span className='stat-value'>
           {metricsComparison ? metricsComparison.currentScore : '0'}
         </span>
-        <div className='stat-desc flex items-center gap-1'>
-          {metricsComparison ? (
-            metricsComparison.isFirstMonth ? (
-              <span className='text-base-content text-xs'>Bulan pertama</span>
-            ) : (
-              <>
-                <span
-                  className={clsx('text-xs', {
-                    'text-base-content': metricsComparison.deltas.score === 0,
-                    'text-success': metricsComparison.deltas.score > 0,
-                    'text-warning': metricsComparison.deltas.score < 0
-                  })}
-                >
-                  {metricsComparison.deltas.score === 0
-                    ? '●'
-                    : metricsComparison.deltas.score > 0
-                      ? '▲'
-                      : '▼'}
-                </span>
-                <span
-                  className={clsx('text-xs', {
-                    'text-base-content': metricsComparison.deltas.score === 0,
-                    'text-success': metricsComparison.deltas.score > 0,
-                    'text-warning': metricsComparison.deltas.score < 0
-                  })}
-                >
-                  {metricsComparison.deltas.score === 0
-                    ? 'Tidak berubah'
-                    : `${metricsComparison.deltas.score > 0 ? '+' : ''}${metricsComparison.deltas.score}`}
-                </span>
-              </>
-            )
+        <div className='stat-desc flex flex-col items-center gap-1'>
+          {metricsComparison && completionProgress ? (
+            <>
+              <span
+                className={clsx(
+                  'text-sm font-medium',
+                  getScoreClassification(
+                    metricsComparison.currentScore,
+                    completionProgress.percentage
+                  ).color
+                )}
+              >
+                {
+                  getScoreClassification(
+                    metricsComparison.currentScore,
+                    completionProgress.percentage
+                  ).category
+                }
+              </span>
+              {!metricsComparison.isFirstMonth &&
+                completionProgress.percentage >= 75 && (
+                  <div className='flex items-center gap-1'>
+                    <span
+                      className={clsx('text-xs', {
+                        'text-base-content':
+                          metricsComparison.deltas.score === 0,
+                        'text-success': metricsComparison.deltas.score > 0,
+                        'text-warning': metricsComparison.deltas.score < 0
+                      })}
+                    >
+                      {metricsComparison.deltas.score === 0
+                        ? '●'
+                        : metricsComparison.deltas.score > 0
+                          ? '▲'
+                          : '▼'}
+                    </span>
+                    <span
+                      className={clsx('text-xs', {
+                        'text-base-content':
+                          metricsComparison.deltas.score === 0,
+                        'text-success': metricsComparison.deltas.score > 0,
+                        'text-warning': metricsComparison.deltas.score < 0
+                      })}
+                    >
+                      {metricsComparison.deltas.score === 0
+                        ? 'Tidak berubah'
+                        : `${metricsComparison.deltas.score > 0 ? '+' : ''}${metricsComparison.deltas.score}`}
+                    </span>
+                  </div>
+                )}
+            </>
           ) : (
-            <span className='text-base-content text-xs'>-</span>
+            <span className='text-base-content text-sm'>-</span>
           )}
         </div>
       </div>
