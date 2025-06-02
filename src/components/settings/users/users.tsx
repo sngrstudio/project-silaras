@@ -30,7 +30,8 @@ import type { GetImageResult } from 'astro'
 import {
   canUserEditUser,
   canUserDeleteUser,
-  getAllowedAccessLevels
+  getAllowedAccessLevels,
+  getAccessLevelName
 } from '~/utils/access-control'
 import { useUserRegion } from '~/utils/hooks/useUserRegion'
 import {
@@ -106,21 +107,6 @@ const useProfilePhoto = (fileName: string | null | undefined) => {
   return profilePhoto
 }
 
-const accessLevelText = (level: number) => {
-  switch (level) {
-    case 1:
-      return 'Viewer'
-    case 2:
-      return 'Editor'
-    case 3:
-      return 'Coordinator'
-    case 4:
-      return 'Admin'
-    default:
-      return 'Unknown'
-  }
-}
-
 // Component for delete button with self-deletion protection
 const UserDeleteButton: FC<{ user: User; onDelete: () => void }> = ({
   user,
@@ -179,7 +165,7 @@ const dColumns = [
     enableSorting: true,
     cell: (cell) => (
       <span className='badge badge-soft badge-primary badge-sm'>
-        {accessLevelText(cell.getValue())}
+        {getAccessLevelName(cell.getValue())}
       </span>
     )
   }),
@@ -314,7 +300,7 @@ const dColumns = [
 
       return (
         <div className='flex gap-2'>
-          {canEdit && (
+          {canEdit ? (
             <button
               className='btn btn-soft btn-primary btn-xs'
               onClick={handleEditBtn}
@@ -322,12 +308,38 @@ const dColumns = [
               <EditIcon />
               <span>Edit</span>
             </button>
+          ) : (
+            // Show disabled button for fellow admins (Admin viewing other Admin)
+            currentUser?.accessLevel === 4 &&
+            user.accessLevel === 4 && (
+              <button
+                className='btn btn-soft btn-primary btn-xs cursor-not-allowed opacity-50'
+                disabled
+                title='Tidak dapat mengedit sesama administrator'
+              >
+                <EditIcon />
+                <span>Edit</span>
+              </button>
+            )
           )}
-          {canDelete && (
+          {canDelete ? (
             <UserDeleteButton
               user={cell.row.original}
               onDelete={handleDeleteBtn}
             />
+          ) : (
+            // Show disabled delete button for fellow admins (Admin viewing other Admin)
+            currentUser?.accessLevel === 4 &&
+            user.accessLevel === 4 && (
+              <button
+                className='btn btn-soft btn-error btn-xs cursor-not-allowed opacity-50'
+                disabled
+                title='Tidak dapat menghapus sesama administrator'
+              >
+                <TrashIcon />
+                <span>Hapus</span>
+              </button>
+            )
           )}
         </div>
       )

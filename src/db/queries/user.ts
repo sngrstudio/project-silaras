@@ -1,12 +1,26 @@
 import { db } from '../db'
 import { user, session } from '../schemas/user'
 import { region } from '../schemas/region'
-import { eq, or, like, sql, getTableColumns } from 'drizzle-orm'
+import { eq, sql, getTableColumns, lt, gte } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 
 /**
  * User table query functions.
  */
+
+/**
+ * Check if any Super Administrators exist in the system.
+ * @returns Promise<boolean> - true if no Super Administrators exist, false otherwise
+ */
+export const isNoSuperAdmin = async (): Promise<boolean> => {
+  const adminCount = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(user)
+    .where(gte(user.accessLevel, 5)) // Check for Super Administrators (level 5 and above)
+    .then((rows) => rows[0]?.count ?? 0)
+
+  return adminCount === 0
+}
 
 /**
  * Insert or update a user (upsert).
@@ -169,6 +183,7 @@ export const getAllUsers = async (page: number = 1, size: number = 10) => {
     })
     .from(user)
     .leftJoin(region, eq(user.regionId, region.id))
+    .where(lt(user.accessLevel, 5)) // Hide Super Administrators (level 5)
     .limit(size)
     .offset(offset)
 
@@ -297,11 +312,7 @@ export const searchUsers = async (
     .from(user)
     .leftJoin(region, eq(user.regionId, region.id))
     .where(
-      or(
-        like(user.username, searchPattern),
-        like(user.fullName, searchPattern),
-        like(user.phoneNumber, searchPattern)
-      )
+      sql`${user.accessLevel} < 5 AND (${user.username} LIKE ${searchPattern} OR ${user.fullName} LIKE ${searchPattern} OR ${user.phoneNumber} LIKE ${searchPattern})`
     )
     .limit(size)
     .offset(offset)

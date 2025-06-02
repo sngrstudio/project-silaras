@@ -170,7 +170,7 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
         )}
       </div>
 
-      <input type='hidden' name='accessLevel' value={first ? 4 : 2} />
+      <input type='hidden' name='accessLevel' value={first ? 5 : 2} />
       {first && regionId && (
         <input type='hidden' name='regionId' value={regionId} />
       )}

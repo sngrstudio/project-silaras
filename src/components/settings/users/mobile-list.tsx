@@ -8,7 +8,11 @@ import TrashIcon from '~icons/lucide/trash-2'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
-import { canUserEditUser, canUserDeleteUser } from '~/utils/access-control'
+import {
+  canUserEditUser,
+  canUserDeleteUser,
+  getAccessLevelName
+} from '~/utils/access-control'
 import { useUserRegion } from '~/utils/hooks/useUserRegion'
 import {
   showSuccessToast,
@@ -161,21 +165,6 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
     }
   }
 
-  const accessLevelText = (level: number) => {
-    switch (level) {
-      case 1:
-        return 'Viewer'
-      case 2:
-        return 'Editor'
-      case 3:
-        return 'Coordinator'
-      case 4:
-        return 'Admin'
-      default:
-        return 'Unknown'
-    }
-  }
-
   return (
     <>
       <div className='list-col-grow flex flex-1 flex-col gap-y-1'>
@@ -191,7 +180,7 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
         </div>
         <div className='flex items-center gap-2'>
           <span className='badge badge-soft badge-primary badge-xs'>
-            {accessLevelText(user.accessLevel)}
+            {getAccessLevelName(user.accessLevel)}
           </span>
           {user.regionName && (
             <span className='text-xs text-gray-500'>
@@ -213,7 +202,7 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
         )}
       </div>
       <div className='flex flex-col gap-1'>
-        {canEdit && (
+        {canEdit ? (
           <button
             className='btn btn-ghost btn-square btn-sm'
             onClick={handleEditBtn}
@@ -221,9 +210,22 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
           >
             <EditIcon />
           </button>
+        ) : (
+          // Show disabled button for fellow admins (Admin viewing other Admin)
+          currentUser?.accessLevel === 4 &&
+          user.accessLevel === 4 && (
+            <button
+              className='btn btn-ghost btn-square btn-sm cursor-not-allowed opacity-50'
+              disabled
+              title='Tidak dapat mengedit sesama administrator'
+              aria-label={`Cannot edit fellow admin: ${user.fullName}`}
+            >
+              <EditIcon />
+            </button>
+          )
         )}
-        {canDelete &&
-          (isSelf ? (
+        {canDelete ? (
+          isSelf ? (
             <button
               className='btn btn-ghost btn-square btn-sm text-error cursor-not-allowed opacity-50'
               disabled
@@ -240,7 +242,21 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
             >
               <TrashIcon />
             </button>
-          ))}
+          )
+        ) : (
+          // Show disabled delete button for fellow admins (Admin viewing other Admin)
+          currentUser?.accessLevel === 4 &&
+          user.accessLevel === 4 && (
+            <button
+              className='btn btn-ghost btn-square btn-sm text-error cursor-not-allowed opacity-50'
+              disabled
+              title='Tidak dapat menghapus sesama administrator'
+              aria-label={`Cannot delete fellow admin: ${user.fullName}`}
+            >
+              <TrashIcon />
+            </button>
+          )
+        )}
       </div>
     </>
   )

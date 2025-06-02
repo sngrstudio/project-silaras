@@ -12,11 +12,33 @@ import { actions, isInputError } from 'astro:actions'
 import Image from '~/components/common/image/image'
 import type { GetImageResult } from 'astro'
 import RegionSelect from './region-select'
-import { getAllowedAccessLevels } from '~/utils/access-control'
+import {
+  getAllowedAccessLevels,
+  getAccessLevelName
+} from '~/utils/access-control'
 import {
   showErrorToast,
   showSuccessToast
 } from '~/components/common/toast/toast.store'
+import EyeIcon from '~icons/lucide/eye'
+import EditIcon from '~icons/lucide/edit'
+import UsersIcon from '~icons/lucide/users'
+import ShieldIcon from '~icons/lucide/shield'
+
+const getIconComponent = (accessLevel: number) => {
+  switch (accessLevel) {
+    case 1:
+      return EyeIcon
+    case 2:
+      return EditIcon
+    case 3:
+      return UsersIcon
+    case 4:
+      return ShieldIcon
+    default:
+      return EyeIcon
+  }
+}
 
 const UserDialog: FC = () => {
   const currentUser = useStore($currentUser)
@@ -36,6 +58,12 @@ const UserDialog: FC = () => {
 
   // Get allowed access levels for current user
   const allowedAccessLevels = getAllowedAccessLevels(globalCurrentUser)
+
+  // Filter out Admin PPPAPPKB (level 4) if the current user is PLKB Kecamatan (level 3)
+  const filteredAccessLevels =
+    globalCurrentUser?.accessLevel === 3
+      ? allowedAccessLevels.filter((level) => level !== 4)
+      : allowedAccessLevels
 
   useEffect(() => {
     if (currentUser) {
@@ -65,6 +93,17 @@ const UserDialog: FC = () => {
   }, [currentUser]) // Depend on the currentUser object itself
 
   const handleSubmit = async (_prev: unknown, formData: FormData) => {
+    // Client-side validation for required regions
+    if (selectedAccessLevel === 3 && !selectedRegionId) {
+      showErrorToast('PLKB Kecamatan harus ditempatkan di wilayah kecamatan.')
+      return undefined
+    }
+
+    if (selectedAccessLevel === 2 && !selectedRegionId) {
+      showErrorToast('Kader DASHAT harus ditempatkan di wilayah desa.')
+      return undefined
+    }
+
     const { data, error } = await actions.user.upsert(formData)
     if (error && !data) {
       if (isInputError(error)) {
@@ -214,48 +253,56 @@ const UserDialog: FC = () => {
         </div>
 
         <div>
-          <label className='label' htmlFor='accessLevel'>
-            Level Akses
-          </label>
-          <select
-            className='select w-full'
-            name='accessLevel'
-            id='accessLevel'
-            value={selectedAccessLevel}
-            onChange={(e) => setSelectedAccessLevel(Number(e.target.value))}
-            disabled={isPending || !!isEdit} // Disable if pending or if editing an existing user
-            required
-          >
-            {/* For new users, filter options based on allowedAccessLevels */}
-            {/* For existing users (isEdit === true), show their current level, but disabled */}
-            {isEdit && currentUser?.accessLevel === 1 && (
-              <option value={1}>Viewer</option>
-            )}
-            {isEdit && currentUser?.accessLevel === 2 && (
-              <option value={2}>Editor</option>
-            )}
-            {isEdit && currentUser?.accessLevel === 3 && (
-              <option value={3}>Coordinator</option>
-            )}
-            {isEdit && currentUser?.accessLevel === 4 && (
-              <option value={4}>Admin</option>
-            )}
-
-            {!isEdit && allowedAccessLevels.includes(1) && (
-              <option value={1}>Viewer</option>
-            )}
-            {!isEdit && allowedAccessLevels.includes(2) && (
-              <option value={2}>Editor</option>
-            )}
-            {!isEdit && allowedAccessLevels.includes(3) && (
-              <option value={3}>Coordinator</option>
-            )}
-            {/* Admin creation (level 4) is typically handled by first signup or by other admins directly */}
-            {/* We might not need to show level 4 here if it's not in allowedAccessLevels for the current globalUser */}
-            {!isEdit && allowedAccessLevels.includes(4) && (
-              <option value={4}>Admin</option>
-            )}
-          </select>
+          <label className='label'>Level Akses</label>
+          {isEdit ? (
+            // Show current access level as read-only for editing
+            <div className='border-base-300 bg-base-100 rounded-lg border p-4'>
+              <div className='flex items-center gap-3'>
+                {(() => {
+                  const IconComponent = getIconComponent(selectedAccessLevel)
+                  return <IconComponent className='text-primary h-5 w-5' />
+                })()}
+                <span className='font-medium'>
+                  {getAccessLevelName(selectedAccessLevel)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            // Show radio buttons for new users
+            <div className='grid grid-cols-2 gap-3'>
+              {filteredAccessLevels.map((level) => {
+                const IconComponent = getIconComponent(level)
+                return (
+                  <label
+                    key={level}
+                    className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      selectedAccessLevel === level
+                        ? 'border-primary bg-primary/10'
+                        : 'border-base-300 hover:border-primary/50'
+                    }`}
+                  >
+                    <input
+                      type='radio'
+                      name='accessLevel'
+                      value={level}
+                      checked={selectedAccessLevel === level}
+                      onChange={(e) =>
+                        setSelectedAccessLevel(Number(e.target.value))
+                      }
+                      disabled={isPending}
+                      className='sr-only'
+                    />
+                    <div className='flex flex-col items-center gap-2 text-center'>
+                      <IconComponent className='text-primary h-6 w-6' />
+                      <span className='text-sm font-medium'>
+                        {getAccessLevelName(level)}
+                      </span>
+                    </div>
+                  </label>
+                )
+              })}
+            </div>
+          )}
           {error?.fields?.accessLevel && (
             <div className='label text-error'>
               {error.fields.accessLevel.join(', ')}

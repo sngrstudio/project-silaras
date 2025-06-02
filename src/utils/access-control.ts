@@ -224,7 +224,7 @@ export function canUserAccessUser(
     return true
   }
 
-  // Coordinators (level 3) have territorial jurisdiction
+  // PLKB Kecamatan (level 3) can only see themselves and Kader DASHAT in their territory
   if (currentUser.accessLevel === 3) {
     // If current user has no region assignment, they can't see anyone
     if (!currentUser.regionId || !currentUserRegion) {
@@ -236,10 +236,12 @@ export function canUserAccessUser(
       return false
     }
 
-    // Coordinators can see ALL users in their kecamatan territory, regardless of access level
-    // This includes:
-    // 1. Users assigned directly to their kecamatan
-    // 2. Users assigned to desa under their kecamatan
+    // Can only see Kader DASHAT (level 2) users in their territory
+    if (targetUser.accessLevel !== 2) {
+      return false
+    }
+
+    // PLKB can see Kader DASHAT in their kecamatan territory
     return (
       targetUserRegion.id === currentUserRegion.id ||
       targetUserRegion.parentId === currentUserRegion.id
@@ -279,12 +281,17 @@ export function canUserEditUser(
     return false
   }
 
-  // Admins can edit everyone except other admins
-  if (currentUser.accessLevel >= 4) {
+  // Super Admin (level 5) can edit everyone
+  if (currentUser.accessLevel >= 5) {
+    return true
+  }
+
+  // Admin (level 4) can edit everyone except fellow admins (level 4)
+  if (currentUser.accessLevel === 4) {
     return targetUser.accessLevel < 4
   }
 
-  // Coordinators have jurisdiction-based authority over ALL users in their territory
+  // PLKB Kecamatan (level 3) can only edit Kader DASHAT (level 2) in their territory
   if (currentUser.accessLevel === 3) {
     // If current user has no region assignment, they can't edit anyone
     if (!currentUser.regionId || !currentUserRegion) {
@@ -296,8 +303,12 @@ export function canUserEditUser(
       return false
     }
 
-    // Coordinators can edit ALL users in their kecamatan territory, regardless of access level
-    // This includes other coordinators and users created by admins
+    // Can only edit Kader DASHAT (level 2) users
+    if (targetUser.accessLevel !== 2) {
+      return false
+    }
+
+    // PLKB can edit Kader DASHAT in their kecamatan territory
     return (
       targetUserRegion.id === currentUserRegion.id ||
       targetUserRegion.parentId === currentUserRegion.id
@@ -336,12 +347,17 @@ export function canUserDeleteUser(
     return false
   }
 
-  // Admins can delete everyone except other admins
-  if (currentUser.accessLevel >= 4) {
+  // Super Admin (level 5) can delete everyone
+  if (currentUser.accessLevel >= 5) {
+    return true
+  }
+
+  // Admin (level 4) can delete everyone except fellow admins (level 4)
+  if (currentUser.accessLevel === 4) {
     return targetUser.accessLevel < 4
   }
 
-  // Coordinators have jurisdiction-based authority over ALL users in their territory
+  // PLKB Kecamatan (level 3) can only delete Kader DASHAT (level 2) in their territory
   if (currentUser.accessLevel === 3) {
     // If current user has no region assignment, they can't delete anyone
     if (!currentUser.regionId || !currentUserRegion) {
@@ -353,8 +369,12 @@ export function canUserDeleteUser(
       return false
     }
 
-    // Coordinators can delete ALL users in their kecamatan territory, regardless of access level
-    // This includes other coordinators and users created by admins
+    // Can only delete Kader DASHAT (level 2) users
+    if (targetUser.accessLevel !== 2) {
+      return false
+    }
+
+    // PLKB can delete Kader DASHAT in their kecamatan territory
     return (
       targetUserRegion.id === currentUserRegion.id ||
       targetUserRegion.parentId === currentUserRegion.id
@@ -376,17 +396,18 @@ export function getAllowedAccessLevels(
     return []
   }
 
-  // Admins can create coordinators, editors, and viewers
+  // Admins (level 4) and Super Admins (level 5) can create coordinators, editors, and viewers
+  // Note: Super Admin (level 5) is not available for creation through UI
   if (currentUser.accessLevel >= 4) {
-    return [1, 2, 3] // Viewer, Editor, Coordinator
+    return [1, 2, 3, 4] // Pengamat, Kader DASHAT, PLKB Kecamatan, Admin Dinas PPPAPPKB
   }
 
-  // Coordinators can create editors and viewers
+  // PLKB Kecamatan can only create Kader DASHAT
   if (currentUser.accessLevel === 3) {
-    return [1, 2] // Viewer, Editor
+    return [2] // Kader DASHAT only
   }
 
-  // Editors and viewers cannot create users
+  // Kader DASHAT and Pengamat cannot create users
   return []
 }
 
@@ -432,4 +453,48 @@ export function canUserAssignToRegion(
 
   // Editors and viewers cannot assign users to regions
   return false
+}
+
+/**
+ * Get the display name for an access level
+ * @param accessLevel The numeric access level
+ * @returns The display name for the access level
+ */
+export function getAccessLevelName(accessLevel: number): string {
+  switch (accessLevel) {
+    case 1:
+      return 'Pengamat'
+    case 2:
+      return 'Kader DASHAT'
+    case 3:
+      return 'PLKB Kecamatan'
+    case 4:
+      return 'Admin Dinas PPPAPPKB'
+    case 5:
+      return 'Super Administrator'
+    default:
+      return 'Unknown'
+  }
+}
+
+/**
+ * Get the icon name for an access level (for use with Lucide icons)
+ * @param accessLevel The numeric access level
+ * @returns The icon name for the access level
+ */
+export function getAccessLevelIcon(accessLevel: number): string {
+  switch (accessLevel) {
+    case 1:
+      return 'Eye' // Pengamat (Observer/Viewer)
+    case 2:
+      return 'Edit' // Kader DASHAT (Editor/Data entry)
+    case 3:
+      return 'Users' // PLKB Kecamatan (Supervisor/Manager)
+    case 4:
+      return 'Shield' // Admin Dinas PPPAPPKB (Administrator)
+    case 5:
+      return 'Crown' // Super Administrator
+    default:
+      return 'User'
+  }
 }

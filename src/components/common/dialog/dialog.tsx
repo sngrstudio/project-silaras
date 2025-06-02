@@ -110,7 +110,7 @@ export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
 
 // Legacy DialogTemplate component for backward compatibility
 export const DialogTemplate: FC<DialogTemplateProps> = ({ children }) => {
-  return <div className="dialog-template">{children}</div>
+  return <div className='dialog-template'>{children}</div>
 }
 
 // Export the main component as default

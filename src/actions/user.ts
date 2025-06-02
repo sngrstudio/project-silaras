@@ -8,7 +8,8 @@ import {
   getUserPasswordHashById,
   getAllUsers,
   searchUsers,
-  deleteUser
+  deleteUser,
+  isNoSuperAdmin
 } from '../db/queries/user'
 import {
   generateSessionToken,
@@ -100,22 +101,22 @@ const user = {
       // Determine if this is the scenario for the first admin signup
       if (isCreatingNewUser && !currentUser) {
         const existingUsersResult = await getAllUsers(1, 1)
-        const adminExists = existingUsersResult.users.some(
-          (u) => u.accessLevel >= 4
+        const superAdminExists = existingUsersResult.users.some(
+          (u) => u.accessLevel >= 5
         )
-        if (!adminExists) {
+        if (!superAdminExists) {
           isFirstAdminSignupScenario = true
         }
       }
 
       if (isCreatingNewUser && !currentUser) {
         if (isFirstAdminSignupScenario) {
-          // This is the first admin account creation
-          if (input.accessLevel !== 4) {
+          // This is the first Super Administrator account creation
+          if (input.accessLevel !== 5) {
             throw new ActionError({
               code: 'BAD_REQUEST',
               message:
-                'Akun administrator pertama harus memiliki level akses 4.'
+                'Akun Super Administrator pertama harus memiliki level akses 5.'
             })
           }
           // Automatically assign the first admin to the KABUPATEN region
@@ -134,19 +135,19 @@ const user = {
             throw new ActionError({
               code: 'INTERNAL_SERVER_ERROR',
               message:
-                'Tidak dapat menentukan wilayah KABUPATEN untuk administrator pertama.'
+                'Tidak dapat menentukan wilayah KABUPATEN untuk Super Administrator pertama.'
             })
           }
           input.regionId = kabupatenToAssign.id
         } else {
-          // This is a regular public signup (not the first admin)
-          // Enforce a default access level, e.g., 2 (Editor).
+          // This is a regular public signup (not the first Super Admin)
+          // Enforce a default access level, e.g., 2 (Kader DASHAT).
           if (input.accessLevel !== 2) {
-            // Assuming 2 is the default for public signups (Editor)
+            // Assuming 2 is the default for public signups (Kader DASHAT)
             throw new ActionError({
               code: 'BAD_REQUEST',
               message:
-                'Level akses tidak valid untuk pendaftaran publik. Seharusnya level 2 (Editor).'
+                'Level akses tidak valid untuk pendaftaran publik. Seharusnya level 2 (Kader DASHAT).'
             })
           }
           // For regular signups, regionId is optional as per schema.
@@ -155,22 +156,22 @@ const user = {
       } else if (currentUser) {
         // Logged-in user is creating or editing another user
         if (currentUser.accessLevel < 3) {
-          // Must be Coordinator (3) or Admin (4)
+          // Must be PLKB Kecamatan (3) or Admin Dinas PPPAPPKB (4) or Super Administrator (5)
           throw new ActionError({
             code: 'FORBIDDEN',
             message:
-              'Hanya koordinator dan administrator yang dapat mengelola pengguna.'
+              'Hanya PLKB Kecamatan dan administrator yang dapat mengelola pengguna.'
           })
         }
 
-        // Additional restrictions for coordinators (level 3) when managing other users
+        // Additional restrictions for PLKB Kecamatan (level 3) when managing other users
         if (currentUser.accessLevel === 3) {
-          // Coordinators cannot create/edit users with higher or equal access level (level 3 or 4)
+          // PLKB Kecamatan cannot create/edit users with higher or equal access level (level 3, 4, or 5)
           if (input.accessLevel >= 3) {
             throw new ActionError({
               code: 'FORBIDDEN',
               message:
-                'Anda tidak dapat membuat atau mengedit pengguna dengan level akses koordinator atau administrator.'
+                'Anda tidak dapat membuat atau mengedit pengguna dengan level akses PLKB Kecamatan atau administrator.'
             })
           }
 
@@ -183,12 +184,12 @@ const user = {
                 message: 'Pengguna tidak ditemukan.'
               })
             }
-            // Coordinator cannot edit another coordinator or admin (already checked by input.accessLevel for new, now for existing)
+            // PLKB Kecamatan cannot edit another PLKB Kecamatan or admin (already checked by input.accessLevel for new, now for existing)
             if (targetUser.accessLevel >= 3) {
               throw new ActionError({
                 code: 'FORBIDDEN',
                 message:
-                  'Anda tidak dapat mengedit pengguna dengan level akses koordinator atau administrator.'
+                  'Anda tidak dapat mengedit pengguna dengan level akses PLKB Kecamatan atau administrator.'
               })
             }
             // Region-based access control for editing by coordinator
@@ -258,6 +259,47 @@ const user = {
           code: 'FORBIDDEN',
           message: 'Operasi tidak diizinkan.'
         })
+      }
+
+      // Validate region assignment based on access level
+      if (input.accessLevel === 3) {
+        // PLKB Kecamatan requires a kecamatan assignment
+        if (!input.regionId) {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message: 'PLKB Kecamatan harus ditempatkan di wilayah kecamatan.'
+          })
+        }
+
+        // Verify that the assigned region is actually a kecamatan
+        const assignedRegion = await getRegionById(input.regionId)
+        if (!assignedRegion || assignedRegion.type !== 'KECAMATAN') {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message:
+              'PLKB Kecamatan harus ditempatkan di wilayah kecamatan yang valid.'
+          })
+        }
+      }
+
+      if (input.accessLevel === 2) {
+        // Kader DASHAT requires a desa assignment
+        if (!input.regionId) {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message: 'Kader DASHAT harus ditempatkan di wilayah desa.'
+          })
+        }
+
+        // Verify that the assigned region is actually a desa
+        const assignedRegion = await getRegionById(input.regionId)
+        if (!assignedRegion || assignedRegion.type !== 'DESA') {
+          throw new ActionError({
+            code: 'BAD_REQUEST',
+            message:
+              'Kader DASHAT harus ditempatkan di wilayah desa yang valid.'
+          })
+        }
       }
 
       const existingUser = await getUserByUsername(input.username)
@@ -426,7 +468,7 @@ const user = {
 
   /**
    * Get a paginated list of users.
-   * Requires coordinator level access or above.
+   * Requires PLKB Kecamatan level access or above.
    * @param page Page number (1-based, defaults to 1)
    * @param size Page size (defaults to 10)
    * @returns Array of users for the page
@@ -439,24 +481,24 @@ const user = {
     handler: async ({ page, size }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only coordinators (level 3) and above can view user lists
+      // Only PLKB Kecamatan (level 3) and above can view user lists
       if (!currentUser || currentUser.accessLevel < 3) {
         throw new ActionError({
           code: 'FORBIDDEN',
           message:
-            'Hanya koordinator dan administrator yang dapat melihat daftar pengguna.'
+            'Hanya PLKB Kecamatan dan administrator yang dapat melihat daftar pengguna.'
         })
       }
 
       // Get all users first
       const allUsersResult = await getAllUsers(page, size)
 
-      // If admin, return all users
+      // If Admin Dinas PPPAPPKB or Super Administrator, return all users
       if (currentUser.accessLevel >= 4) {
         return allUsersResult
       }
 
-      // For coordinators, filter users based on access control
+      // For PLKB Kecamatan, filter users based on access control
       if (currentUser.accessLevel === 3) {
         // Get current user's region for filtering
         let currentUserRegion = null
@@ -464,7 +506,7 @@ const user = {
           currentUserRegion = await getRegionById(currentUser.regionId)
         }
 
-        // Filter users that the coordinator can access
+        // Filter users that the PLKB Kecamatan can access
         const filteredUsers = []
         for (const user of allUsersResult.users) {
           let targetUserRegion = null
@@ -579,11 +621,12 @@ const user = {
         })
       }
 
-      // Only allow admins to delete users
-      if (!currentUser || currentUser.accessLevel < 4) {
+      // Only allow PLKB Kecamatan (3), Admin Dinas PPPAPPKB (4) and Super Administrator (5) to delete users
+      if (!currentUser || currentUser.accessLevel < 3) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Hanya administrator yang dapat menghapus pengguna.'
+          message:
+            'Hanya PLKB Kecamatan dan administrator yang dapat menghapus pengguna.'
         })
       }
 
@@ -758,14 +801,8 @@ const user = {
 
   checks: {
     isNoAdmin: defineAction({
-      handler: async () => {
-        const { users } = await getAllUsers()
-        const admins = users.filter((user) => user.accessLevel >= 4)
-        if (admins.length > 0) {
-          return false
-        } else {
-          return true
-        }
+      handler: async (): Promise<boolean> => {
+        return await isNoSuperAdmin()
       }
     })
   }

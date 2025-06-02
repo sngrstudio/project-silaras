@@ -155,9 +155,9 @@ const RegionSelect: FC<RegionSelectProps> = ({
       case 4:
         return 'Pilih Kabupaten'
       case 3:
-        return 'Pilih Kecamatan'
+        return 'Pilih Kecamatan *'
       case 2:
-        return 'Pilih Desa'
+        return 'Pilih Desa *'
       default:
         return 'Pilih wilayah'
     }
@@ -166,7 +166,7 @@ const RegionSelect: FC<RegionSelectProps> = ({
   return (
     <div className='relative'>
       <label className='label' htmlFor={name}>
-        {getLabel()} {accessLevel && accessLevel > 1 && '(Opsional)'}
+        {getLabel()} {(accessLevel === 2 || accessLevel === 3) && '*'}
       </label>
 
       <div className='relative'>
