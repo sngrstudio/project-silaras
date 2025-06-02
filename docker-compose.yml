@@ -6,7 +6,7 @@ services:
       - .env
     environment:
       DATABASE_URL: 'mysql://test:test@db:3306/test'
-      DB_DEBUG: true
+      # DB_DEBUG: true
     ports:
       - '4321:4321'
     depends_on:
