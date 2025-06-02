@@ -11,17 +11,41 @@ import {
 } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import { $dailyAssesments, type DailyAssesments } from './assesment.store'
+import { $currentUser } from '~/components/layout/drawer/drawer.store'
+
+// Helper function to check if a date is in the future (after today)
+const isDateInFuture = (date: Date | null | undefined): boolean => {
+  if (!date) return false
+  const today = new Date()
+  today.setHours(0, 0, 0, 0) // Reset time to start of day for accurate comparison
+  const compareDate = new Date(date)
+  compareDate.setHours(0, 0, 0, 0)
+  return compareDate > today
+}
 
 const columnHelper = createColumnHelper<DailyAssesments[number]>()
 const dColumns = [
   columnHelper.accessor('date', {
     header: 'Tanggal',
     cell: (cell) => {
-      const date = cell
-        .getValue()
-        ?.toLocaleDateString('id-ID', { dateStyle: 'full' })
+      const date = cell.getValue()
+      const dateString = date?.toLocaleDateString('id-ID', {
+        dateStyle: 'full'
+      })
+      const isFuture = isDateInFuture(date)
 
-      return <span className='font-bold'>{date}</span>
+      return (
+        <div className='flex items-center gap-2'>
+          <span className={`font-bold ${isFuture ? 'text-gray-400' : ''}`}>
+            {dateString}
+          </span>
+          {isFuture && (
+            <span className='badge badge-outline badge-sm text-gray-400'>
+              Akan datang
+            </span>
+          )}
+        </div>
+      )
     }
   }),
   columnHelper.display({
@@ -29,12 +53,13 @@ const dColumns = [
     header: 'Menu',
     cell: (cell) => {
       const menus = [cell.row.original.menu1, cell.row.original.menu2]
+      const isFuture = isDateInFuture(cell.row.original.date)
 
       return (
         <div className='flex flex-col gap-y-1'>
           {menus.map((menu, i) => (
             <span
-              className='badge badge-soft badge-sm md:badge-md data-[menu=0]:badge-primary data-[menu=1]:badge-accent'
+              className={`badge badge-soft badge-sm md:badge-md data-[menu=0]:badge-primary data-[menu=1]:badge-accent ${isFuture ? 'opacity-50' : ''}`}
               data-menu={i}
               key={i}
             >
@@ -47,16 +72,49 @@ const dColumns = [
   }),
   columnHelper.display({
     id: 'd-assesment',
-    header: 'Penilaian',
+    header: 'Penilaian & Foto',
     cell: (cell) => {
+      const isFuture = isDateInFuture(cell.row.original.date)
       return (
-        <AssesmentForm cell={cell} key={cell.row.original.dailyAssesmentId} />
+        <AssesmentForm
+          cell={cell}
+          key={cell.row.original.dailyAssesmentId}
+          isDisabled={isFuture}
+        />
       )
     }
   }),
   columnHelper.accessor('score', {
     header: 'Skor',
-    cell: (cell) => cell.getValue()
+    cell: (cell) => {
+      const currentUser = useStore($currentUser)
+      const assessment = cell.row.original
+
+      // Show metadata tooltip only for users with access level 3 or above
+      const canViewMetadata = currentUser && currentUser.accessLevel >= 3
+
+      if (
+        canViewMetadata &&
+        (assessment.createdAt || assessment.lastModifiedBy)
+      ) {
+        const tooltipContent = [
+          assessment.createdAt &&
+            `Dibuat: ${new Date(assessment.createdAt).toLocaleString('id-ID')}`,
+          assessment.lastModifiedBy &&
+            `Terakhir diubah: ${assessment.lastModifiedByUser?.fullName || 'Unknown'}`
+        ]
+          .filter(Boolean)
+          .join('\n')
+
+        return (
+          <span title={tooltipContent} className='cursor-help'>
+            {cell.getValue()}
+          </span>
+        )
+      }
+
+      return cell.getValue()
+    }
   })
 ]
 const mColumns = [

@@ -12,6 +12,7 @@ import {
   MONTHS,
   type Month
 } from '../db/queries/assesment'
+import { uploadS3 } from '../lib/s3'
 import { z } from 'astro:schema'
 
 /**
@@ -207,7 +208,9 @@ const assesment = {
         containsSideDish: z.boolean(),
         containsVegetables: z.boolean(),
         containsFruits: z.boolean(),
-        isFollowingRecipe: z.boolean()
+        isFollowingRecipe: z.boolean(),
+        imageFile: z.instanceof(File).optional(),
+        removeImage: z.boolean().optional()
       }),
       handler: async (input, ctx) => {
         const currentUser = ctx.locals.user
@@ -221,8 +224,134 @@ const assesment = {
           })
         }
 
+        let imageFileName: string | null | undefined = undefined
+
+        // Handle the three cases for image handling:
+        // 1. If removeImage is explicitly true -> remove image (set to null)
+        // 2. If imageFile is provided -> replace image (set to new filename)
+        // 3. If neither -> don't touch image (undefined - no change)
+
+        if (input.removeImage === true) {
+          // Case 3: Explicitly removing image
+          imageFileName = null
+        } else if (input.imageFile && input.imageFile.size > 0) {
+          // Case 2: New file provided - replace existing image
+          // Validate patientId
+          if (!input.patientId || input.patientId.trim() === '') {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'ID pasien tidak valid.'
+            })
+          }
+
+          // Validate file name exists
+          if (!input.imageFile.name || input.imageFile.name.trim() === '') {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'Nama file tidak valid.'
+            })
+          }
+
+          // Validate file type
+          if (
+            !input.imageFile.type ||
+            !input.imageFile.type.startsWith('image/')
+          ) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'File harus berupa gambar.'
+            })
+          }
+
+          // Validate file size (max 5MB)
+          if (input.imageFile.size > 5 * 1024 * 1024) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message: 'Ukuran file maksimal 5MB.'
+            })
+          }
+
+          // Generate filename with timestamp
+          const timestamp = Date.now()
+          const fileNameParts = input.imageFile.name.split('.')
+          const lastPart =
+            fileNameParts.length > 1
+              ? fileNameParts[fileNameParts.length - 1]
+              : null
+          const extension =
+            lastPart && lastPart.trim() !== '' ? lastPart.toLowerCase() : 'jpg'
+
+          // Validate extension
+          const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+          if (!allowedExtensions.includes(extension)) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message:
+                'Format file tidak didukung. Gunakan JPG, PNG, GIF, atau WebP.'
+            })
+          }
+
+          // Sanitize patientId for filename (remove non-alphanumeric characters except hyphens and underscores)
+          const sanitizedPatientId = input.patientId.replace(
+            /[^a-zA-Z0-9\-_]/g,
+            ''
+          )
+          if (!sanitizedPatientId) {
+            throw new ActionError({
+              code: 'BAD_REQUEST',
+              message:
+                'ID pasien mengandung karakter yang tidak valid untuk nama file.'
+            })
+          }
+
+          imageFileName = `assesment-${sanitizedPatientId}-${timestamp}.${extension}`
+
+          try {
+            await uploadS3(input.imageFile, imageFileName)
+          } catch (error) {
+            console.error('S3 upload error:', error)
+            throw new ActionError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Gagal mengunggah gambar: ${error instanceof Error ? error.message : 'Unknown error'}`
+            })
+          }
+        }
+        // Case 1: No file and no explicit removal -> imageFileName remains undefined (no change)
+
         // Use the upsertPatientDailyAssesment query for upsert logic
-        return await upsertPatientDailyAssesment(input)
+        console.log('=== ACTION DEBUG ===')
+        console.log('patientId:', input.patientId)
+        console.log('dailyAssesmentId:', input.dailyAssesmentId)
+        console.log('imageFileName (final):', imageFileName)
+        console.log('imageFile provided:', !!input.imageFile)
+        console.log('removeImage:', input.removeImage)
+        console.log('currentUser.id:', currentUser.id)
+
+        // Prepare parameters, only include image if it's not undefined
+        const upsertParams: any = {
+          patientId: input.patientId,
+          dailyAssesmentId: input.dailyAssesmentId,
+          containsStapleFood: input.containsStapleFood,
+          containsSideDish: input.containsSideDish,
+          containsVegetables: input.containsVegetables,
+          containsFruits: input.containsFruits,
+          isFollowingRecipe: input.isFollowingRecipe,
+          lastModifiedBy: currentUser.id
+        }
+
+        // Only include image parameter if we want to change it
+        if (imageFileName !== undefined) {
+          upsertParams.image = imageFileName
+        }
+
+        console.log('=== UPSERT PARAMS ===')
+        console.log('upsertParams:', upsertParams)
+
+        const result = await upsertPatientDailyAssesment(upsertParams)
+        console.log('=== UPSERT RESULT ===')
+        console.log('Result returned:', result)
+        console.log('Result image field:', result?.image)
+        return result
       }
     }),
     /**

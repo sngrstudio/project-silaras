@@ -70,7 +70,7 @@ const TableTemplate: FC<TableTemplateProps> = ({
         {table.getRowModel().rows.map((row) => (
           <tr key={row.id}>
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>
+              <td key={cell.id} className='align-top'>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

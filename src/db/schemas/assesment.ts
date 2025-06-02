@@ -6,11 +6,13 @@ import {
   date,
   boolean,
   tinyint,
+  timestamp,
   primaryKey,
   foreignKey
 } from 'drizzle-orm/mysql-core'
 import { eq, sum, sql, type SQL } from 'drizzle-orm'
 import { patient } from './patient'
+import { user } from './user'
 
 /**
  * Table: monthlyAssesment
@@ -131,7 +133,10 @@ export const patientDailyAssesment = mysqlTable(
         sql<number>`${patientDailyAssesment.containsStapleFood} + ${patientDailyAssesment.containsSideDish} + ${patientDailyAssesment.containsVegetables} + ${patientDailyAssesment.containsFruits} + ${patientDailyAssesment.isFollowingRecipe}`,
       { mode: 'stored' }
     ),
-    isCompleted: boolean('is_completed').default(false).notNull()
+    isCompleted: boolean('is_completed').default(false).notNull(),
+    image: varchar('image', { length: 255 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    lastModifiedBy: varchar('last_modified_by', { length: 36 })
   },
   (table) => [
     primaryKey({ columns: [table.patientId, table.dailyAssesmentId] }),
@@ -148,6 +153,13 @@ export const patientDailyAssesment = mysqlTable(
       name: 'fk_patient_daily_daily'
     })
       .onDelete('cascade')
+      .onUpdate('cascade'),
+    foreignKey({
+      columns: [table.lastModifiedBy],
+      foreignColumns: [user.id],
+      name: 'fk_patient_daily_last_modified_by'
+    })
+      .onDelete('restrict')
       .onUpdate('cascade')
   ]
 )

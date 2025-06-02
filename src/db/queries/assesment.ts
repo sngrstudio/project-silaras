@@ -7,6 +7,7 @@ import {
   patientMonthlyAssesmentWithTotalScore
 } from '../schemas/assesment'
 import { patient } from '../schemas/patient'
+import { user } from '../schemas/user'
 import { eq, and, sql } from 'drizzle-orm'
 
 export const MONTHS = [
@@ -147,7 +148,9 @@ export async function upsertPatientDailyAssesment({
   containsSideDish,
   containsVegetables,
   containsFruits,
-  isFollowingRecipe
+  isFollowingRecipe,
+  lastModifiedBy,
+  image
 }: {
   patientId: string
   dailyAssesmentId: string
@@ -156,6 +159,8 @@ export async function upsertPatientDailyAssesment({
   containsVegetables: boolean
   containsFruits: boolean
   isFollowingRecipe: boolean
+  lastModifiedBy: string
+  image?: string | null
 }) {
   // Check if any boolean field is true to determine isCompleted
   const hasAnyTrue =
@@ -183,6 +188,35 @@ export async function upsertPatientDailyAssesment({
   // 2. It was already true in the existing record (never revert to false)
   const isCompleted = hasAnyTrue || (existing?.isCompleted ?? false)
 
+  console.log('=== DATABASE QUERY DEBUG ===')
+  console.log('Input parameters:')
+  console.log('- patientId:', patientId)
+  console.log('- dailyAssesmentId:', dailyAssesmentId)
+  console.log('- image parameter:', image)
+  console.log('- image type:', typeof image)
+  console.log('- lastModifiedBy:', lastModifiedBy)
+
+  // Prepare the update data - only include image if it's explicitly provided
+  const updateData: any = {
+    containsStapleFood,
+    containsSideDish,
+    containsVegetables,
+    containsFruits,
+    isFollowingRecipe,
+    isCompleted,
+    lastModifiedBy
+  }
+
+  // Only update image if explicitly provided (even if null, to clear it)
+  if (image !== undefined) {
+    updateData.image = image
+    console.log('Adding image to updateData:', image)
+  } else {
+    console.log('Image is undefined, not updating image field')
+  }
+
+  console.log('Final updateData:', updateData)
+
   // MySQL upsert using onDuplicateKeyUpdate
   await db
     .insert(patientDailyAssesment)
@@ -194,18 +228,16 @@ export async function upsertPatientDailyAssesment({
       containsVegetables,
       containsFruits,
       isFollowingRecipe,
-      isCompleted
+      isCompleted,
+      lastModifiedBy,
+      image: image || null // Ensure null for initial insert if no image
     })
     .onDuplicateKeyUpdate({
-      set: {
-        containsStapleFood,
-        containsSideDish,
-        containsVegetables,
-        containsFruits,
-        isFollowingRecipe,
-        isCompleted
-      }
+      set: updateData
     })
+
+  console.log('Database upsert completed')
+
   // Return the upserted row
   const [row] = await db
     .select()
@@ -217,6 +249,8 @@ export async function upsertPatientDailyAssesment({
       )
     )
     .limit(1)
+
+  console.log('Retrieved row after upsert:', row)
   return row
 }
 
@@ -255,7 +289,15 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
       containsFruits: patientDailyAssesment.containsFruits,
       isFollowingRecipe: patientDailyAssesment.isFollowingRecipe,
       score: patientDailyAssesment.score,
-      isCompleted: patientDailyAssesment.isCompleted
+      isCompleted: patientDailyAssesment.isCompleted,
+      image: patientDailyAssesment.image,
+      createdAt: patientDailyAssesment.createdAt,
+      lastModifiedBy: patientDailyAssesment.lastModifiedBy,
+      lastModifiedByUser: {
+        id: user.id,
+        fullName: user.fullName,
+        username: user.username
+      }
     })
     .from(patientDailyAssesment)
     .innerJoin(
@@ -269,6 +311,7 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
         eq(monthlyAssesment.month, month)
       )
     )
+    .leftJoin(user, eq(patientDailyAssesment.lastModifiedBy, user.id))
     .where(
       eq(
         patientDailyAssesment.patientId,
