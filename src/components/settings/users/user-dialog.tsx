@@ -150,6 +150,9 @@ const UserDialog: FC = () => {
     >
       <form action={action} className='flex flex-col gap-4'>
         {isEdit && <input type='hidden' name='id' value={currentUser.id} />}
+        {isEdit && (
+          <input type='hidden' name='accessLevel' value={selectedAccessLevel} />
+        )}
 
         <div>
           <label className='label' htmlFor='username'>
