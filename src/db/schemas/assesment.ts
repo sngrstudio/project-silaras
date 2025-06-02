@@ -135,7 +135,7 @@ export const patientDailyAssesment = mysqlTable(
     ),
     isCompleted: boolean('is_completed').default(false).notNull(),
     image: varchar('image', { length: 255 }),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
+    lastModifiedAt: timestamp('last_modified_at'),
     lastModifiedBy: varchar('last_modified_by', { length: 36 })
   },
   (table) => [

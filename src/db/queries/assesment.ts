@@ -188,14 +188,6 @@ export async function upsertPatientDailyAssesment({
   // 2. It was already true in the existing record (never revert to false)
   const isCompleted = hasAnyTrue || (existing?.isCompleted ?? false)
 
-  console.log('=== DATABASE QUERY DEBUG ===')
-  console.log('Input parameters:')
-  console.log('- patientId:', patientId)
-  console.log('- dailyAssesmentId:', dailyAssesmentId)
-  console.log('- image parameter:', image)
-  console.log('- image type:', typeof image)
-  console.log('- lastModifiedBy:', lastModifiedBy)
-
   // Prepare the update data - only include image if it's explicitly provided
   const updateData: any = {
     containsStapleFood,
@@ -204,18 +196,14 @@ export async function upsertPatientDailyAssesment({
     containsFruits,
     isFollowingRecipe,
     isCompleted,
-    lastModifiedBy
+    lastModifiedBy,
+    lastModifiedAt: new Date() // Always timestamp when updating
   }
 
   // Only update image if explicitly provided (even if null, to clear it)
   if (image !== undefined) {
     updateData.image = image
-    console.log('Adding image to updateData:', image)
-  } else {
-    console.log('Image is undefined, not updating image field')
   }
-
-  console.log('Final updateData:', updateData)
 
   // MySQL upsert using onDuplicateKeyUpdate
   await db
@@ -230,13 +218,12 @@ export async function upsertPatientDailyAssesment({
       isFollowingRecipe,
       isCompleted,
       lastModifiedBy,
+      lastModifiedAt: new Date(), // Always timestamp when inserting
       image: image || null // Ensure null for initial insert if no image
     })
     .onDuplicateKeyUpdate({
       set: updateData
     })
-
-  console.log('Database upsert completed')
 
   // Return the upserted row
   const [row] = await db
@@ -250,7 +237,6 @@ export async function upsertPatientDailyAssesment({
     )
     .limit(1)
 
-  console.log('Retrieved row after upsert:', row)
   return row
 }
 
@@ -291,7 +277,7 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
       score: patientDailyAssesment.score,
       isCompleted: patientDailyAssesment.isCompleted,
       image: patientDailyAssesment.image,
-      createdAt: patientDailyAssesment.createdAt,
+      lastModifiedAt: patientDailyAssesment.lastModifiedAt,
       lastModifiedBy: patientDailyAssesment.lastModifiedBy,
       lastModifiedByUser: {
         id: user.id,

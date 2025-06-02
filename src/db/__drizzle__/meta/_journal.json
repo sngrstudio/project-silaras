@@ -43,6 +43,13 @@
       "when": 1748844523793,
       "tag": "0005_round_mac_gargan",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1748852505252,
+      "tag": "0006_sad_chimera",
+      "breakpoints": true
     }
   ]
 }

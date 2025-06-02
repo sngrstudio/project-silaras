@@ -319,14 +319,6 @@ const assesment = {
         // Case 1: No file and no explicit removal -> imageFileName remains undefined (no change)
 
         // Use the upsertPatientDailyAssesment query for upsert logic
-        console.log('=== ACTION DEBUG ===')
-        console.log('patientId:', input.patientId)
-        console.log('dailyAssesmentId:', input.dailyAssesmentId)
-        console.log('imageFileName (final):', imageFileName)
-        console.log('imageFile provided:', !!input.imageFile)
-        console.log('removeImage:', input.removeImage)
-        console.log('currentUser.id:', currentUser.id)
-
         // Prepare parameters, only include image if it's not undefined
         const upsertParams: any = {
           patientId: input.patientId,
@@ -344,13 +336,7 @@ const assesment = {
           upsertParams.image = imageFileName
         }
 
-        console.log('=== UPSERT PARAMS ===')
-        console.log('upsertParams:', upsertParams)
-
         const result = await upsertPatientDailyAssesment(upsertParams)
-        console.log('=== UPSERT RESULT ===')
-        console.log('Result returned:', result)
-        console.log('Result image field:', result?.image)
         return result
       }
     }),

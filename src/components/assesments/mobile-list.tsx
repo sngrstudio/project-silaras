@@ -20,12 +20,9 @@ interface MobileListProps {
 }
 
 const MobileList: FC<MobileListProps> = ({ cell }) => {
-  const currentUser = useStore($currentUser)
   const assessment = cell.row.original
   const isFuture = isDateInFuture(assessment.date)
-
-  // Show metadata (timestamp and lastModifiedBy) only for users with access level 3 or above
-  const canViewMetadata = currentUser && currentUser.accessLevel >= 3
+  const currentUser = useStore($currentUser)
 
   return (
     <>
@@ -55,22 +52,21 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
           {assessment.menu2}
         </div>
 
-        {/* Mobile metadata display for authorized users */}
-        {canViewMetadata &&
-          (assessment.createdAt || assessment.lastModifiedBy) && (
+        {/* Show "last modified" metadata when assessment is completed and user has access level 3+ */}
+        {assessment.isCompleted &&
+          assessment.lastModifiedAt &&
+          assessment.lastModifiedBy &&
+          currentUser &&
+          currentUser.accessLevel >= 3 && (
             <div className='mt-2 text-xs text-gray-500'>
-              {assessment.createdAt && (
-                <div>
-                  Dibuat:{' '}
-                  {new Date(assessment.createdAt).toLocaleString('id-ID')}
-                </div>
-              )}
-              {assessment.lastModifiedBy && (
-                <div>
-                  Terakhir diubah:{' '}
-                  {assessment.lastModifiedByUser?.fullName || 'Unknown'}
-                </div>
-              )}
+              <div>
+                terakhir diubah oleh{' '}
+                {assessment.lastModifiedByUser?.fullName || 'Unknown'}
+              </div>
+              <div>
+                pada{' '}
+                {new Date(assessment.lastModifiedAt!).toLocaleString('id-ID')}
+              </div>
             </div>
           )}
       </div>

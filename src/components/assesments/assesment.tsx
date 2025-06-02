@@ -33,16 +33,40 @@ const dColumns = [
         dateStyle: 'full'
       })
       const isFuture = isDateInFuture(date)
+      const assessment = cell.row.original
+      const currentUser = useStore($currentUser)
+
+      // Show metadata if assessment is completed, has been modified, and user has access level 3+
+      const showMetadata =
+        assessment.isCompleted &&
+        assessment.lastModifiedAt &&
+        assessment.lastModifiedBy &&
+        currentUser &&
+        currentUser.accessLevel >= 3
 
       return (
-        <div className='flex items-center gap-2'>
-          <span className={`font-bold ${isFuture ? 'text-gray-400' : ''}`}>
-            {dateString}
-          </span>
-          {isFuture && (
-            <span className='badge badge-outline badge-sm text-gray-400'>
-              Akan datang
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2'>
+            <span className={`font-bold ${isFuture ? 'text-gray-400' : ''}`}>
+              {dateString}
             </span>
+            {isFuture && (
+              <span className='badge badge-outline badge-sm text-gray-400'>
+                Akan datang
+              </span>
+            )}
+          </div>
+          {showMetadata && (
+            <div className='text-xs text-gray-500'>
+              <div>
+                terakhir diubah oleh{' '}
+                {assessment.lastModifiedByUser?.fullName || 'Unknown'}
+              </div>
+              <div>
+                pada{' '}
+                {new Date(assessment.lastModifiedAt!).toLocaleString('id-ID')}
+              </div>
+            </div>
           )}
         </div>
       )
@@ -87,32 +111,6 @@ const dColumns = [
   columnHelper.accessor('score', {
     header: 'Skor',
     cell: (cell) => {
-      const currentUser = useStore($currentUser)
-      const assessment = cell.row.original
-
-      // Show metadata tooltip only for users with access level 3 or above
-      const canViewMetadata = currentUser && currentUser.accessLevel >= 3
-
-      if (
-        canViewMetadata &&
-        (assessment.createdAt || assessment.lastModifiedBy)
-      ) {
-        const tooltipContent = [
-          assessment.createdAt &&
-            `Dibuat: ${new Date(assessment.createdAt).toLocaleString('id-ID')}`,
-          assessment.lastModifiedBy &&
-            `Terakhir diubah: ${assessment.lastModifiedByUser?.fullName || 'Unknown'}`
-        ]
-          .filter(Boolean)
-          .join('\n')
-
-        return (
-          <span title={tooltipContent} className='cursor-help'>
-            {cell.getValue()}
-          </span>
-        )
-      }
-
       return cell.getValue()
     }
   })

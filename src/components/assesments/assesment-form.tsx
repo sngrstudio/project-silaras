@@ -48,7 +48,6 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
   }, [cell.row.original.image])
 
   const handleForm = async (_prev: unknown, data: FormData) => {
-    console.log(data)
     const { error } = await actions.assesment.daily.set(data)
     if (error) {
       if (isInputError(error)) {
