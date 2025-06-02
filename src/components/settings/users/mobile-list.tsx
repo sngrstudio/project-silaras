@@ -18,6 +18,7 @@ import {
   showSuccessToast,
   showErrorToast
 } from '~/components/common/toast/toast.store'
+import clsx from 'clsx'
 
 type CurrentUser = Awaited<ReturnType<typeof actions.user.getCurrent.orThrow>>
 
@@ -64,14 +65,12 @@ const UserAvatar: FC<{
   const profilePhotoUrl = useProfilePhoto(profilePhoto)
 
   return (
-    <div className='avatar' data-placeholder={!profilePhotoUrl}>
-      <div className='w-10 rounded'>
+    <div className={clsx('avatar', !profilePhotoUrl && 'avatar-placeholder')}>
+      <div className='bg-primary text-primary-content aspect-square w-8 rounded-full'>
         {profilePhotoUrl ? (
           <Image image={profilePhotoUrl} alt={fullName} />
         ) : (
-          <div className='bg-neutral text-neutral-content w-10 rounded-full'>
-            <span className='text-sm'>{fullName.charAt(0).toUpperCase()}</span>
-          </div>
+          <span>{fullName.charAt(0).toUpperCase()}</span>
         )}
       </div>
     </div>
@@ -179,7 +178,7 @@ const MobileList: FC<MobileListProps> = ({ cell, currentUser }) => {
           </div>
         </div>
         <div className='flex items-center gap-2'>
-          <span className='badge badge-soft badge-primary badge-xs'>
+          <span className='badge badge-soft badge-primary badge-xs line-clamp-1'>
             {getAccessLevelName(user.accessLevel)}
           </span>
           {user.regionName && (

@@ -164,7 +164,10 @@ const dColumns = [
     header: 'Level Akses',
     enableSorting: true,
     cell: (cell) => (
-      <span className='badge badge-soft badge-primary badge-sm'>
+      <span
+        className='badge badge-soft badge-primary badge-sm line-clamp-1'
+        title={getAccessLevelName(cell.getValue())}
+      >
         {getAccessLevelName(cell.getValue())}
       </span>
     )
