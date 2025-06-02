@@ -5,4 +5,6 @@ const pool = mysql.createPool({
   uri: process.env.DATABASE_URL
 })
 
-export const db = drizzle(pool, { logger: import.meta.env.DEV })
+export const db = drizzle(pool, {
+  logger: import.meta.env.DEV || process.env.DB_DEBUG
+})

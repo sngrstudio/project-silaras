@@ -1,4 +1,17 @@
 services:
+  app:
+    container_name: app
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: 'mysql://test:test@db:3306/test'
+      DB_DEBUG: true
+    ports:
+      - '4321:4321'
+    depends_on:
+      - db
+
   db:
     container_name: db
     image: mariadb:10.11.10

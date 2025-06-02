@@ -1,92 +1,69 @@
-import { upsertRegion, getRegionBySlug } from '../queries/region'
-import {
-  upsertMonthlyAssesment,
-  upsertDailyAssesment
-} from '../queries/assesment'
-import { upsertSiteProperty } from '../queries/site'
-import regionsData from './data/regions.json'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { drizzle } from 'drizzle-orm/mysql2'
+import mysql from 'mysql2/promise'
 
 async function seed() {
-  // Map to store slug to region id
-  const slugToId = new Map<string, string>()
+  try {
+    console.log('🌱 Starting SILARAS database seeding...')
 
-  // Insert regions in order: KABUPATEN, KECAMATAN, DESA
-  for (const type of ['KABUPATEN', 'KECAMATAN', 'DESA'] as const) {
-    const regionsOfType = regionsData.filter((r) => r.type === type)
-    // Prepare regions with parentId resolved
-    const regionsToInsert = []
-    for (const region of regionsOfType) {
-      let parentId: string | undefined = undefined
-      if (region.parentSlug) {
-        const parentRegion = await getRegionBySlug(region.parentSlug)
-        if (!parentRegion) {
-          throw new Error(
-            `Parent region with slug '${region.parentSlug}' not found for region '${region.slug}'`
-          )
-        }
-        parentId = parentRegion.id
-      }
-      regionsToInsert.push({
-        name: region.name,
-        slug: region.slug,
-        type: region.type as 'KABUPATEN' | 'KECAMATAN' | 'DESA',
-        parentId: parentId ?? null
-      })
+    // Read the SQL seed file
+    const sqlFilePath = join(__dirname, 'seed.sql')
+    const sqlContent = readFileSync(sqlFilePath, 'utf-8')
+
+    console.log('📄 SQL seed file loaded successfully')
+    console.log('🔄 Executing SQL seed script...')
+
+    // Create a dedicated Drizzle instance with multi-statement support
+    // This preserves MySQL session variables (@kabupaten_id, etc.) across statements
+    const seedPool = mysql.createPool({
+      uri: process.env.DATABASE_URL,
+      multipleStatements: true // Enable multi-statement queries
+    })
+
+    const seedDb = drizzle(seedPool, {
+      logger: import.meta.env.DEV || process.env.DB_DEBUG
+    })
+
+    try {
+      // Remove comments and empty lines for cleaner execution
+      const cleanedSql = sqlContent
+        .split('\n')
+        .filter(
+          (line) => !line.trim().startsWith('--') && line.trim().length > 0
+        )
+        .join('\n')
+        .trim()
+
+      console.log(
+        '📝 Executing SQL seed script as single multi-statement query...'
+      )
+
+      // Execute the entire SQL content in one go to maintain session context
+      await seedDb.execute(cleanedSql)
+
+      console.log('✅ SQL seed script executed successfully!')
+    } catch (error) {
+      console.error('❌ Error executing SQL seed script:')
+      console.error('Error details:', error)
+      throw error
+    } finally {
+      // Always close the dedicated pool
+      await seedPool.end()
     }
-    // Insert all regions of this type in parallel (one by one, but concurrently)
-    const dbRegions = await Promise.all(regionsToInsert.map(upsertRegion))
-    for (const dbRegion of dbRegions) {
-      if (dbRegion && dbRegion.id && dbRegion.slug) {
-        slugToId.set(dbRegion.slug, dbRegion.id)
-      }
-    }
+
+    console.log('✅ SQL seed script executed successfully!')
+    console.log('🎉 SILARAS database seeding completed!')
+    console.log('')
+    console.log('📊 Seeded data summary:')
+    console.log('   • 203 regions (1 KABUPATEN + 17 KECAMATAN + 185 DESA)')
+    console.log('   • 5 monthly assessment templates (June-October 2025)')
+    console.log('   • 150 daily assessment entries (30 days per month)')
+    console.log('   • 3 site properties configured')
+  } catch (error) {
+    console.error('💥 Seed process failed:', error)
+    throw error
   }
-
-  // --- Monthly and Daily Assessment Seeder ---
-  // Only generate for June to October, using correct enum and types
-  // Use upsertMonthlyAssesment and upsertDailyAssesment from queries
-  type MonthEnum = 'JUNE' | 'JULY' | 'AUGUST' | 'SEPTEMBER' | 'OCTOBER'
-  const months: { name: MonthEnum; days: number }[] = [
-    { name: 'JUNE', days: 30 },
-    { name: 'JULY', days: 31 },
-    { name: 'AUGUST', days: 31 },
-    { name: 'SEPTEMBER', days: 30 },
-    { name: 'OCTOBER', days: 31 }
-  ]
-
-  // Only push defined rows
-  const monthlyAssesmentRows: Array<{ id: string; month: MonthEnum }> = []
-  for (const m of months) {
-    const row = await upsertMonthlyAssesment(m.name)
-    if (row && row.id)
-      monthlyAssesmentRows.push(row as { id: string; month: MonthEnum })
-  }
-
-  for (let i = 0; i < months.length; i++) {
-    const month = months[i]
-    const monthlyRow = monthlyAssesmentRows[i]
-    if (!month || !monthlyRow || !monthlyRow.id) continue
-    for (let day = 1; day <= month.days; day++) {
-      if (day === 31 && month.days < 31) continue // skip 31st if not in month
-      const dateObj = new Date(Date.UTC(2025, 5 + i, day)) // June is month 5 (0-based)
-      await upsertDailyAssesment({
-        monthlyAssesmentId: monthlyRow.id,
-        date: dateObj,
-        menu1: '<<menu>>',
-        menu2: '<<menu>>'
-      })
-    }
-  }
-
-  // --- Site Settings Seeder ---
-  await upsertSiteProperty('SITE_NAME', 'Silaras')
-  await upsertSiteProperty(
-    'SITE_DESCRIPTION',
-    'Sistem Laporan Dapur Sehat Atasi Stunting (DASHAT)'
-  )
-  await upsertSiteProperty('SITE_LOGO', '')
-
-  console.log('Seed completed!')
 }
 
 seed()
