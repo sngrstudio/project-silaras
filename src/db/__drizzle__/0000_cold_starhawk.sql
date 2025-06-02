@@ -23,6 +23,10 @@ CREATE TABLE `patient_daily_assesment` (
 	`contains_fruits` boolean DEFAULT false,
 	`is_following_recipe` boolean DEFAULT false,
 	`score` tinyint unsigned GENERATED ALWAYS AS (`patient_daily_assesment`.`contains_staple_food` + `patient_daily_assesment`.`contains_side_dish` + `patient_daily_assesment`.`contains_vegetables` + `patient_daily_assesment`.`contains_fruits` + `patient_daily_assesment`.`is_following_recipe`) STORED,
+	`is_completed` boolean NOT NULL DEFAULT false,
+	`image` varchar(255),
+	`last_modified_at` timestamp,
+	`last_modified_by` varchar(36),
 	CONSTRAINT `patient_daily_assesment_patient_id_daily_assesment_id_pk` PRIMARY KEY(`patient_id`,`daily_assesment_id`)
 );
 --> statement-breakpoint
@@ -93,7 +97,7 @@ CREATE TABLE `user` (
 	`full_name` varchar(255) NOT NULL,
 	`phone_number` varchar(32),
 	`profile_photo` varchar(255),
-	`region_id` varchar(36) NOT NULL,
+	`region_id` varchar(36) DEFAULT '',
 	CONSTRAINT `user_id` PRIMARY KEY(`id`),
 	CONSTRAINT `user_username_unique` UNIQUE(`username`),
 	CONSTRAINT `user_phone_number_unique` UNIQUE(`phone_number`)
@@ -102,6 +106,7 @@ CREATE TABLE `user` (
 ALTER TABLE `daily_assesment` ADD CONSTRAINT `fk_daily_monthly` FOREIGN KEY (`monthly_assesment_id`) REFERENCES `monthly_assesment`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `patient_daily_assesment` ADD CONSTRAINT `fk_patient_daily_patient` FOREIGN KEY (`patient_id`) REFERENCES `patient`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `patient_daily_assesment` ADD CONSTRAINT `fk_patient_daily_daily` FOREIGN KEY (`daily_assesment_id`) REFERENCES `daily_assesment`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `patient_daily_assesment` ADD CONSTRAINT `fk_patient_daily_last_modified_by` FOREIGN KEY (`last_modified_by`) REFERENCES `user`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `patient_monthly_assesment` ADD CONSTRAINT `fk_patient_monthly_patient` FOREIGN KEY (`patient_id`) REFERENCES `patient`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `patient_monthly_assesment` ADD CONSTRAINT `fk_patient_monthly_monthly` FOREIGN KEY (`monthly_assesment_id`) REFERENCES `monthly_assesment`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `patient` ADD CONSTRAINT `patient_region_id_region_id_fk` FOREIGN KEY (`region_id`) REFERENCES `region`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint

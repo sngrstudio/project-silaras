@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1748586894554,
-      "tag": "0000_perfect_bushwacker",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1748601341805,
-      "tag": "0001_moaning_tony_stark",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1748704141021,
-      "tag": "0002_warm_captain_stacy",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1748797294365,
-      "tag": "0003_dear_blue_marvel",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1748844432527,
-      "tag": "0004_loving_the_enforcers",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1748844523793,
-      "tag": "0005_round_mac_gargan",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1748852505252,
-      "tag": "0006_sad_chimera",
+      "when": 1748859284253,
+      "tag": "0000_cold_starhawk",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TABLE `user` MODIFY COLUMN `region_id` varchar(36) DEFAULT '';
