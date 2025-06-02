@@ -1,10 +1,24 @@
 import type { FC, PropsWithChildren } from 'react'
+import { useEffect } from 'react'
 import DrawerMenuRC from './menu'
 import { useStore } from '@nanostores/react'
-import { $openDrawer, setOpenDrawer } from './drawer.store'
+import { $openDrawer, setOpenDrawer, setCurrentUser } from './drawer.store'
 
-const DrawerRC: FC<PropsWithChildren> = ({ children }) => {
+interface DrawerProps extends PropsWithChildren {
+  user?: any // User from Astro.locals
+}
+
+const DrawerRC: FC<DrawerProps> = ({ children, user }) => {
   const openDrawer = useStore($openDrawer)
+
+  // Set user data immediately to prevent hydration mismatch
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user)
+    } else {
+      setCurrentUser(undefined)
+    }
+  }, [user])
 
   const handleOpenDrawer = () => {
     setOpenDrawer(!openDrawer)

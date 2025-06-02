@@ -21,6 +21,14 @@ if (!page) {
   return Astro.redirect('/404')
 }
 
+// Get regions data during SSR to prevent hydration mismatch
+const regionsData = await Astro.callAction(
+  actions.region.getAllWithCounts.orThrow,
+  {
+    parentSlug: slug
+  }
+)
+
 // Access control based on user access level and region assignment
 const hasAccess = await (async () => {
   // Admin (level 4) has access to everything
@@ -107,7 +115,11 @@ const props = {
 <DLayout {...props}>
   {
     page.type !== 'DESA' && (
-      <Region transition:name={page.slug} transition:animate='none' />
+      <Region
+        regionsData={regionsData}
+        transition:name={page.slug}
+        transition:animate='none'
+      />
     )
   }
   {

@@ -1,26 +1,16 @@
 ---
 import DrawerRC from './drawer'
+
+// Get user data during SSR to prevent hydration mismatch
+const { user } = Astro.locals
 ---
 
-<DrawerRC client:load>
+<DrawerRC client:load user={user}>
   <slot />
 </DrawerRC>
 
 <script>
-  import { onMount, task } from 'nanostores'
-  import { $currentUser, setCurrentUser, setOpenDrawer } from './drawer.store'
-  import { actions } from 'astro:actions'
-
-  onMount($currentUser, () => {
-    task(async () => {
-      const state = await actions.user.getCurrent.orThrow()
-      setCurrentUser(state)
-    })
-
-    return () => {
-      setCurrentUser(undefined)
-    }
-  })
+  import { setOpenDrawer } from './drawer.store'
 
   document.addEventListener('astro:page-load', () => {
     setOpenDrawer(false)

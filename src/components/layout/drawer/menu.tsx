@@ -4,18 +4,30 @@ import { $currentUser, setCurrentUser } from './drawer.store'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 
+// Icons
+import HomeIcon from '~icons/lucide/home'
+import MapIcon from '~icons/lucide/map'
+import SettingsIcon from '~icons/lucide/settings'
+import MenuIcon from '~icons/lucide/menu'
+import UsersIcon from '~icons/lucide/users'
+import UserIcon from '~icons/lucide/user'
+import LogOutIcon from '~icons/lucide/log-out'
+
 const SETTINGS_MENU = [
   {
     label: 'Setelan Situs',
-    href: '/settings/site'
+    href: '/settings/site',
+    icon: SettingsIcon
   },
   {
     label: 'Setelan Menu',
-    href: '/settings/menu'
+    href: '/settings/menu',
+    icon: MenuIcon
   },
   {
     label: 'Manajemen Pengguna',
-    href: '/settings/users'
+    href: '/settings/users',
+    icon: UsersIcon
   }
 ]
 
@@ -36,7 +48,10 @@ const MainMenu: FC = () => {
   return (
     <>
       <li>
-        <a href='/'>Beranda</a>
+        <a href='/'>
+          <HomeIcon className='h-5 w-5' />
+          Beranda
+        </a>
       </li>
     </>
   )
@@ -60,13 +75,19 @@ const RegionsMenu: FC = () => {
       {/* Admin gets link to main kabupaten */}
       {user.accessLevel >= 4 && (
         <li>
-          <a href='/region/kotawaringin-timur-6202'>Kotawaringin Timur</a>
+          <a href='/region/kotawaringin-timur-6202'>
+            <MapIcon className='h-5 w-5' />
+            Kotawaringin Timur
+          </a>
         </li>
       )}
       {/* Users with region assignment get quick link to their region */}
       {user.regionId && user.accessLevel < 4 && (
         <li>
-          <a href='/'>Wilayah Saya</a>
+          <a href='/'>
+            <MapIcon className='h-5 w-5' />
+            Wilayah Saya
+          </a>
         </li>
       )}
     </>
@@ -104,11 +125,17 @@ const SettingsMenu: FC = () => {
     <>
       {/* Pengaturan Aplikasi */}
       <li className='menu-title mt-4 uppercase'>Pengaturan Aplikasi</li>
-      {availableMenuItems.map((item, i) => (
-        <li key={i}>
-          <a href={item.href}>{item.label}</a>
-        </li>
-      ))}
+      {availableMenuItems.map((item, i) => {
+        const IconComponent = item.icon
+        return (
+          <li key={i}>
+            <a href={item.href}>
+              <IconComponent className='h-5 w-5' />
+              {item.label}
+            </a>
+          </li>
+        )
+      })}
     </>
   )
 }
@@ -117,9 +144,17 @@ const UserMenu: FC = () => {
   const user = useStore($currentUser)
 
   const handleLogout = async () => {
-    await actions.user.auth.logout.orThrow()
-    setCurrentUser(undefined)
-    navigate('/')
+    if (!confirm('Apakah Anda yakin ingin keluar dari aplikasi?')) {
+      return
+    }
+
+    try {
+      await actions.user.auth.logout.orThrow()
+      setCurrentUser(undefined)
+      navigate('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   if (!user) {
@@ -130,10 +165,18 @@ const UserMenu: FC = () => {
     <>
       <li className='menu-title mt-auto uppercase'>{user.fullName}</li>
       <li>
-        <a href='/user/profile'>Profil Pengguna</a>
+        <a href='/user/profile'>
+          <UserIcon className='h-5 w-5' />
+          Profil Pengguna
+        </a>
       </li>
       <li>
-        <div role='button' onClick={handleLogout}>
+        <div
+          role='button'
+          onClick={handleLogout}
+          className='flex items-center gap-2'
+        >
+          <LogOutIcon className='h-5 w-5' />
           Logout
         </div>
       </li>

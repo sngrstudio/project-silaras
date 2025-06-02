@@ -1,36 +1,34 @@
 ---
 import RegionRC from './region'
 import CardTemplateRC from '~/components/common/card/card'
+import type { Regions } from './region.store'
+
+interface Props {
+  regionsData?: Regions
+}
+
+const { regionsData } = Astro.props
 ---
 
 <CardTemplateRC>
-  <RegionRC client:idle />
+  <RegionRC client:idle regionsData={regionsData} />
 </CardTemplateRC>
 
 <script>
-  import { onMount, task } from 'nanostores'
-  import { $regions, setRegions } from './region.store'
+  import { setRegions } from './region.store'
   import { actions } from 'astro:actions'
 
-  const parentSlug = window.location.pathname.split('/').at(-1) ?? ''
-
-  onMount($regions, () => {
-    task(async () => {
-      const state = await actions.region.getAllWithCounts.orThrow({
-        parentSlug
-      })
-      setRegions(state)
-    })
-    return () => {
-      setRegions(undefined)
-    }
-  })
-
+  // Handle view transitions - reload data when navigating between regions
   document.addEventListener('astro:page-load', async () => {
     const newParentSlug = window.location.pathname.split('/').at(-1) ?? ''
-    const state = await actions.region.getAllWithCounts.orThrow({
-      parentSlug: newParentSlug
-    })
-    setRegions(state)
+    try {
+      const state = await actions.region.getAllWithCounts.orThrow({
+        parentSlug: newParentSlug
+      })
+      setRegions(state)
+    } catch (error) {
+      console.error('Failed to load regions data on page transition:', error)
+      setRegions(undefined)
+    }
   })
 </script>

@@ -1,10 +1,21 @@
-import { type FC } from 'react'
+import { type FC, useEffect } from 'react'
 import Navigation from './navigation'
 import { useStore } from '@nanostores/react'
-import { $regions, type Regions } from './region.store'
+import { $regions, setRegions, type Regions } from './region.store'
 
-const RegionRC: FC = () => {
+interface RegionRCProps {
+  regionsData?: Regions | undefined
+}
+
+const RegionRC: FC<RegionRCProps> = ({ regionsData }) => {
   const regions = useStore($regions)
+
+  // Set regions data immediately to prevent hydration mismatch
+  useEffect(() => {
+    if (regionsData) {
+      setRegions(regionsData)
+    }
+  }, [regionsData])
 
   if (!regions) {
     return <></>

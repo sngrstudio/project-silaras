@@ -6,7 +6,7 @@ import {
   type FC,
   type SetStateAction
 } from 'react'
-import { DialogTemplate } from '~/components/common/dialog/dialog'
+import DialogComponent from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
   $currentPatient,
@@ -71,10 +71,10 @@ const PatientDialog: FC = () => {
   }
 
   return (
-    <DialogTemplate
+    <DialogComponent
       title='Tambah atau Ubah Pasien'
       open={openPatientModal}
-      closeAction={() => setCurrentPatient(undefined)}
+      onOpenChange={(open) => !open && setCurrentPatient(undefined)}
     >
       <form className='flex flex-col gap-2' action={action}>
         {/* Nama */}
@@ -307,7 +307,7 @@ const PatientDialog: FC = () => {
           </button>
         </div>
       </form>
-    </DialogTemplate>
+    </DialogComponent>
   )
 }
 
