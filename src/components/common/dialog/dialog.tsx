@@ -58,7 +58,7 @@ export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
             'fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
             'z-[9998]', // Same z-index as overlay, below toast notifications
             'bg-base-100 border-base-300 rounded-2xl border shadow-xl',
-            'mx-4 max-h-[90vh] w-full max-w-[75vh] overflow-y-auto',
+            'max-h-[90vh] w-full max-w-[75vh] overflow-y-auto',
             'max-md:top-auto max-md:bottom-0 max-md:left-0 max-md:translate-x-0 max-md:translate-y-0',
             'max-md:max-h-[85vh] max-md:w-full max-md:rounded-b-none', // Mobile bottom modal styling
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
