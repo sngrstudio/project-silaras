@@ -5,16 +5,8 @@ import { actions } from 'astro:actions'
 
 const site = await Astro.callAction(actions.site.getAll.orThrow, {})
 export type Site = typeof site
-
-const logo = site.SITE_LOGO
-  ? await Astro.callAction(actions.image.getPresignedImage.orThrow, {
-      fileName: site.SITE_LOGO,
-      width: 35,
-      height: 35
-    })
-  : undefined
 ---
 
-<NavigationRC site={site} logo={logo}>
+<NavigationRC site={site}>
   <DrawerButtonRC client:load />
 </NavigationRC>

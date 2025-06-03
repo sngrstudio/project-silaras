@@ -9,7 +9,7 @@ import { eq } from 'drizzle-orm'
 /**
  * Get a site property value.
  *
- * @param property The site property to get (SITE_NAME, SITE_DESCRIPTION, or SITE_LOGO)
+ * @param property The site property to get (SITE_NAME or SITE_DESCRIPTION)
  * @returns The value of the property or undefined if not found
  */
 export const getSiteProperty = async (
@@ -45,7 +45,7 @@ export const getAllSiteProperties = async () => {
 /**
  * Update or insert a site property.
  *
- * @param property The site property to set (SITE_NAME, SITE_DESCRIPTION, or SITE_LOGO)
+ * @param property The site property to set (SITE_NAME or SITE_DESCRIPTION)
  * @param value The new value for the property
  * @returns The updated site property value
  */

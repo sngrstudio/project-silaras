@@ -4,7 +4,6 @@ import {
   getAllSiteProperties,
   upsertSiteProperty
 } from '../db/queries/site'
-import { deleteS3, uploadS3 } from '~/lib/s3'
 import { z } from 'astro:schema'
 
 /**
@@ -22,7 +21,7 @@ const site = {
    */
   get: defineAction({
     input: z.object({
-      property: z.enum(['SITE_NAME', 'SITE_DESCRIPTION', 'SITE_LOGO'])
+      property: z.enum(['SITE_NAME', 'SITE_DESCRIPTION'])
     }),
     handler: async ({ property }) => {
       return await getSiteProperty(property)
@@ -59,37 +58,12 @@ const site = {
     accept: 'form',
     input: z.object({
       siteName: z.string().optional(),
-      siteDescription: z.string().optional(),
-      siteLogo: z.instanceof(File).optional()
+      siteDescription: z.string().optional()
     }),
     handler: async (input) => {
       // Get current settings
       const currentSettings = await getAllSiteProperties()
       const updates: Array<Promise<string>> = []
-
-      // Handle logo file if provided
-      if (input.siteLogo && input.siteLogo.name) {
-        const hashHex = Array.from(
-          new Uint8Array(
-            await crypto.subtle.digest(
-              'SHA-256',
-              await input.siteLogo.arrayBuffer()
-            )
-          )
-        )
-          .map((b) => b.toString(16).padStart(2, '0'))
-          .join('')
-        const fileName = `site-logo-${hashHex}.${input.siteLogo.name.split('.').pop() || ''}`
-
-        if (currentSettings.SITE_LOGO !== fileName) {
-          // Different file, handle upload
-          if (currentSettings.SITE_LOGO) {
-            await deleteS3(currentSettings.SITE_LOGO)
-          }
-          await uploadS3(input.siteLogo, fileName)
-          updates.push(upsertSiteProperty('SITE_LOGO', fileName))
-        }
-      }
 
       // Handle text properties if they've changed
       if (

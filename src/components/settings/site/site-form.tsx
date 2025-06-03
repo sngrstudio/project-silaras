@@ -2,8 +2,6 @@ import { useActionState, useRef, useState, useEffect, type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import { $siteSettings, setSiteSettings } from './site.store'
 import { actions, isInputError } from 'astro:actions'
-import Image from '~/components/common/image/image'
-import type { GetImageResult } from 'astro'
 import {
   showErrorToast,
   showSuccessToast
@@ -12,34 +10,20 @@ import {
 const SiteForm: FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
   const siteSettings = useStore($siteSettings)
-  const [siteLogo, setSiteLogo] = useState<GetImageResult | undefined>(
-    undefined
-  )
   const [formValues, setFormValues] = useState({
     siteName: '',
-    siteDescription: '',
-    siteLogo: null as File | null
+    siteDescription: ''
   })
   const [initialValues, setInitialValues] = useState({
     siteName: '',
-    siteDescription: '',
-    siteLogo: null as File | null
+    siteDescription: ''
   })
-
-  useEffect(() => {
-    if (siteSettings && siteSettings.SITE_LOGO) {
-      actions.image.getPresignedImage
-        .orThrow({ fileName: siteSettings.SITE_LOGO, height: 50, width: 50 })
-        .then((image) => setSiteLogo(image))
-    }
-  }, [siteSettings?.SITE_LOGO])
 
   useEffect(() => {
     if (siteSettings) {
       const values = {
         siteName: siteSettings.SITE_NAME,
-        siteDescription: siteSettings.SITE_DESCRIPTION,
-        siteLogo: null
+        siteDescription: siteSettings.SITE_DESCRIPTION
       }
       setFormValues(values)
       setInitialValues(values)
@@ -49,12 +33,11 @@ const SiteForm: FC = () => {
   const hasChanges = () => {
     return (
       formValues.siteName !== initialValues.siteName ||
-      formValues.siteDescription !== initialValues.siteDescription ||
-      formValues.siteLogo !== null
+      formValues.siteDescription !== initialValues.siteDescription
     )
   }
 
-  const handleInputChange = (field: string, value: string | File | null) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormValues((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -124,34 +107,6 @@ const SiteForm: FC = () => {
           required
           disabled={isPending}
         />
-      </div>
-
-      <div>
-        <label className='label' htmlFor='siteLogo'>
-          Site Logo
-        </label>
-        <div className='flex flex-col md:flex-row md:items-center md:gap-4'>
-          {siteLogo && (
-            <div className='mb-4 flex justify-center md:mb-0 md:justify-start'>
-              <Image
-                image={siteLogo}
-                className='h-20 w-20 rounded-lg border-2 border-gray-200 object-cover'
-                alt='Current site logo'
-              />
-            </div>
-          )}
-          <input
-            className='file-input md:file-input-lg file-input-ghost w-full md:flex-1'
-            type='file'
-            id='siteLogo'
-            name='siteLogo'
-            accept='image/*'
-            onChange={(e) =>
-              handleInputChange('siteLogo', e.target.files?.[0] || null)
-            }
-            disabled={isPending}
-          />
-        </div>
       </div>
 
       <div className='flex w-full flex-col-reverse gap-2 md:flex-row-reverse'>
