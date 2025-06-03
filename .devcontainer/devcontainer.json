@@ -74,8 +74,7 @@
 
   "containerEnv": {
     "DATABASE_URL": "mysql://test:test@localhost:3306/test"
-  }
+  },
 
-  // "postCreateCommand": "bun install --frozen-lockfile && bunx astro sync"
-  // "postStartCommand": "docker compose up -d"
+  "postCreateCommand": "npm ci && npx astro sync"
 }
