@@ -2,6 +2,7 @@ import { db } from '../db'
 import { target } from '../schemas/target'
 import { region } from '../schemas/region'
 import { eq, sql } from 'drizzle-orm'
+import crypto from 'node:crypto'
 
 /**
  * Target table query functions.
@@ -33,7 +34,7 @@ export const upsertTarget = async (data: {
   id?: string
 }) => {
   // Always set id: use provided or generate new
-  const id = data.id ?? Bun.randomUUIDv7()
+  const id = data.id ?? crypto.randomUUID()
   const isUpdate = !!data.id
 
   // Generate or fetch slug in a single operation

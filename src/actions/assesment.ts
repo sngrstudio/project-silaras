@@ -14,7 +14,7 @@ import {
 } from '../db/queries/assesment'
 import { getTargetById } from '../db/queries/target'
 import { getFileHash } from '../utils/file-hash'
-import { uploadS3 } from '../lib/s3'
+import { uploadS3 } from '../utils/s3'
 import { z } from 'astro:schema'
 
 /**
@@ -313,7 +313,6 @@ const assesment = {
           try {
             await uploadS3(input.imageFile, imageFileName)
           } catch (error) {
-            console.error('S3 upload error:', error)
             throw new ActionError({
               code: 'INTERNAL_SERVER_ERROR',
               message: `Gagal mengunggah gambar: ${error instanceof Error ? error.message : 'Unknown error'}`

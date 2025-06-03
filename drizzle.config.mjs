@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'drizzle-kit'
-import './polyfills/compression-stream' //polyfill for drizzle studio to work
 
 const { DATABASE_URL } = process.env
 

@@ -1,7 +1,12 @@
 import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { drizzle } from 'drizzle-orm/mysql2'
 import mysql from 'mysql2/promise'
+
+// ES Module equivalent for __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 async function seed() {
   try {
@@ -22,7 +27,9 @@ async function seed() {
     })
 
     const seedDb = drizzle(seedPool, {
-      logger: import.meta.env.DEV || process.env.DB_DEBUG
+      logger:
+        process.env.NODE_ENV === 'development' ||
+        process.env.DB_DEBUG === 'true'
     })
 
     try {

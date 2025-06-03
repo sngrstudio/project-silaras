@@ -21,8 +21,9 @@ import {
   deleteSessionTokenCookie
 } from '../auth/cookies'
 import { z } from 'astro:schema'
-import { deleteS3, uploadS3 } from '~/lib/s3'
+import { deleteS3, uploadS3 } from '~/utils/s3'
 import { getFileHash } from '~/utils/file-hash'
+import { hashPassword, verifyPassword } from '~/utils/password'
 import { getRegionById, getRegionsByType } from '../db/queries/region' // Added getRegionsByType
 import {
   canUserEditUser,
@@ -749,12 +750,25 @@ const user = {
         }
 
         // 4. Verify password
-        if (
-          !user.passwordHash ||
-          !(await verifyPassword(password, user.passwordHash))
-        ) {
+        if (!user.passwordHash) {
           // Record failed attempt for rate limiting
           recordLoginAttempt(clientIp, username, false)
+          throw InvalidUsernameAndOrPassword
+        }
+
+        try {
+          const isValid = await verifyPassword(password, user.passwordHash)
+          if (!isValid) {
+            // Record failed attempt for rate limiting
+            recordLoginAttempt(clientIp, username, false)
+            throw InvalidUsernameAndOrPassword
+          }
+        } catch (error) {
+          // Record failed attempt for rate limiting
+          recordLoginAttempt(clientIp, username, false)
+          console.error(
+            `Authentication error: ${error instanceof Error ? error.message : 'unknown error'}`
+          )
           throw InvalidUsernameAndOrPassword
         }
 
@@ -913,10 +927,3 @@ setInterval(
   },
   30 * 60 * 1000
 )
-
-// password tools
-const hashPassword = async (password: string) =>
-  await Bun.password.hash(password)
-
-const verifyPassword = async (password: string, hash: string) =>
-  Bun.password.verify(password, hash)

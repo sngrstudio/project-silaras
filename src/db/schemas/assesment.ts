@@ -23,7 +23,7 @@ export const monthlyAssesment = mysqlTable('monthly_assesment', {
   id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
-    .$default(() => Bun.randomUUIDv7()),
+    .$default(() => sql`(UUID())`),
   month: varchar('month', {
     length: 255,
     enum: [
@@ -93,7 +93,7 @@ export const dailyAssesment = mysqlTable(
     id: varchar('id', { length: 36 })
       .primaryKey()
       .notNull()
-      .$default(() => Bun.randomUUIDv7()),
+      .$default(() => sql`(UUID())`),
     monthlyAssesmentId: varchar('monthly_assesment_id', {
       length: 36
     }).notNull(),

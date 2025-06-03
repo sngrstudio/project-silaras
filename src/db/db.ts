@@ -6,5 +6,5 @@ const pool = mysql.createPool({
 })
 
 export const db = drizzle(pool, {
-  logger: import.meta.env.DEV || process.env.DB_DEBUG
+  logger: import.meta.env.DEV || process.env.DB_DEBUG === 'true'
 })

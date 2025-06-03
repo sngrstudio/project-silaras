@@ -8,12 +8,13 @@ import {
 } from 'drizzle-orm/mysql-core'
 import { region } from './region'
 import { sql, type SQL } from 'drizzle-orm'
+import { randomUUID } from 'crypto'
 
 /**
  * Target table schema definition.
  *
  * Fields:
- * - id: string, primary key, generated with Bun.randomUUIDv7()
+ * - id: string, primary key, generated with crypto.randomUUID()
  * - name: string, target name
  * - regionId: string, foreign key referencing region (should be of type 'DESA')
  */
@@ -22,7 +23,7 @@ export const target = mysqlTable('target', {
   id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
-    .$default(() => Bun.randomUUIDv7()),
+    .$default(() => randomUUID()),
   name: varchar('name', { length: 255 }).notNull(),
   motherName: varchar('mother_name', { length: 255 }).notNull(),
   birthDate: date('birth_date').notNull(),

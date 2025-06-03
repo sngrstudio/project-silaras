@@ -1,5 +1,5 @@
 import { defineAction } from 'astro:actions'
-import { getPresignURLS3 } from '../lib/s3'
+import { getPresignURLS3 } from '../utils/s3'
 import { getPresignedImageURL } from '../db/queries/image'
 import { getImage } from 'astro:assets'
 import { z } from 'astro:schema'

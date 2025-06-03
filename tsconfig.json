@@ -3,7 +3,7 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "types": ["bun", "express", "morgan", "unplugin-icons/types/react"],
+    "types": ["node", "express", "morgan", "unplugin-icons/types/react"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]

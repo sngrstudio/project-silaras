@@ -1,38 +1,38 @@
-FROM oven/bun:1.2.15 AS base-builder
+FROM node:22.16.0-bookworm AS base-builder
 WORKDIR /usr/src/app
 
 # By copying only the package.json and package-lock.json here, we ensure that the following `-deps` steps are independent of the source code.
 # Therefore, the `-deps` steps will be skipped if only the source code changes.
-COPY package.json bun.lock ./
+COPY package.json package-lock.json* ./
 
 FROM base-builder AS prod-deps
-RUN bun install --frozen-lockfile --production
+RUN npm ci --only=production
 
 FROM base-builder AS build-deps
-RUN bun install --frozen-lockfile
+RUN npm ci
 
 FROM build-deps AS build
 COPY . .
-RUN bun run build
+RUN npm run build
 
 # Runner image
-FROM oven/bun:1.2.15-slim AS runtime
+FROM node:22.16.0-bookworm-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dumb-init && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /home/bun/app && chown -R bun:bun /home/bun/app
-WORKDIR /home/bun/app
-USER bun
+RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
+WORKDIR /home/node/app
+USER node
 
-COPY --from=prod-deps --chown=bun:bun /usr/src/app/node_modules ./node_modules
-COPY --from=build --chown=bun:bun /usr/src/app/dist ./dist
-COPY --chown=bun:bun server.mjs .
+COPY --from=prod-deps --chown=node:node /usr/src/app/node_modules ./node_modules
+COPY --from=build --chown=node:node /usr/src/app/dist ./dist
+COPY --chown=node:node server.mjs .
 
 ENV HOST=0.0.0.0
 ENV PORT=4321
 EXPOSE 4321
 ENTRYPOINT [ "dumb-init", "--" ]
-CMD ["bun", "./server.mjs"]
+CMD ["node", "./server.mjs"]

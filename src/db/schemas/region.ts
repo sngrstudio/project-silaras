@@ -4,12 +4,13 @@ import {
   mysqlEnum,
   type AnyMySqlColumn
 } from 'drizzle-orm/mysql-core'
+import { sql } from 'drizzle-orm'
 
 /**
  * Region table schema definition.
  *
  * Fields:
- * - id: string, primary key, generated with Bun.randomUUIDv7()
+ * - id: string, primary key, generated with UUIDv7()
  * - name: string, region name
  * - slug: string, unique slug for the region
  * - type: enum ('KABUPATEN', 'KECAMATAN', 'DESA')
@@ -24,7 +25,7 @@ export const region = mysqlTable('region', {
   id: varchar('id', { length: 36 })
     .primaryKey()
     .notNull()
-    .$default(() => Bun.randomUUIDv7()),
+    .$default(() => sql`(UUID())`),
   name: varchar('name', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   type: mysqlEnum('type', ['KABUPATEN', 'KECAMATAN', 'DESA']).notNull(),
