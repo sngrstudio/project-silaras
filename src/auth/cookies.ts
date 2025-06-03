@@ -10,7 +10,7 @@ export const setSessionTokenCookie = (
 ) => {
   ctx.cookies.set(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: import.meta.env.PROD,
     expires: expiresAt,
     path: '/'
@@ -22,7 +22,7 @@ export const deleteSessionTokenCookie = (
 ) => {
   ctx.cookies.delete(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: import.meta.env.PROD,
     path: '/'
   })
