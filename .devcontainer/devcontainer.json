@@ -1,13 +1,12 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-  "name": "Astro Base Template",
+  "name": "Project Silaras Devcontainer",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/shyim/devcontainers-features/bun:0": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
@@ -75,8 +74,8 @@
 
   "containerEnv": {
     "DATABASE_URL": "mysql://test:test@localhost:3306/test"
-  },
+  }
 
-  "postCreateCommand": "bun install --frozen-lockfile && bunx astro sync"
+  // "postCreateCommand": "bun install --frozen-lockfile && bunx astro sync"
   // "postStartCommand": "docker compose up -d"
 }
