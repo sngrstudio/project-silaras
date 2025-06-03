@@ -1,30 +1,30 @@
 import { defineAction, ActionError } from 'astro:actions'
 import {
-  upsertPatient,
-  getPatientById,
-  getAllPatients,
-  deletePatient,
-  getPatientBySlug
-} from '../db/queries/patient'
+  upsertTarget,
+  getTargetById,
+  getAllTargets,
+  deleteTarget,
+  getTargetBySlug
+} from '../db/queries/target'
 import { getRegionById } from '../db/queries/region'
 import { z } from 'astro:schema'
 
 /**
- * Astro Actions for Patient table
- * Each action corresponds to a query function for patient data operations.
+ * Astro Actions for Target table
+ * Each action corresponds to a query function for target data operations.
  *
- * - upsert: Insert or update a patient (requires name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight; id and slug optional)
- * - getById: Get a patient by its id
- * - getBySlug: Get a patient by its slug
- * - getAll: Get a paginated list of patients (optionally filtered by regionSlug)
- * - delete: Delete a patient by id
+ * - upsert: Insert or update a target (requires name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight; id and slug optional)
+ * - getById: Get a target by its id
+ * - getBySlug: Get a target by its slug
+ * - getAll: Get a paginated list of targets (optionally filtered by regionSlug)
+ * - delete: Delete a target by id
  */
 
-const patient = {
+const target = {
   /**
-   * Upsert (insert or update) a patient.
-   * @param data Patient data (name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight, id?, slug?)
-   * @returns The newly created or updated patient object
+   * Upsert (insert or update) a target.
+   * @param data Target data (name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight, id?, slug?)
+   * @returns The newly created or updated target object
    */
   upsert: defineAction({
     accept: 'form',
@@ -45,22 +45,22 @@ const patient = {
     handler: async (input, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only editors (level 2) and above can create/edit patients
+      // Only editors (level 2) and above can create/edit targets
       if (!currentUser || currentUser.accessLevel < 2) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Anda tidak memiliki izin untuk mengelola data pasien.'
+          message: 'Anda tidak memiliki izin untuk mengelola data sasaran.'
         })
       }
 
       // For non-admins, check region access
       if (currentUser.accessLevel < 4) {
-        // Users without region assignment cannot manage patients
+        // Users without region assignment cannot manage targets
         if (!currentUser.regionId) {
           throw new ActionError({
             code: 'FORBIDDEN',
             message:
-              'Anda tidak memiliki wilayah yang ditugaskan untuk mengelola pasien.'
+              'Anda tidak memiliki wilayah yang ditugaskan untuk mengelola sasaran.'
           })
         }
 
@@ -73,18 +73,18 @@ const patient = {
           })
         }
 
-        // Get the target region for the patient
+        // Get the target region for the target
         const targetRegion = await getRegionById(input.regionId)
         if (!targetRegion) {
           throw new ActionError({
             code: 'BAD_REQUEST',
-            message: 'Wilayah pasien tidak valid.'
+            message: 'Wilayah sasaran tidak valid.'
           })
         }
 
         // Access control based on user level and region hierarchy
         if (currentUser.accessLevel === 3) {
-          // Coordinators can manage patients in desa under their kecamatan
+          // Coordinators can manage targets in desa under their kecamatan
           if (
             targetRegion.type !== 'DESA' ||
             targetRegion.parentId !== userRegion.id
@@ -92,11 +92,11 @@ const patient = {
             throw new ActionError({
               code: 'FORBIDDEN',
               message:
-                'Anda hanya dapat mengelola pasien di desa yang berada di bawah kecamatan Anda.'
+                'Anda hanya dapat mengelola sasaran di desa yang berada di bawah kecamatan Anda.'
             })
           }
         } else if (currentUser.accessLevel === 2) {
-          // Editors can only manage patients in their assigned desa
+          // Editors can only manage targets in their assigned desa
           if (
             targetRegion.id !== userRegion.id ||
             targetRegion.type !== 'DESA'
@@ -104,14 +104,14 @@ const patient = {
             throw new ActionError({
               code: 'FORBIDDEN',
               message:
-                'Anda hanya dapat mengelola pasien di desa yang ditugaskan kepada Anda.'
+                'Anda hanya dapat mengelola sasaran di desa yang ditugaskan kepada Anda.'
             })
           }
         }
       }
 
       const { id, ...rest } = input as any
-      return await upsertPatient({
+      return await upsertTarget({
         ...rest,
         ...(id ? { id } : {}),
         birthDate:
@@ -123,58 +123,58 @@ const patient = {
   }),
 
   /**
-   * Get a patient by its id.
+   * Get a target by its id.
    * Requires editor level access or above.
-   * @param id Patient id
-   * @returns Patient object or null if not found
+   * @param id Target id
+   * @returns Target object or null if not found
    */
   getById: defineAction({
     input: z.object({ id: z.string() }),
     handler: async ({ id }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only editors (level 2) and above can view patient details
+      // Only editors (level 2) and above can view target details
       if (!currentUser || currentUser.accessLevel < 2) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Anda tidak memiliki izin untuk melihat detail pasien.'
+          message: 'Anda tidak memiliki izin untuk melihat detail sasaran.'
         })
       }
 
-      return getPatientById(id)
+      return getTargetById(id)
     }
   }),
 
   /**
-   * Get a patient by its slug.
+   * Get a target by its slug.
    * Requires editor level access or above.
-   * @param slug Patient slug
-   * @returns Patient object or null if not found
+   * @param slug Target slug
+   * @returns Target object or null if not found
    */
   getBySlug: defineAction({
     input: z.object({ slug: z.string() }),
     handler: async ({ slug }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only editors (level 2) and above can view patient details
+      // Only editors (level 2) and above can view target details
       if (!currentUser || currentUser.accessLevel < 2) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Anda tidak memiliki izin untuk melihat detail pasien.'
+          message: 'Anda tidak memiliki izin untuk melihat detail sasaran.'
         })
       }
 
-      return getPatientBySlug(slug)
+      return getTargetBySlug(slug)
     }
   }),
 
   /**
-   * Get a paginated list of patients.
+   * Get a paginated list of targets.
    * Requires editor level access or above.
    * @param page Page number (1-based, defaults to 1)
    * @param size Page size (defaults to 10)
-   * @param regionSlug Region slug to filter patients by region (required)
-   * @returns Array of patients for the page
+   * @param regionSlug Region slug to filter targets by region (required)
+   * @returns Array of targets for the page
    */
   getAll: defineAction({
     input: z.object({
@@ -185,22 +185,22 @@ const patient = {
     handler: async ({ page, size, regionSlug }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only editors (level 2) and above can view patient lists
+      // Only editors (level 2) and above can view target lists
       if (!currentUser || currentUser.accessLevel < 2) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Anda tidak memiliki izin untuk melihat daftar pasien.'
+          message: 'Anda tidak memiliki izin untuk melihat daftar sasaran.'
         })
       }
 
-      return getAllPatients(page, size, regionSlug)
+      return getAllTargets(page, size, regionSlug)
     }
   }),
 
   /**
-   * Delete a patient by id.
+   * Delete a target by id.
    * Requires admin access.
-   * @param id Patient id
+   * @param id Target id
    * @returns void
    */
   delete: defineAction({
@@ -208,17 +208,17 @@ const patient = {
     handler: async ({ id }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only admins can delete patients
+      // Only admins can delete targets
       if (!currentUser || currentUser.accessLevel < 4) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Hanya administrator yang dapat menghapus data pasien.'
+          message: 'Hanya administrator yang dapat menghapus data sasaran.'
         })
       }
 
-      await deletePatient(id)
+      await deleteTarget(id)
     }
   })
 }
 
-export default patient
+export default target

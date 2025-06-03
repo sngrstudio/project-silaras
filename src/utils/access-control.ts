@@ -141,15 +141,15 @@ export function canUserAccessRegionSync(
 }
 
 /**
- * Check if a user can access a specific patient based on the patient's region
+ * Check if a user can access a specific target based on the target's region
  * @param user Current user object
- * @param patientRegion Region where the patient is located
+ * @param targetRegion Region where the target is located
  * @param userRegion User's assigned region (required)
- * @returns boolean - true if user can access the patient, false otherwise
+ * @returns boolean - true if user can access the target, false otherwise
  */
-export function canUserAccessPatientSync(
+export function canUserAccessTargetSync(
   user: CurrentUser | undefined,
-  patientRegion: Region,
+  targetRegion: Region,
   userRegion: Region
 ): boolean {
   // No user means no access
@@ -172,20 +172,20 @@ export function canUserAccessPatientSync(
     return false
   }
 
-  // Coordinators (level 3) can access patients in desa under their kecamatan
+  // Coordinators (level 3) can access targets in desa under their kecamatan
   if (user.accessLevel === 3) {
-    // Check if the patient's desa is under the user's kecamatan
-    if (patientRegion.parentId === userRegion.id) {
+    // Check if the target's desa is under the user's kecamatan
+    if (targetRegion.parentId === userRegion.id) {
       return true
     }
 
     return false
   }
 
-  // Editors (level 2) can only access patients in their assigned desa
+  // Editors (level 2) can only access targets in their assigned desa
   if (user.accessLevel === 2) {
-    // User can only access patients in their own desa
-    if (patientRegion.id === userRegion.id && patientRegion.type === 'DESA') {
+    // User can only access targets in their own desa
+    if (targetRegion.id === userRegion.id && targetRegion.type === 'DESA') {
       return true
     }
 

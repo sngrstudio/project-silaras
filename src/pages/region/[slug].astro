@@ -1,7 +1,7 @@
 ---
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import Region from '~/components/region/subregion/region.astro'
-import Patient from '~/components/region/patient/patient.astro'
+import Target from '~/components/region/target/target.astro'
 import { actions } from 'astro:actions'
 import BackIcon from '~icons/lucide/arrow-left'
 import { canUserAccessRegionSync } from '~/utils/access-control'
@@ -71,7 +71,7 @@ const hasAccess = await (async () => {
     return false
   }
 
-  // Editors (level 2) can only access their assigned desa and patients under it
+  // Editors (level 2) can only access their assigned desa and targets under it
   if (user.accessLevel === 2) {
     // User can only access their own desa
     if (page.id === userRegion.id && page.type === 'DESA') {
@@ -124,7 +124,7 @@ const props = {
   }
   {
     page.type === 'DESA' && (
-      <Patient transition:name={page.slug} transition:animate='none' />
+      <Target transition:name={page.slug} transition:animate='none' />
     )
   }
   {

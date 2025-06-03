@@ -25,7 +25,7 @@ import CardTemplateRC from '~/components/common/card/card'
   } from './assesment.store'
   import { actions } from 'astro:actions'
 
-  const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+  const getTargetSlug = () => window.location.pathname.split('/').at(-1) || ''
 
   onMount($currentMonthIndex, () => {
     const state = Math.min(10, Math.max(6, new Date().getMonth() + 1))
@@ -39,7 +39,7 @@ import CardTemplateRC from '~/components/common/card/card'
   onMount($dailyAssesments, () => {
     task(async () => {
       const state = await actions.assesment.daily.getAll.orThrow({
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: $currentMonthIndex.get()
       })
       setDailyAssesments(state)
@@ -53,7 +53,7 @@ import CardTemplateRC from '~/components/common/card/card'
   onMount($monthlyAssesments, () => {
     task(async () => {
       const state = await actions.assesment.monthly.get.orThrow({
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: $currentMonthIndex.get()
       })
       setMonthlyAssesment(state)
@@ -68,7 +68,7 @@ import CardTemplateRC from '~/components/common/card/card'
   document.addEventListener('astro:page-load', async () => {
     const newDailyAssesmentState = await actions.assesment.daily.getAll.orThrow(
       {
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: $currentMonthIndex.get()
       }
     )
@@ -76,7 +76,7 @@ import CardTemplateRC from '~/components/common/card/card'
 
     const newMonthlyAssesmentState =
       await actions.assesment.monthly.get.orThrow({
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: $currentMonthIndex.get()
       })
     setMonthlyAssesment(newMonthlyAssesmentState)

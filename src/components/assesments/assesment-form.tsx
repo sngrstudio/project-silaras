@@ -59,7 +59,7 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
     }
 
     const updatedState = await actions.assesment.daily.getAll.orThrow({
-      patientSlug: window.location.pathname.split('/').at(-1) || '',
+      targetSlug: window.location.pathname.split('/').at(-1) || '',
       monthIndex: currentMonthIndex
     })
     setDailyAssesments(updatedState)
@@ -263,11 +263,7 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
       </div>
 
       {/* Hidden inputs */}
-      <input
-        type='hidden'
-        name='patientId'
-        value={cell.row.original.patientId}
-      />
+      <input type='hidden' name='targetId' value={cell.row.original.targetId} />
       <input
         type='hidden'
         name='dailyAssesmentId'

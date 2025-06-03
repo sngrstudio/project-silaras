@@ -9,12 +9,12 @@ import {
 import DialogComponent from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'
 import {
-  $currentPatient,
-  setCurrentPatient,
+  $currentTarget,
+  setCurrentTarget,
   $currentRegion,
-  setPatients,
-  $openPatientModal
-} from './patient.store'
+  setTargets,
+  $openTargetModal
+} from './target.store'
 import { actions, isInputError } from 'astro:actions'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
@@ -24,41 +24,41 @@ import {
   showSuccessToast
 } from '~/components/common/toast/toast.store'
 
-const PatientDialog: FC = () => {
+const TargetDialog: FC = () => {
   const currentRegion = useStore($currentRegion)
-  const currentPatient = useStore($currentPatient)
-  const openPatientModal = useStore($openPatientModal)
+  const currentTarget = useStore($currentTarget)
+  const openTargetModal = useStore($openTargetModal)
   const [latLng, setLatLng] = useState<L.LatLng>({
-    lat: currentPatient?.latitude ?? 0,
-    lng: currentPatient?.longitude ?? 0
+    lat: currentTarget?.latitude ?? 0,
+    lng: currentTarget?.longitude ?? 0
   } as L.LatLng)
 
   useEffect(() => {
     document.addEventListener('astro:page-load', () => {
-      setCurrentPatient(undefined)
+      setCurrentTarget(undefined)
     })
   })
 
   const handleSubmit = async (_prev: unknown, formData: FormData) => {
-    const { data, error } = await actions.patient.upsert(formData)
+    const { data, error } = await actions.target.upsert(formData)
     if (error && !data) {
       if (isInputError(error)) {
         return error
       }
 
-      showErrorToast('Terjadi kesalahan saat menyimpan data pasien.')
+      showErrorToast('Terjadi kesalahan saat menyimpan data sasaran.')
       return undefined
     }
 
-    const updatedPatients = await actions.patient.getAll.orThrow({
+    const updatedTargets = await actions.target.getAll.orThrow({
       regionSlug: currentRegion?.slug ?? ''
     })
-    setPatients(updatedPatients)
-    setCurrentPatient(undefined)
+    setTargets(updatedTargets)
+    setCurrentTarget(undefined)
     showSuccessToast(
-      currentPatient?.id
-        ? 'Data pasien berhasil diperbarui!'
-        : 'Pasien baru berhasil ditambahkan!'
+      currentTarget?.id
+        ? 'Data sasaran berhasil diperbarui!'
+        : 'Sasaran baru berhasil ditambahkan!'
     )
     return undefined
   }
@@ -66,28 +66,28 @@ const PatientDialog: FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, action, isPending] = useActionState(handleSubmit, undefined)
 
-  if (!currentPatient || !currentRegion) {
+  if (!currentTarget || !currentRegion) {
     return <></>
   }
 
   return (
     <DialogComponent
-      title='Tambah atau Ubah Pasien'
-      open={openPatientModal}
-      onOpenChange={(open) => !open && setCurrentPatient(undefined)}
+      title='Tambah atau Ubah Sasaran'
+      open={openTargetModal}
+      onOpenChange={(open) => !open && setCurrentTarget(undefined)}
     >
       <form className='flex flex-col gap-2' action={action}>
         {/* Nama */}
         <div>
           <label className='label' htmlFor='name'>
-            Nama Pasien
+            Nama Sasaran
           </label>
           <input
             id='name'
             name='name'
             className='input w-full'
             type='text'
-            defaultValue={currentPatient.name}
+            defaultValue={currentTarget.name}
             disabled={isPending}
             required
           />
@@ -106,7 +106,7 @@ const PatientDialog: FC = () => {
             name='motherName'
             className='input w-full'
             type='text'
-            defaultValue={currentPatient.motherName}
+            defaultValue={currentTarget.motherName}
             disabled={isPending}
             required
           />
@@ -126,9 +126,9 @@ const PatientDialog: FC = () => {
             className='input w-full'
             type='date'
             defaultValue={
-              typeof currentPatient.birthDate === 'string'
-                ? (currentPatient.birthDate as string).slice(0, 10)
-                : currentPatient.birthDate?.toISOString().slice(0, 10)
+              typeof currentTarget.birthDate === 'string'
+                ? (currentTarget.birthDate as string).slice(0, 10)
+                : currentTarget.birthDate?.toISOString().slice(0, 10)
             }
             disabled={isPending}
             required
@@ -147,7 +147,7 @@ const PatientDialog: FC = () => {
             className='select w-full'
             name='status'
             id='status'
-            defaultValue={currentPatient.status}
+            defaultValue={currentTarget.status}
             disabled={isPending}
             required
           >
@@ -174,7 +174,7 @@ const PatientDialog: FC = () => {
             type='number'
             step='0.01'
             min='0'
-            defaultValue={currentPatient.initialWeight}
+            defaultValue={currentTarget.initialWeight}
             disabled={isPending}
             required
           />
@@ -195,7 +195,7 @@ const PatientDialog: FC = () => {
             type='number'
             step='0.1'
             min='0'
-            defaultValue={currentPatient.initialHeight}
+            defaultValue={currentTarget.initialHeight}
             disabled={isPending}
             required
           />
@@ -212,8 +212,8 @@ const PatientDialog: FC = () => {
           <MapContainer
             className='aspect-[4/3] w-full'
             center={[
-              currentPatient.latitude || -2.537956,
-              currentPatient.longitude || 112.940995
+              currentTarget.latitude || -2.537956,
+              currentTarget.longitude || 112.940995
             ]}
             zoom={15}
           >
@@ -224,10 +224,10 @@ const PatientDialog: FC = () => {
             <LocationMarker
               setLatLng={setLatLng}
               initialLatLng={
-                currentPatient
+                currentTarget
                   ? ({
-                      lat: currentPatient.latitude,
-                      lng: currentPatient.longitude
+                      lat: currentTarget.latitude,
+                      lng: currentTarget.longitude
                     } as L.LatLng)
                   : ({
                       lat: -2.537956,
@@ -258,7 +258,7 @@ const PatientDialog: FC = () => {
             name='address'
             className='input w-full'
             type='text'
-            defaultValue={currentPatient.address || ''}
+            defaultValue={currentTarget.address || ''}
             disabled={isPending}
           />
           {error && error.fields.address && (
@@ -276,7 +276,7 @@ const PatientDialog: FC = () => {
             name='phoneNumber'
             className='input w-full'
             type='tel'
-            defaultValue={currentPatient.phoneNumber || ''}
+            defaultValue={currentTarget.phoneNumber || ''}
             disabled={isPending}
           />
           {error && error.fields.phoneNumber && (
@@ -285,8 +285,8 @@ const PatientDialog: FC = () => {
         </div>
 
         {/* hidden mandatory fields */}
-        {currentPatient.id && (
-          <input type='hidden' name='id' value={currentPatient.id} />
+        {currentTarget.id && (
+          <input type='hidden' name='id' value={currentTarget.id} />
         )}
         <input type='hidden' name='regionId' value={currentRegion.id} />
 
@@ -301,7 +301,7 @@ const PatientDialog: FC = () => {
 
           <button
             className='btn btn-link'
-            onClick={() => setCurrentPatient(undefined)}
+            onClick={() => setCurrentTarget(undefined)}
           >
             Batal
           </button>
@@ -311,7 +311,7 @@ const PatientDialog: FC = () => {
   )
 }
 
-export default PatientDialog
+export default TargetDialog
 
 export const LocationMarker: FC<{
   initialLatLng?: L.LatLng | undefined

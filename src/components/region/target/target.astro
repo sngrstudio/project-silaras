@@ -1,22 +1,22 @@
 ---
-import PatientRC from './patient'
+import TargetRC from './target'
 import CardTemplateRC from '../../common/card/card'
-import PatientDialogRC from './patient-dialog'
+import TargetDialogRC from './target-dialog'
 ---
 
 <CardTemplateRC>
-  <PatientRC client:idle />
-  <PatientDialogRC client:only='react' />
+  <TargetRC client:idle />
+  <TargetDialogRC client:only='react' />
 </CardTemplateRC>
 
 <script>
   import { onMount, task } from 'nanostores'
   import {
-    $patients,
-    setPatients,
+    $targets,
+    setTargets,
     $currentRegion,
     setCurrentRegion
-  } from './patient.store'
+  } from './target.store'
   import { actions } from 'astro:actions'
 
   const getRegionSlug = () => window.location.pathname.split('/').at(-1) ?? ''
@@ -33,15 +33,15 @@ import PatientDialogRC from './patient-dialog'
     }
   })
 
-  onMount($patients, () => {
+  onMount($targets, () => {
     task(async () => {
-      const state = await actions.patient.getAll.orThrow({
+      const state = await actions.target.getAll.orThrow({
         regionSlug: getRegionSlug()
       })
-      setPatients(state)
+      setTargets(state)
     })
     return () => {
-      setPatients(undefined)
+      setTargets(undefined)
     }
   })
 
@@ -51,9 +51,9 @@ import PatientDialogRC from './patient-dialog'
     })
     setCurrentRegion(currentRegionState!)
 
-    const patientsState = await actions.patient.getAll.orThrow({
+    const targetsState = await actions.target.getAll.orThrow({
       regionSlug: getRegionSlug()
     })
-    setPatients(patientsState)
+    setTargets(targetsState)
   })
 </script>

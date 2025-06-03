@@ -28,12 +28,12 @@ const MONTHS = [
 const Navigation: FC = () => {
   const currentMonthIndex = useStore($currentMonthIndex)
 
-  const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+  const getTargetSlug = () => window.location.pathname.split('/').at(-1) || ''
 
   useEffect(() => {
     actions.assesment.daily.getAll
       .orThrow({
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: currentMonthIndex
       })
       .then((state) => {
@@ -42,7 +42,7 @@ const Navigation: FC = () => {
 
     actions.assesment.monthly.get
       .orThrow({
-        patientSlug: getPatientSlug(),
+        targetSlug: getTargetSlug(),
         monthIndex: currentMonthIndex
       })
       .then((state) => {

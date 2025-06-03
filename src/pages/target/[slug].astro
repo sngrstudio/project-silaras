@@ -14,18 +14,18 @@ if (!slug) {
   return Astro.redirect('/')
 }
 
-const patient = await Astro.callAction(actions.patient.getBySlug.orThrow, {
+const target = await Astro.callAction(actions.target.getBySlug.orThrow, {
   slug
 })
-if (!patient) {
+if (!target) {
   return Astro.redirect('/404')
 }
 
 const region = await Astro.callAction(actions.region.getById.orThrow, {
-  id: patient.regionId
+  id: target.regionId
 })
 
-// Access control for patient pages
+// Access control for target pages
 const hasAccess = await (async () => {
   // Admin (level 4) has access to everything
   if (user.accessLevel >= 4) {
@@ -55,9 +55,9 @@ const hasAccess = await (async () => {
     return false
   }
 
-  // Coordinators (level 3) can access patients in desa under their kecamatan
+  // Coordinators (level 3) can access targets in desa under their kecamatan
   if (user.accessLevel === 3) {
-    // Check if the patient's desa is under the user's kecamatan
+    // Check if the target's desa is under the user's kecamatan
     if (region.parentId === userRegion.id) {
       return true
     }
@@ -65,9 +65,9 @@ const hasAccess = await (async () => {
     return false
   }
 
-  // Editors (level 2) can only access patients in their assigned desa
+  // Editors (level 2) can only access targets in their assigned desa
   if (user.accessLevel === 2) {
-    // User can only access patients in their own desa
+    // User can only access targets in their own desa
     if (region.id === userRegion.id && region.type === 'DESA') {
       return true
     }
@@ -84,13 +84,13 @@ if (!hasAccess) {
 }
 
 const props = {
-  title: patient.name,
-  description: `Halaman pasien untuk ${patient.name}`
+  title: target.name,
+  description: `Halaman sasaran untuk ${target.name}`
 } satisfies DLayoutProps
 ---
 
 <DLayout {...props}>
-  <Assesment transition:name={patient.slug} transition:animate='none' />
+  <Assesment transition:name={target.slug} transition:animate='none' />
 
   {
     /* controls */

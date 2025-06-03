@@ -178,11 +178,11 @@ Sistem scoring canggih dengan 4 kategori berdasarkan algoritma yang mempertimban
 
 ### 🏗️ Core Tables
 
-#### 👶 **Patient Management**
+#### 👶 **Target Management**
 
 ```sql
--- Tabel utama untuk data anak/pasien
-patient
+-- Tabel utama untuk data anak/sasaran
+target
 ├── id (UUID, PK)
 ├── name
 ├── birth_date
@@ -219,23 +219,23 @@ monthly_assesment
 └── bmi_category (computed) -- WHO classification
 ```
 
-#### 📊 **Patient Assessment Records**
+#### 📊 **Target Assessment Records**
 
 ```sql
--- Record asesmen harian per pasien
-patient_daily_assesment
+-- Record asesmen harian per sasaran
+target_daily_assesment
 ├── id (UUID, PK)
-├── patient_id (FK → patient)
+├── target_id (FK → target)
 ├── daily_assesment_id (FK → daily_assesment)
 ├── photo_url (AWS S3 URL)
 ├── completion_status
 ├── score (inherited dari template)
 └── classification (computed) -- Terbiasa/Butuh Pendampingan/dll
 
--- Record asesmen bulanan per pasien
-patient_monthly_assesment
+-- Record asesmen bulanan per sasaran
+target_monthly_assesment
 ├── id (UUID, PK)
-├── patient_id (FK → patient)
+├── target_id (FK → target)
 ├── monthly_assesment_id (FK → monthly_assesment)
 ├── previous_bmi_delta (computed)
 ├── growth_trend
@@ -283,7 +283,7 @@ user
 
 #### 🔗 **Relationships & Constraints**
 
-- **CASCADE DELETE**: Hapus patient → hapus semua assessments
+- **CASCADE DELETE**: Hapus target → hapus semua assessments
 - **FOREIGN KEY**: Referential integrity enforcement
 - **UNIQUE CONSTRAINTS**: Prevent duplicate assessments per periode
 - **INDEX OPTIMIZATION**: Query performance untuk regional filtering
@@ -292,8 +292,8 @@ user
 
 ```sql
 -- View untuk reporting dashboard
-patient_summary_view
-├── patient_info
+target_summary_view
+├── target_info
 ├── latest_daily_assessment
 ├── latest_monthly_assessment
 ├── monthly_completion_rate
@@ -302,7 +302,7 @@ patient_summary_view
 
 -- View untuk regional statistics
 regional_stats_view
-├── total_patients_per_region
+├── total_targets_per_region
 ├── average_scores_per_region
 ├── classification_distribution
 └── completion_rates_by_area
@@ -315,7 +315,7 @@ Data awal yang di-populate otomatis:
 - **1,200+ wilayah** Kotawaringin Timur (kabupaten → kecamatan → desa)
 - **User admin** default dengan access level lengkap
 - **Template asesmen** standar untuk daily dan monthly
-- **Sample patients** untuk testing dan demo
+- **Sample targets** untuk testing dan demo
 - **Regional assignments** untuk user testing
 
 ### 🔄 **Migration System**
@@ -598,11 +598,11 @@ mysql -u username -p silaras_db < backup.sql
 
 SILARAS menggunakan **Astro Actions** untuk type-safe server-side operations. Semua actions memiliki built-in validation dan error handling.
 
-### 🏥 **Patient Management Actions**
+### 🏥 **Target Management Actions**
 
-#### `createPatient`
+#### `createTarget`
 
-Membuat data pasien baru dengan validasi regional assignment.
+Membuat data sasaran baru dengan validasi regional assignment.
 
 ```typescript
 // Input Schema
@@ -618,7 +618,7 @@ Membuat data pasien baru dengan validasi regional assignment.
 }
 
 // Usage
-const result = await actions.createPatient({
+const result = await actions.createTarget({
   name: 'Ahmad Fauzi',
   birthDate: new Date('2020-05-15'),
   gender: 'L',
@@ -630,17 +630,17 @@ const result = await actions.createPatient({
 })
 ```
 
-#### `updatePatient`
+#### `updateTarget`
 
-Update data pasien dengan authorization check berdasarkan regional assignment user.
+Update data sasaran dengan authorization check berdasarkan regional assignment user.
 
-#### `deletePatient`
+#### `deleteTarget`
 
-Soft delete pasien dengan cascade ke semua assessment records.
+Soft delete sasaran dengan cascade ke semua assessment records.
 
-#### `getPatientsByRegion`
+#### `getTargetsByRegion`
 
-Mengambil daftar pasien berdasarkan regional scope user yang login.
+Mengambil daftar sasaran berdasarkan regional scope user yang login.
 
 ### 📊 **Assessment Actions**
 
@@ -651,7 +651,7 @@ Input asesmen harian dengan scoring otomatis.
 ```typescript
 // Input Schema
 {
-  patientId: string;
+  targetId: string;
   date: Date;
   makananPokok: boolean;
   laukPauk: boolean;
@@ -677,7 +677,7 @@ Input data antropometri dengan perhitungan BMI otomatis.
 ```typescript
 // Input Schema
 {
-  patientId: string;
+  targetId: string;
   date: Date;
   height: number; // cm
   weight: number; // kg
@@ -772,7 +772,7 @@ Dashboard statistics berdasarkan regional scope user.
 ```typescript
 // Response berdasarkan access level
 {
-  totalPatients: number;
+  totalTargets: number;
   activeAssessments: number;
   completionRates: {
     daily: number; // Percentage
@@ -979,10 +979,10 @@ sudo crontab -e
 
 ```bash
 # Feature development
-git checkout -b feature/patient-assessment-improvement
+git checkout -b feature/target-assessment-improvement
 git add .
 git commit -m "feat: add BMI trend calculation to monthly assessment"
-git push origin feature/patient-assessment-improvement
+git push origin feature/target-assessment-improvement
 
 # Create Pull Request untuk code review
 # Merge setelah approval dan CI passed
@@ -1032,7 +1032,7 @@ project-silaras/
 │   └── 📄 favicon.ico
 ├── 📁 src/
 │   ├── 📁 actions/            # Server-side API actions
-│   │   ├── 🏥 patient.ts      # Patient management actions
+│   │   ├── 🏥 target.ts       # Target management actions
 │   │   ├── 📊 assessment.ts   # Assessment CRUD operations
 │   │   ├── 👥 user.ts         # User management actions
 │   │   ├── 🗺️ region.ts       # Regional data actions
@@ -1044,7 +1044,7 @@ project-silaras/
 │   │   └── 🗺️ regional/       # Regional management components
 │   ├── 📁 pages/              # Astro pages (routes)
 │   │   ├── 🏠 index.astro     # Dashboard utama
-│   │   ├── 👶 patients/       # Patient management pages
+│   │   ├── 👶 targets/        # Target management pages
 │   │   ├── 📊 assessments/    # Assessment pages
 │   │   ├── 👥 users/          # User management
 │   │   └── 🔐 auth/           # Authentication pages
@@ -1053,7 +1053,7 @@ project-silaras/
 │   │   └── 📱 AuthLayout.astro
 │   ├── 📁 db/                 # Database layer
 │   │   ├── 📊 schemas/        # Drizzle schema definitions
-│   │   │   ├── 👶 patient.ts
+│   │   │   ├── 👶 target.ts
 │   │   │   ├── 📋 assessment.ts
 │   │   │   ├── 👥 user.ts
 │   │   │   └── 🗺️ region.ts

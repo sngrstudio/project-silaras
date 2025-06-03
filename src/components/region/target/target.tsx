@@ -13,22 +13,22 @@ import {
 import { useStore } from '@nanostores/react'
 import {
   $currentRegion,
-  $patients,
-  setCurrentPatient,
-  type Patients
-} from './patient.store'
-import AddPatientIcon from '~icons/lucide/user-plus'
+  $targets,
+  setCurrentTarget,
+  type Targets
+} from './target.store'
+import AddTargetIcon from '~icons/lucide/user-plus'
 import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
-import { canUserAccessPatientSync } from '../../../utils/access-control'
+import { canUserAccessTargetSync } from '../../../utils/access-control'
 import { useUserRegion } from '../../../utils/hooks/useUserRegion'
 import {
   showSuccessToast,
   showErrorToast
 } from '~/components/common/toast/toast.store'
 
-type Patient = Patients[number]
+type Target = Targets[number]
 
 // Helper function to copy text to clipboard
 const copyToClipboard = async (text: string) => {
@@ -40,7 +40,7 @@ const copyToClipboard = async (text: string) => {
   }
 }
 
-const columnHelper = createColumnHelper<Patient>()
+const columnHelper = createColumnHelper<Target>()
 
 // Function to create dynamic columns with access control
 const createDesktopColumns = (
@@ -53,14 +53,14 @@ const createDesktopColumns = (
     header: 'Nama',
     enableSorting: true,
     cell: (cell) => {
-      const url = `/patient/${cell.row.original.slug}`
+      const url = `/target/${cell.row.original.slug}`
 
-      // Check if user can access this patient
+      // Check if user can access this target
       const canAccess =
         !loading &&
         currentRegion &&
         userRegion &&
-        canUserAccessPatientSync(currentUser, currentRegion, userRegion)
+        canUserAccessTargetSync(currentUser, currentRegion, userRegion)
 
       if (canAccess) {
         return (
@@ -72,7 +72,7 @@ const createDesktopColumns = (
         return (
           <span
             className='text-base-content/50 cursor-not-allowed font-bold'
-            title='Anda tidak memiliki akses ke pasien ini'
+            title='Anda tidak memiliki akses ke sasaran ini'
           >
             {cell.getValue()}
           </span>
@@ -150,10 +150,10 @@ const createDesktopColumns = (
         !loading &&
         currentRegion &&
         userRegion &&
-        canUserAccessPatientSync(currentUser, currentRegion, userRegion)
+        canUserAccessTargetSync(currentUser, currentRegion, userRegion)
 
       const handleEditBtn = () => {
-        setCurrentPatient(cell.row.original)
+        setCurrentTarget(cell.row.original)
       }
 
       return (
@@ -166,8 +166,8 @@ const createDesktopColumns = (
             disabled={!canAccess}
             title={
               !canAccess
-                ? 'Anda tidak memiliki akses ke pasien ini'
-                : 'Edit pasien'
+                ? 'Anda tidak memiliki akses ke sasaran ini'
+                : 'Edit sasaran'
             }
           >
             <EditIcon />
@@ -207,29 +207,29 @@ const createMobileColumns = (
   })
 ]
 
-const PatientRC: FC = () => {
-  const patients = useStore($patients)
+const TargetRC: FC = () => {
+  const targets = useStore($targets)
   const currentRegion = useStore($currentRegion)
   const [searchInput, setSearchInput] = useState('')
   const { userRegion, loading, currentUser } = useUserRegion()
 
-  // Filter patients based on search input
+  // Filter targets based on search input
   const filteredData = useMemo(() => {
-    if (!patients || !searchInput.trim()) {
-      return patients || []
+    if (!targets || !searchInput.trim()) {
+      return targets || []
     }
 
     const search = searchInput.toLowerCase()
-    return patients.filter(
-      (patient) =>
-        patient.name.toLowerCase().includes(search) ||
-        patient.status.toLowerCase().includes(search) ||
-        patient.phoneNumber?.toLowerCase().includes(search) ||
-        patient.motherName?.toLowerCase().includes(search)
+    return targets.filter(
+      (target) =>
+        target.name.toLowerCase().includes(search) ||
+        target.status.toLowerCase().includes(search) ||
+        target.phoneNumber?.toLowerCase().includes(search) ||
+        target.motherName?.toLowerCase().includes(search)
     )
-  }, [patients, searchInput])
+  }, [targets, searchInput])
 
-  if (!patients) return <></>
+  if (!targets) return <></>
 
   return (
     <>
@@ -237,15 +237,15 @@ const PatientRC: FC = () => {
       <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <input
           type='text'
-          placeholder='Cari pasien berdasarkan nama, status, atau nomor telepon...'
+          placeholder='Cari sasaran berdasarkan nama, status, atau nomor telepon...'
           className='input input-bordered w-full sm:max-w-md'
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
-        <PatientAddButton />
+        <TargetAddButton />
       </div>
 
-      <PatientTableRenderer
+      <TargetTableRenderer
         data={filteredData}
         currentUser={currentUser}
         userRegion={userRegion}
@@ -256,10 +256,10 @@ const PatientRC: FC = () => {
   )
 }
 
-export default PatientRC
+export default TargetRC
 
-const PatientTableRenderer: FC<{
-  data: Patients
+const TargetTableRenderer: FC<{
+  data: Targets
   currentUser: any
   userRegion: any
   currentRegion: any
@@ -296,7 +296,7 @@ const PatientTableRenderer: FC<{
           aValue = a.age || 0
           bValue = b.age || 0
         } else if (sort.id === 'status') {
-          // Custom sort order for patient status
+          // Custom sort order for target status
           const statusOrder = { 'ANAK-ANAK': 1, HAMIL: 2, MENYUSUI: 3 }
           aValue = statusOrder[a.status as keyof typeof statusOrder] || 4
           bValue = statusOrder[b.status as keyof typeof statusOrder] || 4
@@ -329,10 +329,10 @@ const PatientTableRenderer: FC<{
     return (
       <div className='py-8 text-center'>
         <div className='text-base-content/70 text-lg'>
-          Belum ada data pasien
+          Belum ada data sasaran
         </div>
         <div className='text-base-content/50 mt-1 text-sm'>
-          Silakan tambah pasien baru untuk memulai
+          Silakan tambah sasaran baru untuk memulai
         </div>
       </div>
     )
@@ -346,11 +346,11 @@ const PatientTableRenderer: FC<{
   )
 }
 
-export const PatientAddButton: FC = () => {
+export const TargetAddButton: FC = () => {
   const currentRegion = useStore($currentRegion)
 
   const handleClick = async () => {
-    setCurrentPatient({
+    setCurrentTarget({
       name: '',
       motherName: '',
       birthDate: new Date(Date.now()),
@@ -371,8 +371,8 @@ export const PatientAddButton: FC = () => {
       className='btn btn-primary w-full whitespace-nowrap sm:w-auto'
       onClick={handleClick}
     >
-      <AddPatientIcon />
-      <span>Tambah Pasien</span>
+      <AddTargetIcon />
+      <span>Tambah Sasaran</span>
     </button>
   )
 }

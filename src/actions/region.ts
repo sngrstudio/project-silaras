@@ -81,7 +81,7 @@ const region = {
    * @param page Page number (1-based, defaults to 1)
    * @param size Page size (defaults to 8)
    * @param parentSlug Optional parent slug to filter regions by
-   * @returns Array of regions with child region and patient counts
+   * @returns Array of regions with child region and target counts
    */
   getAllWithCounts: defineAction({
     input: z.object({

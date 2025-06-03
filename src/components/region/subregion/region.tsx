@@ -72,9 +72,9 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
           )}
 
           <div className='flex items-center justify-between'>
-            <span className='text-sm text-gray-600'>Jumlah Pasien:</span>
+            <span className='text-sm text-gray-600'>Jumlah Sasaran:</span>
             <span className='text-sm font-medium text-green-600'>
-              {region.patientCount}
+              {region.targetCount}
             </span>
           </div>
         </div>

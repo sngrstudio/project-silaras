@@ -1,15 +1,11 @@
 import { type FC } from 'react'
 import clsx from 'clsx'
 import { type CellContext } from '@tanstack/react-table'
-import {
-  setCurrentPatient,
-  type Patients,
-  $currentRegion
-} from './patient.store'
+import { setCurrentTarget, type Targets, $currentRegion } from './target.store'
 import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
-import { canUserAccessPatientSync } from '../../../utils/access-control'
+import { canUserAccessTargetSync } from '../../../utils/access-control'
 import {
   showSuccessToast,
   showErrorToast
@@ -17,7 +13,7 @@ import {
 import { useStore } from '@nanostores/react'
 
 interface MobileListProps {
-  cell: CellContext<Patients[number], unknown>
+  cell: CellContext<Targets[number], unknown>
   currentUser: any
   userRegion: any
   loading: boolean
@@ -39,21 +35,21 @@ const MobileList: FC<MobileListProps> = ({
   userRegion,
   loading
 }) => {
-  const patient = cell.row.original
+  const target = cell.row.original
   const currentRegion = useStore($currentRegion)
-  const name = patient.name
-  const path = `/patient/${patient.slug}`
+  const name = target.name
+  const path = `/target/${target.slug}`
 
-  // Check if user can access this patient
-  // Use currentRegion as the patient's region since all patients on this page belong to the current region
+  // Check if user can access this target
+  // Use currentRegion as the target's region since all targets on this page belong to the current region
   const canAccess =
     !loading &&
     currentRegion &&
     userRegion &&
-    canUserAccessPatientSync(currentUser, currentRegion, userRegion)
+    canUserAccessTargetSync(currentUser, currentRegion, userRegion)
 
   const handleEditBtn = () => {
-    setCurrentPatient(cell.row.original)
+    setCurrentTarget(cell.row.original)
   }
 
   const handleCopyPhone = () => {
@@ -65,7 +61,7 @@ const MobileList: FC<MobileListProps> = ({
   return (
     <>
       <div className='list-col-grow flex flex-col gap-y-2'>
-        {/* Patient name and basic info */}
+        {/* Target name and basic info */}
         <div>
           {canAccess ? (
             <a className='link text-base font-bold' href={path}>
@@ -74,7 +70,7 @@ const MobileList: FC<MobileListProps> = ({
           ) : (
             <span
               className='text-base-content/50 cursor-not-allowed text-base font-bold'
-              title='Anda tidak memiliki akses ke pasien ini'
+              title='Anda tidak memiliki akses ke sasaran ini'
             >
               {name}
             </span>
@@ -124,8 +120,8 @@ const MobileList: FC<MobileListProps> = ({
           disabled={!canAccess}
           title={
             !canAccess
-              ? 'Anda tidak memiliki akses ke pasien ini'
-              : 'Edit pasien'
+              ? 'Anda tidak memiliki akses ke sasaran ini'
+              : 'Edit sasaran'
           }
         >
           <EditIcon />

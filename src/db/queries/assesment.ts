@@ -2,11 +2,11 @@ import { db } from '../db'
 import {
   monthlyAssesment,
   dailyAssesment,
-  patientDailyAssesment,
-  patientMonthlyAssesment,
-  patientMonthlyAssesmentWithTotalScore
+  targetDailyAssesment,
+  targetMonthlyAssesment,
+  targetMonthlyAssesmentWithTotalScore
 } from '../schemas/assesment'
-import { patient } from '../schemas/patient'
+import { target } from '../schemas/target'
 import { user } from '../schemas/user'
 import { eq, and, sql } from 'drizzle-orm'
 
@@ -113,14 +113,14 @@ export async function upsertDailyAssesment({
 }
 
 /**
- * Upsert (insert or update) a patient's daily assessment result.
+ * Upsert (insert or update) a target's daily assessment result.
  *
- * This function will insert a new row into the patientDailyAssesment table if one does not exist for the given
- * patientId and dailyAssesmentId, or update the existing row if it does. The upsert is performed using MySQL's
+ * This function will insert a new row into the targetDailyAssesment table if one does not exist for the given
+ * targetId and dailyAssesmentId, or update the existing row if it does. The upsert is performed using MySQL's
  * ON DUPLICATE KEY UPDATE pattern, as recommended by Drizzle ORM for MySQL compatibility.
  *
  * @param {Object} params - The upsert parameters.
- * @param {string} params.patientId - The ID of the patient.
+ * @param {string} params.targetId - The ID of the target.
  * @param {string} params.dailyAssesmentId - The ID of the daily assessment definition.
  * @param {boolean} params.containsStapleFood - Whether the assessment contains staple food.
  * @param {boolean} params.containsSideDish - Whether the assessment contains a side dish.
@@ -128,11 +128,11 @@ export async function upsertDailyAssesment({
  * @param {boolean} params.containsFruits - Whether the assessment contains fruits.
  * @param {boolean} params.isFollowingRecipe - Whether the assessment follows the recipe.
  *
- * @returns {Promise<object|undefined>} The upserted or updated patientDailyAssesment row, or undefined if not found.
+ * @returns {Promise<object|undefined>} The upserted or updated targetDailyAssesment row, or undefined if not found.
  *
  * @example
- * await upsertPatientDailyAssesment({
- *   patientId: 'abc123',
+ * await upsertTargetDailyAssesment({
+ *   targetId: 'abc123',
  *   dailyAssesmentId: 'def456',
  *   containsStapleFood: true,
  *   containsSideDish: false,
@@ -141,8 +141,8 @@ export async function upsertDailyAssesment({
  *   isFollowingRecipe: true
  * })
  */
-export async function upsertPatientDailyAssesment({
-  patientId,
+export async function upsertTargetDailyAssesment({
+  targetId,
   dailyAssesmentId,
   containsStapleFood,
   containsSideDish,
@@ -152,7 +152,7 @@ export async function upsertPatientDailyAssesment({
   lastModifiedBy,
   image
 }: {
-  patientId: string
+  targetId: string
   dailyAssesmentId: string
   containsStapleFood: boolean
   containsSideDish: boolean
@@ -172,12 +172,12 @@ export async function upsertPatientDailyAssesment({
 
   // Get existing record to check current isCompleted status
   const existing = await db
-    .select({ isCompleted: patientDailyAssesment.isCompleted })
-    .from(patientDailyAssesment)
+    .select({ isCompleted: targetDailyAssesment.isCompleted })
+    .from(targetDailyAssesment)
     .where(
       and(
-        eq(patientDailyAssesment.patientId, patientId),
-        eq(patientDailyAssesment.dailyAssesmentId, dailyAssesmentId)
+        eq(targetDailyAssesment.targetId, targetId),
+        eq(targetDailyAssesment.dailyAssesmentId, dailyAssesmentId)
       )
     )
     .limit(1)
@@ -207,9 +207,9 @@ export async function upsertPatientDailyAssesment({
 
   // MySQL upsert using onDuplicateKeyUpdate
   await db
-    .insert(patientDailyAssesment)
+    .insert(targetDailyAssesment)
     .values({
-      patientId,
+      targetId,
       dailyAssesmentId,
       containsStapleFood,
       containsSideDish,
@@ -228,11 +228,11 @@ export async function upsertPatientDailyAssesment({
   // Return the upserted row
   const [row] = await db
     .select()
-    .from(patientDailyAssesment)
+    .from(targetDailyAssesment)
     .where(
       and(
-        eq(patientDailyAssesment.patientId, patientId),
-        eq(patientDailyAssesment.dailyAssesmentId, dailyAssesmentId)
+        eq(targetDailyAssesment.targetId, targetId),
+        eq(targetDailyAssesment.dailyAssesmentId, dailyAssesmentId)
       )
     )
     .limit(1)
@@ -241,54 +241,54 @@ export async function upsertPatientDailyAssesment({
 }
 
 /**
- * Get all daily assessments for a patient (by slug) and month.
+ * Get all daily assessments for a target (by slug) and month.
  *
- * Returns an array of daily assessment results for the given patient and month, including both the assessment
- * definition (date, menu1, menu2) and the patient's results (booleans and score). Uses a single SQL query with joins.
+ * Returns an array of daily assessment results for the given target and month, including both the assessment
+ * definition (date, menu1, menu2) and the target's results (booleans and score). Uses a single SQL query with joins.
  *
  * @param {Object} params - The query parameters.
- * @param {string} params.patientSlug - The slug of the patient.
+ * @param {string} params.targetSlug - The slug of the target.
  * @param {Month} params.month - The month name (enum).
- * @returns {Promise<Array<object>>} Array of daily assessment results for the patient and month.
+ * @returns {Promise<Array<object>>} Array of daily assessment results for the target and month.
  *
  * @example
- * await getAllDailyAssesmentsByPatientAndMonth({ patientSlug: 'john-doe', month: 'JUNE' })
+ * await getAllDailyAssesmentsByTargetAndMonth({ targetSlug: 'john-doe', month: 'JUNE' })
  */
-export async function getAllDailyAssesmentsByPatientAndMonth({
-  patientSlug,
+export async function getAllDailyAssesmentsByTargetAndMonth({
+  targetSlug,
   month
 }: {
-  patientSlug: string
+  targetSlug: string
   month: Month
 }) {
   // Single query with subqueries to get all daily assessment results
   return await db
     .select({
-      patientId: patientDailyAssesment.patientId,
-      dailyAssesmentId: patientDailyAssesment.dailyAssesmentId,
+      targetId: targetDailyAssesment.targetId,
+      dailyAssesmentId: targetDailyAssesment.dailyAssesmentId,
       date: dailyAssesment.date,
       menu1: dailyAssesment.menu1,
       menu2: dailyAssesment.menu2,
-      containsStapleFood: patientDailyAssesment.containsStapleFood,
-      containsSideDish: patientDailyAssesment.containsSideDish,
-      containsVegetables: patientDailyAssesment.containsVegetables,
-      containsFruits: patientDailyAssesment.containsFruits,
-      isFollowingRecipe: patientDailyAssesment.isFollowingRecipe,
-      score: patientDailyAssesment.score,
-      isCompleted: patientDailyAssesment.isCompleted,
-      image: patientDailyAssesment.image,
-      lastModifiedAt: patientDailyAssesment.lastModifiedAt,
-      lastModifiedBy: patientDailyAssesment.lastModifiedBy,
+      containsStapleFood: targetDailyAssesment.containsStapleFood,
+      containsSideDish: targetDailyAssesment.containsSideDish,
+      containsVegetables: targetDailyAssesment.containsVegetables,
+      containsFruits: targetDailyAssesment.containsFruits,
+      isFollowingRecipe: targetDailyAssesment.isFollowingRecipe,
+      score: targetDailyAssesment.score,
+      isCompleted: targetDailyAssesment.isCompleted,
+      image: targetDailyAssesment.image,
+      lastModifiedAt: targetDailyAssesment.lastModifiedAt,
+      lastModifiedBy: targetDailyAssesment.lastModifiedBy,
       lastModifiedByUser: {
         id: user.id,
         fullName: user.fullName,
         username: user.username
       }
     })
-    .from(patientDailyAssesment)
+    .from(targetDailyAssesment)
     .innerJoin(
       dailyAssesment,
-      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+      eq(targetDailyAssesment.dailyAssesmentId, dailyAssesment.id)
     )
     .innerJoin(
       monthlyAssesment,
@@ -297,50 +297,50 @@ export async function getAllDailyAssesmentsByPatientAndMonth({
         eq(monthlyAssesment.month, month)
       )
     )
-    .leftJoin(user, eq(patientDailyAssesment.lastModifiedBy, user.id))
+    .leftJoin(user, eq(targetDailyAssesment.lastModifiedBy, user.id))
     .where(
       eq(
-        patientDailyAssesment.patientId,
+        targetDailyAssesment.targetId,
         db
-          .select({ id: patient.id })
-          .from(patient)
-          .where(eq(patient.slug, patientSlug))
+          .select({ id: target.id })
+          .from(target)
+          .where(eq(target.slug, targetSlug))
           .limit(1)
       )
     )
 }
 
 /**
- * Get a patient's monthly assessment summary (including total score and BMI) by patientSlug and month name.
- * Returns a single row from the patientMonthlyAssesmentWithTotalScore view, or null if not found.
+ * Get a target's monthly assessment summary (including total score and BMI) by targetSlug and month name.
+ * Returns a single row from the targetMonthlyAssesmentWithTotalScore view, or null if not found.
  *
  * @param {Object} params - The query parameters.
- * @param {string} params.patientSlug - The slug of the patient.
+ * @param {string} params.targetSlug - The slug of the target.
  * @param {Month} params.month - The month name (enum).
  * @returns {Promise<object|null>} The monthly assessment summary row, or null if not found.
  */
 export async function getMonthlyAssesment({
-  patientSlug,
+  targetSlug,
   month
 }: {
-  patientSlug: string
+  targetSlug: string
   month: Month
 }) {
-  // Query the view for this patient and month using a subquery for patientId
+  // Query the view for this target and month using a subquery for targetId
   const rows = await db
     .select()
-    .from(patientMonthlyAssesmentWithTotalScore)
+    .from(targetMonthlyAssesmentWithTotalScore)
     .where(
       and(
         eq(
-          patientMonthlyAssesmentWithTotalScore.patientId,
+          targetMonthlyAssesmentWithTotalScore.targetId,
           db
-            .select({ id: patient.id })
-            .from(patient)
-            .where(eq(patient.slug, patientSlug))
+            .select({ id: target.id })
+            .from(target)
+            .where(eq(target.slug, targetSlug))
             .limit(1)
         ),
-        eq(patientMonthlyAssesmentWithTotalScore.month, month)
+        eq(targetMonthlyAssesmentWithTotalScore.month, month)
       )
     )
     .limit(1)
@@ -348,31 +348,31 @@ export async function getMonthlyAssesment({
 }
 
 /**
- * Upsert (insert or update) a patient's monthly assessment result by patientSlug and month name.
- * Uses subqueries for patientId and monthlyAssesmentId, and returns the new/updated row in a single call.
+ * Upsert (insert or update) a target's monthly assessment result by targetSlug and month name.
+ * Uses subqueries for targetId and monthlyAssesmentId, and returns the new/updated row in a single call.
  *
  * @param {Object} params - The upsert parameters.
- * @param {string} params.patientSlug - The slug of the patient.
+ * @param {string} params.targetSlug - The slug of the target.
  * @param {Month} params.month - The month name (enum).
- * @param {number} params.weight - The patient's weight.
- * @param {number} params.height - The patient's height.
+ * @param {number} params.weight - The target's weight.
+ * @param {number} params.height - The target's height.
  * @returns {Promise<object|null>} The upserted or updated row, or null if not found.
  */
-export async function upsertPatientMonthlyAssesment({
-  patientId,
+export async function upsertTargetMonthlyAssesment({
+  targetId,
   monthlyAssesmentId,
   weight,
   height
 }: {
-  patientId: string
+  targetId: string
   monthlyAssesmentId: string
   weight: number
   height: number
 }) {
   await db
-    .insert(patientMonthlyAssesment)
+    .insert(targetMonthlyAssesment)
     .values({
-      patientId,
+      targetId,
       monthlyAssesmentId,
       weight,
       height
@@ -382,12 +382,12 @@ export async function upsertPatientMonthlyAssesment({
   // Return the upserted row from the view (with totalScore, bmi, etc)
   const [row] = await db
     .select()
-    .from(patientMonthlyAssesmentWithTotalScore)
+    .from(targetMonthlyAssesmentWithTotalScore)
     .where(
       and(
-        eq(patientMonthlyAssesmentWithTotalScore.patientId, patientId),
+        eq(targetMonthlyAssesmentWithTotalScore.targetId, targetId),
         eq(
-          patientMonthlyAssesmentWithTotalScore.monthlyAssesmentId,
+          targetMonthlyAssesmentWithTotalScore.monthlyAssesmentId,
           monthlyAssesmentId
         )
       )
@@ -420,23 +420,23 @@ export async function getDailyAssesments(month: Month) {
 }
 
 /**
- * Get completion progress for a patient in a specific month.
+ * Get completion progress for a target in a specific month.
  * Returns the percentage of completed daily assessments and total/completed counts.
  *
  * @param {Object} params - The query parameters.
- * @param {string} params.patientSlug - The slug of the patient.
+ * @param {string} params.targetSlug - The slug of the target.
  * @param {Month} params.month - The month name (enum).
  * @returns {Promise<Object>} Object containing progress percentage and counts.
  *
  * @example
- * await getPatientCompletionProgress({ patientSlug: 'john-doe', month: 'JUNE' })
+ * await getTargetCompletionProgress({ targetSlug: 'john-doe', month: 'JUNE' })
  * // Returns: { completed: 15, total: 30, percentage: 50 }
  */
-export async function getPatientCompletionProgress({
-  patientSlug,
+export async function getTargetCompletionProgress({
+  targetSlug,
   month
 }: {
-  patientSlug: string
+  targetSlug: string
   month: Month
 }) {
   // Get total daily assessments for the month
@@ -454,13 +454,13 @@ export async function getPatientCompletionProgress({
       )
     )
 
-  // Get completed daily assessments for the patient
+  // Get completed daily assessments for the target
   const completedAssessments = await db
     .select({ count: sql<number>`COUNT(*)`.as('count') })
-    .from(patientDailyAssesment)
+    .from(targetDailyAssesment)
     .innerJoin(
       dailyAssesment,
-      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+      eq(targetDailyAssesment.dailyAssesmentId, dailyAssesment.id)
     )
     .innerJoin(
       monthlyAssesment,
@@ -472,14 +472,14 @@ export async function getPatientCompletionProgress({
     .where(
       and(
         eq(
-          patientDailyAssesment.patientId,
+          targetDailyAssesment.targetId,
           db
-            .select({ id: patient.id })
-            .from(patient)
-            .where(eq(patient.slug, patientSlug))
+            .select({ id: target.id })
+            .from(target)
+            .where(eq(target.slug, targetSlug))
             .limit(1)
         ),
-        eq(patientDailyAssesment.isCompleted, true)
+        eq(targetDailyAssesment.isCompleted, true)
       )
     )
 
@@ -495,43 +495,43 @@ export async function getPatientCompletionProgress({
 }
 
 /**
- * Get comparison data for a patient's current vs previous month metrics.
+ * Get comparison data for a target's current vs previous month metrics.
  * If it's the first month, compare with initial values.
  *
  * @param {Object} params - The query parameters.
- * @param {string} params.patientSlug - The slug of the patient.
+ * @param {string} params.targetSlug - The slug of the target.
  * @param {Month} params.currentMonth - The current month name.
  * @returns {Promise<Object>} Object containing current and comparison metrics.
  */
-export async function getPatientMetricsComparison({
-  patientSlug,
+export async function getTargetMetricsComparison({
+  targetSlug,
   currentMonth
 }: {
-  patientSlug: string
+  targetSlug: string
   currentMonth: Month
 }) {
   const currentMonthIndex = MONTHS.indexOf(currentMonth)
   const previousMonth =
     currentMonthIndex > 0 ? MONTHS[currentMonthIndex - 1] : null
 
-  // Get patient initial data
-  const patientData = await db
+  // Get target initial data
+  const targetData = await db
     .select({
-      initialWeight: patient.initialWeight,
-      initialHeight: patient.initialHeight,
-      initialBMI: patient.initialBMI
+      initialWeight: target.initialWeight,
+      initialHeight: target.initialHeight,
+      initialBMI: target.initialBMI
     })
-    .from(patient)
-    .where(eq(patient.slug, patientSlug))
+    .from(target)
+    .where(eq(target.slug, targetSlug))
     .limit(1)
 
-  if (!patientData[0]) {
-    throw new Error('Patient not found')
+  if (!targetData[0]) {
+    throw new Error('Target not found')
   }
 
   // Get current month data
   const currentData = await getMonthlyAssesment({
-    patientSlug,
+    targetSlug,
     month: currentMonth
   })
 
@@ -539,23 +539,21 @@ export async function getPatientMetricsComparison({
   let previousData = null
   if (previousMonth) {
     previousData = await getMonthlyAssesment({
-      patientSlug,
+      targetSlug,
       month: previousMonth
     })
   }
 
   // Calculate deltas
   const weightDelta = currentData
-    ? currentData.weight -
-      (previousData?.weight || patientData[0].initialWeight)
+    ? currentData.weight - (previousData?.weight || targetData[0].initialWeight)
     : 0
   const heightDelta = currentData
-    ? currentData.height -
-      (previousData?.height || patientData[0].initialHeight)
+    ? currentData.height - (previousData?.height || targetData[0].initialHeight)
     : 0
   const bmiDelta =
     currentData && currentData.bmi
-      ? currentData.bmi - (previousData?.bmi || patientData[0].initialBMI || 0)
+      ? currentData.bmi - (previousData?.bmi || targetData[0].initialBMI || 0)
       : 0
 
   // Get current month total score
@@ -572,7 +570,7 @@ export async function getPatientMetricsComparison({
   return {
     current: currentData,
     previous: previousData,
-    initial: patientData[0],
+    initial: targetData[0],
     deltas: {
       weight: weightDelta,
       height: heightDelta,

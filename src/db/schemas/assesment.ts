@@ -11,7 +11,7 @@ import {
   foreignKey
 } from 'drizzle-orm/mysql-core'
 import { eq, sum, sql, type SQL } from 'drizzle-orm'
-import { patient } from './patient'
+import { target } from './target'
 import { user } from './user'
 
 /**
@@ -44,14 +44,14 @@ export const monthlyAssesment = mysqlTable('monthly_assesment', {
 })
 
 /**
- * Table: patientMonthlyAssesment
- * Join table linking patients to monthly assessments, logging patient-specific weight and height for each month.
- * Composite primary key: (patientId, monthlyAssesmentId).
+ * Table: targetMonthlyAssesment
+ * Join table linking targets to monthly assessments, logging target-specific weight and height for each month.
+ * Composite primary key: (targetId, monthlyAssesmentId).
  */
-export const patientMonthlyAssesment = mysqlTable(
-  'patient_monthly_assesment',
+export const targetMonthlyAssesment = mysqlTable(
+  'target_monthly_assesment',
   {
-    patientId: varchar('patient_id', { length: 36 }).notNull(),
+    targetId: varchar('target_id', { length: 36 }).notNull(),
     monthlyAssesmentId: varchar('monthly_assesment_id', {
       length: 36
     }).notNull(),
@@ -59,23 +59,23 @@ export const patientMonthlyAssesment = mysqlTable(
     height: double('height', { precision: 5, scale: 2 }).notNull(),
     bmi: double('bmi', { precision: 5, scale: 2 }).generatedAlwaysAs(
       (): SQL =>
-        sql<number>`${patientMonthlyAssesment.weight} / pow(${patientMonthlyAssesment.height} / 100, 2)`,
+        sql<number>`${targetMonthlyAssesment.weight} / pow(${targetMonthlyAssesment.height} / 100, 2)`,
       { mode: 'stored' }
     )
   },
   (table) => [
-    primaryKey({ columns: [table.patientId, table.monthlyAssesmentId] }),
+    primaryKey({ columns: [table.targetId, table.monthlyAssesmentId] }),
     foreignKey({
-      columns: [table.patientId],
-      foreignColumns: [patient.id],
-      name: 'fk_patient_monthly_patient'
+      columns: [table.targetId],
+      foreignColumns: [target.id],
+      name: 'fk_target_monthly_target'
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
     foreignKey({
       columns: [table.monthlyAssesmentId],
       foreignColumns: [monthlyAssesment.id],
-      name: 'fk_patient_monthly_monthly'
+      name: 'fk_target_monthly_monthly'
     })
       .onDelete('cascade')
       .onUpdate('cascade')
@@ -113,15 +113,15 @@ export const dailyAssesment = mysqlTable(
 )
 
 /**
- * Table: patientDailyAssesment
- * Join table linking patients to daily assessments, logging patient-specific boolean results for each assessment.
+ * Table: targetDailyAssesment
+ * Join table linking targets to daily assessments, logging target-specific boolean results for each assessment.
  * Includes a generated score column that sums the boolean fields.
- * Composite primary key: (patientId, dailyAssesmentId).
+ * Composite primary key: (targetId, dailyAssesmentId).
  */
-export const patientDailyAssesment = mysqlTable(
-  'patient_daily_assesment',
+export const targetDailyAssesment = mysqlTable(
+  'target_daily_assesment',
   {
-    patientId: varchar('patient_id', { length: 36 }).notNull(),
+    targetId: varchar('target_id', { length: 36 }).notNull(),
     dailyAssesmentId: varchar('daily_assesment_id', { length: 36 }).notNull(),
     containsStapleFood: boolean('contains_staple_food').default(false),
     containsSideDish: boolean('contains_side_dish').default(false),
@@ -130,7 +130,7 @@ export const patientDailyAssesment = mysqlTable(
     isFollowingRecipe: boolean('is_following_recipe').default(false),
     score: tinyint('score', { unsigned: true }).generatedAlwaysAs(
       (): SQL =>
-        sql<number>`${patientDailyAssesment.containsStapleFood} + ${patientDailyAssesment.containsSideDish} + ${patientDailyAssesment.containsVegetables} + ${patientDailyAssesment.containsFruits} + ${patientDailyAssesment.isFollowingRecipe}`,
+        sql<number>`${targetDailyAssesment.containsStapleFood} + ${targetDailyAssesment.containsSideDish} + ${targetDailyAssesment.containsVegetables} + ${targetDailyAssesment.containsFruits} + ${targetDailyAssesment.isFollowingRecipe}`,
       { mode: 'stored' }
     ),
     isCompleted: boolean('is_completed').default(false).notNull(),
@@ -139,25 +139,25 @@ export const patientDailyAssesment = mysqlTable(
     lastModifiedBy: varchar('last_modified_by', { length: 36 })
   },
   (table) => [
-    primaryKey({ columns: [table.patientId, table.dailyAssesmentId] }),
+    primaryKey({ columns: [table.targetId, table.dailyAssesmentId] }),
     foreignKey({
-      columns: [table.patientId],
-      foreignColumns: [patient.id],
-      name: 'fk_patient_daily_patient'
+      columns: [table.targetId],
+      foreignColumns: [target.id],
+      name: 'fk_target_daily_target'
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
     foreignKey({
       columns: [table.dailyAssesmentId],
       foreignColumns: [dailyAssesment.id],
-      name: 'fk_patient_daily_daily'
+      name: 'fk_target_daily_daily'
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
     foreignKey({
       columns: [table.lastModifiedBy],
       foreignColumns: [user.id],
-      name: 'fk_patient_daily_last_modified_by'
+      name: 'fk_target_daily_last_modified_by'
     })
       .onDelete('restrict')
       .onUpdate('cascade')
@@ -165,48 +165,48 @@ export const patientDailyAssesment = mysqlTable(
 )
 
 /**
- * View: patientMonthlyAssesmentWithTotalScore
- * Drizzle ORM view that joins patientMonthlyAssesment, monthlyAssesment, and aggregates totalScore from patientDailyAssesment for each (patientId, monthlyAssesmentId).
+ * View: targetMonthlyAssesmentWithTotalScore
+ * Drizzle ORM view that joins targetMonthlyAssesment, monthlyAssesment, and aggregates totalScore from targetDailyAssesment for each (targetId, monthlyAssesmentId).
  * Uses Drizzle's query builder, not raw SQL.
  */
-export const patientMonthlyAssesmentWithTotalScore = mysqlView(
-  'patient_monthly_assesment_with_total_score'
+export const targetMonthlyAssesmentWithTotalScore = mysqlView(
+  'target_monthly_assesment_with_total_score'
 ).as((db) =>
   db
     .select({
-      patientId: patientMonthlyAssesment.patientId,
-      monthlyAssesmentId: patientMonthlyAssesment.monthlyAssesmentId,
-      weight: patientMonthlyAssesment.weight,
-      height: patientMonthlyAssesment.height,
-      bmi: patientMonthlyAssesment.bmi,
+      targetId: targetMonthlyAssesment.targetId,
+      monthlyAssesmentId: targetMonthlyAssesment.monthlyAssesmentId,
+      weight: targetMonthlyAssesment.weight,
+      height: targetMonthlyAssesment.height,
+      bmi: targetMonthlyAssesment.bmi,
       month: monthlyAssesment.month,
-      totalScore: sum(patientDailyAssesment.score).as('total_score')
+      totalScore: sum(targetDailyAssesment.score).as('total_score')
     })
-    .from(patientMonthlyAssesment)
+    .from(targetMonthlyAssesment)
     .innerJoin(
       monthlyAssesment,
-      eq(patientMonthlyAssesment.monthlyAssesmentId, monthlyAssesment.id)
+      eq(targetMonthlyAssesment.monthlyAssesmentId, monthlyAssesment.id)
     )
     .leftJoin(
-      patientDailyAssesment,
-      eq(patientMonthlyAssesment.patientId, patientDailyAssesment.patientId)
+      targetDailyAssesment,
+      eq(targetMonthlyAssesment.targetId, targetDailyAssesment.targetId)
     )
     .leftJoin(
       dailyAssesment,
-      eq(patientDailyAssesment.dailyAssesmentId, dailyAssesment.id)
+      eq(targetDailyAssesment.dailyAssesmentId, dailyAssesment.id)
     )
     .where(
       eq(
-        patientMonthlyAssesment.monthlyAssesmentId,
+        targetMonthlyAssesment.monthlyAssesmentId,
         dailyAssesment.monthlyAssesmentId
       )
     )
     .groupBy(
-      patientMonthlyAssesment.patientId,
-      patientMonthlyAssesment.monthlyAssesmentId,
-      patientMonthlyAssesment.weight,
-      patientMonthlyAssesment.height,
-      patientMonthlyAssesment.bmi,
+      targetMonthlyAssesment.targetId,
+      targetMonthlyAssesment.monthlyAssesmentId,
+      targetMonthlyAssesment.weight,
+      targetMonthlyAssesment.height,
+      targetMonthlyAssesment.bmi,
       monthlyAssesment.month
     )
 )

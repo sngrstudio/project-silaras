@@ -1,24 +1,24 @@
 import { db } from '../db'
-import { patient } from '../schemas/patient'
+import { target } from '../schemas/target'
 import { region } from '../schemas/region'
 import { eq, sql } from 'drizzle-orm'
 
 /**
- * Patient table query functions.
+ * Target table query functions.
  *
- * - upsertPatient(data): Insert or update a patient (id auto-generated if not provided)
- * - getPatientById(id): Get a patient by its id
- * - deletePatient(id): Delete a patient by id
- * - getAllPatients(page?, size?): Get paginated list of patients (default 10 per page)
+ * - upsertTarget(data): Insert or update a target (id auto-generated if not provided)
+ * - getTargetById(id): Get a target by its id
+ * - deleteTarget(id): Delete a target by id
+ * - getAllTargets(page?, size?): Get paginated list of targets (default 10 per page)
  */
 
 /**
- * Insert or update a patient (upsert). The id is auto-generated if not provided.
- * If a patient with the same id exists, it will be updated.
- * @param data Patient data (must include name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight, id optional)
- * @returns The newly created or updated patient object
+ * Insert or update a target (upsert). The id is auto-generated if not provided.
+ * If a target with the same id exists, it will be updated.
+ * @param data Target data (must include name, motherName, birthDate, status, location, regionId, initialWeight, initialHeight, id optional)
+ * @returns The newly created or updated target object
  */
-export const upsertPatient = async (data: {
+export const upsertTarget = async (data: {
   name: string
   motherName: string
   birthDate: Date
@@ -39,15 +39,15 @@ export const upsertPatient = async (data: {
   // Generate or fetch slug in a single operation
   const slug = isUpdate
     ? await db
-        .select({ slug: patient.slug })
-        .from(patient)
-        .where(eq(patient.id, data.id!))
+        .select({ slug: target.slug })
+        .from(target)
+        .where(eq(target.id, data.id!))
         .limit(1)
         .then((rows) => {
-          if (!rows[0]?.slug) throw new Error('Patient not found for update')
+          if (!rows[0]?.slug) throw new Error('Target not found for update')
           return rows[0].slug
         })
-    : generatePatientSlug(data.name)
+    : generateTargetSlug(data.name)
 
   // Transactional logic
   return await db.transaction(async (tx) => {
@@ -66,7 +66,7 @@ export const upsertPatient = async (data: {
     }
 
     await tx
-      .insert(patient)
+      .insert(target)
       .values(preparedData)
       .onDuplicateKeyUpdate({
         set: {
@@ -88,18 +88,18 @@ export const upsertPatient = async (data: {
         }
       })
 
-    // Only create assessment join rows for new patients
+    // Only create assessment join rows for new targets
     if (!isUpdate) {
       // Use a single query with cross join to create all assessment records
       await tx.execute(sql`
-        INSERT INTO patient_monthly_assesment (patient_id, monthly_assesment_id, weight, height)
+        INSERT INTO target_monthly_assesment (target_id, monthly_assesment_id, weight, height)
         SELECT ${id}, ma.id, ${data.initialWeight}, ${data.initialHeight}
         FROM monthly_assesment ma
       `)
 
       await tx.execute(sql`
-        INSERT INTO patient_daily_assesment (
-          patient_id, daily_assesment_id, 
+        INSERT INTO target_daily_assesment (
+          target_id, daily_assesment_id, 
           contains_staple_food, contains_side_dish, 
           contains_vegetables, contains_fruits, is_following_recipe
         )
@@ -109,48 +109,48 @@ export const upsertPatient = async (data: {
       `)
     }
 
-    return await getPatientById(id)
+    return await getTargetById(id)
   })
 }
 
 /**
- * Get a patient by its id.
- * @param id Patient id
- * @returns Patient object or null if not found
+ * Get a target by its id.
+ * @param id Target id
+ * @returns Target object or null if not found
  */
-export const getPatientById = async (id: string) => {
+export const getTargetById = async (id: string) => {
   const row = await db
     .select()
-    .from(patient)
-    .where(eq(patient.id, id))
+    .from(target)
+    .where(eq(target.id, id))
     .limit(1)
     .then((rows) => rows[0] ?? null)
   return row
 }
 
 /**
- * Get a patient by its slug.
- * @param slug Patient slug
- * @returns Patient object or null if not found
+ * Get a target by its slug.
+ * @param slug Target slug
+ * @returns Target object or null if not found
  */
-export const getPatientBySlug = async (slug: string) => {
+export const getTargetBySlug = async (slug: string) => {
   const row = await db
     .select()
-    .from(patient)
-    .where(eq(patient.slug, slug))
+    .from(target)
+    .where(eq(target.slug, slug))
     .limit(1)
     .then((rows) => rows[0] ?? null)
   return row
 }
 
 /**
- * Get a paginated list of patients.
+ * Get a paginated list of targets.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
- * @param regionSlug Region slug to filter patients by region (required)
- * @returns Array of patients for the page
+ * @param regionSlug Region slug to filter targets by region (required)
+ * @returns Array of targets for the page
  */
-export const getAllPatients = async (
+export const getAllTargets = async (
   page: number = 1,
   size: number = 10,
   regionSlug: string // now mandatory and first
@@ -160,10 +160,10 @@ export const getAllPatients = async (
   // Use subquery to filter by regionSlug directly
   return db
     .select()
-    .from(patient)
+    .from(target)
     .where(
       eq(
-        patient.regionId,
+        target.regionId,
         db
           .select({ id: region.id })
           .from(region)
@@ -176,20 +176,20 @@ export const getAllPatients = async (
 }
 
 /**
- * Delete a patient by id.
- * @param id Patient id
+ * Delete a target by id.
+ * @param id Target id
  * @returns void
  */
-export const deletePatient = async (id: string): Promise<void> => {
-  await db.delete(patient).where(eq(patient.id, id))
+export const deleteTarget = async (id: string): Promise<void> => {
+  await db.delete(target).where(eq(target.id, id))
 }
 
 /**
- * Generate a patient slug from name and a random 6-char string.
- * @param name Patient name
+ * Generate a target slug from name and a random 6-char string.
+ * @param name Target name
  * @returns Slugified string
  */
-const generatePatientSlug = (name: string): string => {
+const generateTargetSlug = (name: string): string => {
   const base = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')

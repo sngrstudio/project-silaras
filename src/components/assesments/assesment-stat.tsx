@@ -34,7 +34,7 @@ interface MetricsComparison {
   previousScore: number | null
 }
 
-interface PatientData {
+interface TargetData {
   id: string
   name: string
   age: number | null // age in months
@@ -139,9 +139,9 @@ const AssesmentStatRC: FC = () => {
     useState<CompletionProgress | null>(null)
   const [metricsComparison, setMetricsComparison] =
     useState<MetricsComparison | null>(null)
-  const [patientData, setPatientData] = useState<PatientData | null>(null)
+  const [targetData, setTargetData] = useState<TargetData | null>(null)
 
-  const getPatientSlug = () => window.location.pathname.split('/').at(-1) || ''
+  const getTargetSlug = () => window.location.pathname.split('/').at(-1) || ''
 
   // Fetch completion progress and metrics comparison when monthIndex, monthlyAssesments, or dailyAssesments change
   useEffect(() => {
@@ -149,15 +149,15 @@ const AssesmentStatRC: FC = () => {
       if (!monthlyAssesments) return
 
       try {
-        // Fetch patient data
-        const patient = await actions.patient.getBySlug.orThrow({
-          slug: getPatientSlug()
+        // Fetch target data
+        const target = await actions.target.getBySlug.orThrow({
+          slug: getTargetSlug()
         })
-        setPatientData(patient)
+        setTargetData(target)
 
         // Fetch completion progress
         const progress = await actions.assesment.monthly.getProgress.orThrow({
-          patientSlug: getPatientSlug(),
+          targetSlug: getTargetSlug(),
           monthIndex: currentMonthIndex
         })
         setCompletionProgress(progress)
@@ -165,7 +165,7 @@ const AssesmentStatRC: FC = () => {
         // Fetch metrics comparison
         const comparison =
           await actions.assesment.monthly.getMetricsComparison.orThrow({
-            patientSlug: getPatientSlug(),
+            targetSlug: getTargetSlug(),
             monthIndex: currentMonthIndex
           })
         setMetricsComparison(comparison)
@@ -173,7 +173,7 @@ const AssesmentStatRC: FC = () => {
         console.error('Error fetching data:', error)
         setCompletionProgress(null)
         setMetricsComparison(null)
-        setPatientData(null)
+        setTargetData(null)
       }
     }
 
@@ -188,7 +188,7 @@ const AssesmentStatRC: FC = () => {
     }
 
     const state = await actions.assesment.monthly.get.orThrow({
-      patientSlug: getPatientSlug(),
+      targetSlug: getTargetSlug(),
       monthIndex: currentMonthIndex
     })
     setMonthlyAssesment(state)
@@ -247,14 +247,14 @@ const AssesmentStatRC: FC = () => {
       <div className='stat place-items-center'>
         <span className='stat-title'>Usia</span>
         <span className='stat-value'>
-          {patientData ? formatAge(patientData.age) : '-'}
+          {targetData ? formatAge(targetData.age) : '-'}
         </span>
         <div className='stat-desc'>
-          {patientData && patientData.age
-            ? patientData.age < 24
+          {targetData && targetData.age
+            ? targetData.age < 24
               ? 'bulan'
               : (() => {
-                  const remainingMonths = patientData.age % 12
+                  const remainingMonths = targetData.age % 12
                   return remainingMonths === 0
                     ? 'tahun'
                     : `tahun ${remainingMonths} bulan`
@@ -433,11 +433,7 @@ const AssesmentStatRC: FC = () => {
       </div>
 
       {/* hidden */}
-      <input
-        type='hidden'
-        name='patientId'
-        value={monthlyAssesments.patientId}
-      />
+      <input type='hidden' name='targetId' value={monthlyAssesments.targetId} />
       <input
         type='hidden'
         name='monthlyAssesmentId'

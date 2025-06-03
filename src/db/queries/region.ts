@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { region } from '../schemas/region'
-import { patient } from '../schemas/patient'
+import { target } from '../schemas/target'
 import { eq, count, sql } from 'drizzle-orm'
 
 /**
@@ -169,20 +169,20 @@ export const getChildRegionCount = async (regionId: string) => {
 }
 
 /**
- * Get count of patients in a given region (including all descendant regions)
+ * Get count of targets in a given region (including all descendant regions)
  * @param regionId Region id
- * @returns Number of patients in the region and all its descendants
+ * @returns Number of targets in the region and all its descendants
  */
-export const getPatientCountByRegion = async (
+export const getTargetCountByRegion = async (
   regionId: string
 ): Promise<number> => {
   // For the 3-level hierarchy (KABUPATEN -> KECAMATAN -> DESA), use a single query
   // This covers: current region + direct children + grandchildren
   const result = await db
     .select({ count: count() })
-    .from(patient)
+    .from(target)
     .where(
-      sql`${patient.regionId} IN (
+      sql`${target.regionId} IN (
         SELECT ${regionId} as id
         UNION ALL
         SELECT r1.id FROM ${region} r1 WHERE r1.parent_id = ${regionId}
@@ -197,7 +197,7 @@ export const getPatientCountByRegion = async (
 }
 
 /**
- * Get regions with their child region and patient counts
+ * Get regions with their child region and target counts
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 8)
  * @param parentSlug Optional parent slug to filter regions by
@@ -231,10 +231,10 @@ export const getAllRegionsWithCounts = async (
         FROM region r2 
         WHERE r2.parent_id = region.id
       )`,
-      patientCount: sql<number>`(
+      targetCount: sql<number>`(
         SELECT COUNT(*) 
-        FROM patient p 
-        WHERE p.region_id IN (
+        FROM target t 
+        WHERE t.region_id IN (
           SELECT region.id as id
           UNION ALL
           SELECT r1.id FROM region r1 WHERE r1.parent_id = region.id
