@@ -8,6 +8,9 @@ import { handler as ssrHandler } from './dist/server/entry.mjs'
 
 const app = express()
 
+// Trust proxy
+app.set('trust proxy', true)
+
 // logger
 app.use(morgan('common'))
 
