@@ -7,6 +7,7 @@ import icons from 'unplugin-icons/vite'
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://staging.silaras.com',
   integrations: [react()],
   image: {
     domains: []
