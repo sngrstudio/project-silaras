@@ -1,11 +1,12 @@
 # SILARAS - Sistem Laporan Dapur Sehat Atasi Stunting (DASHAT)
 
 ![SILARAS Logo](https://img.shields.io/badge/SILARAS-Nutrition%20Monitoring-green?style=for-the-badge)
-[![Astro](https://img.shields.io/badge/Astro-FF5D01?style=flat&logo=astro&logoColor=white)](https://astro.build)
-[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=flat&logo=mysql&logoColor=white)](https://mysql.com)
-[![AWS S3](https://img.shields.io/badge/Amazon%20S3-569A31?style=flat&logo=amazons3&logoColor=white)](https://aws.amazon.com/s3/)
+[![Astro](https://img.shields.io/badge/Astro-5.8.1-FF5D01?style=flat&logo=astro&logoColor=white)](https://astro.build)
+[![React](https://img.shields.io/badge/React-19.1.0-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-007ACC?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![MySQL](https://img.shields.io/badge/MySQL-3.14.1-00000F?style=flat&logo=mysql&logoColor=white)](https://mysql.com)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-2.6.1-3448C5?style=flat&logo=cloudinary&logoColor=white)](https://cloudinary.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
 
 ## 📝 Tentang SILARAS
 
@@ -24,12 +25,14 @@ Sistem ini melayani **1.200+ wilayah** di Kotawaringin Timur dengan struktur hie
 
 ### 🌟 Keunggulan Sistem
 
-- **🔐 Multi-Level Access Control**: 4 tingkat akses dengan pembatasan regional
+- **🔐 Session-Based Authentication**: Sistem autentikasi aman menggunakan Oslo crypto dengan session management
 - **🗺️ Geographic Hierarchy**: Manajemen data berdasarkan wilayah (Kabupaten → Kecamatan → Desa)
 - **🔄 Real-time Scoring**: Perhitungan skor dan klasifikasi otomatis menggunakan computed columns
-- **☁️ Cloud Storage**: Integrasi AWS S3 untuk penyimpanan foto makanan
+- **☁️ Cloudinary Integration**: Penyimpanan foto makanan dengan optimasi otomatis dan CDN global
 - **📱 Responsive Design**: Interface yang optimal untuk desktop dan mobile
 - **🛡️ Type Safety**: Full TypeScript implementation untuk reliabilitas tinggi
+- **🐳 Docker Ready**: Containerized deployment dengan multi-stage builds
+- **⚡ Performance Optimized**: Astro Islands architecture dengan selective hydration
 
 ## ✨ Fitur Utama
 
@@ -41,7 +44,7 @@ Sistem ini melayani **1.200+ wilayah** di Kotawaringin Timur dengan struktur hie
   - 🥬 Sayuran segar
   - 🍎 Buah-buahan
   - 📋 Mengikuti resep yang diberikan
-- **📸 Upload Foto Makanan** dengan integrasi AWS S3 dan presigned URLs
+- **📸 Upload Foto Makanan** dengan integrasi Cloudinary dan optimasi otomatis
 - **⚡ Scoring Otomatis** berdasarkan kelengkapan komponen
 - **📊 Completion Rate Tracking** per bulan untuk menilai konsistensi keluarga
 - **🎯 Smart Classification** berdasarkan skor dan consistency rate
@@ -110,69 +113,58 @@ Sistem scoring canggih dengan 4 kategori berdasarkan algoritma yang mempertimban
 
 ### 🔐 Authentication & Security
 
-- **🛡️ Lucia Auth Integration**: Session-based authentication yang aman
-- **🔑 Role-Based Access Control**: Pembatasan akses berdasarkan level dan regional
+- **🛡️ Oslo Crypto Integration**: Modern cryptographic primitives untuk session-based authentication
+- **🔑 Role-Based Access Control**: Pembatasan akses berdasarkan level dan regional assignment
 - **🛡️ Middleware Protection**: Route protection dengan authentication check
 - **🔒 Data Isolation**: User hanya bisa akses data sesuai assignment regional
+- **⏰ Session Management**: Secure 7-day session expiration dengan automatic cleanup
 
-## 🛠️ Arsitektur Teknologi
+## 🏗️ Current Technology Stack (Production Ready)
 
-### 🎨 Frontend Technology Stack
+### Core Framework & Runtime
 
-- **⚡ Astro 5.8.1**: Modern static site generator dengan island architecture untuk performance optimal
-- **⚛️ React 19.1**: Latest React dengan Server Components dan improved hydration
-- **📘 TypeScript 5.8.3**: Full type safety untuk development experience dan code reliability
-- **🎨 Tailwind CSS 4.1.6**: Latest utility-first CSS framework dengan modern features
-- **🧩 DaisyUI 5.0.35**: Pre-built component library berbasis Tailwind untuk konsistensi design
-- **📊 TanStack Table 8.21**: Powerful table library untuk data visualization
-- **🗺️ React Leaflet 5.0**: Interactive maps untuk geographic data
-- **📱 Responsive Design**: Mobile-first approach dengan optimasi untuk semua device
+- **Astro 5.8.1** - Modern static site generator dengan islands architecture
+- **React 19.1.0** - Latest React dengan Server Components support
+- **TypeScript 5.8.3** - Full type safety untuk development dan production
+- **Node.js 22.16.0** - LTS runtime dengan optimal performance
 
-### 🗄️ Backend & Database
+### Frontend & Styling
 
-- **🔄 Drizzle ORM 0.43.1**: Type-safe database operations dengan auto-migration dan schema generation
-- **🔧 Drizzle Kit 0.31.1**: CLI tools untuk migrations, studio, dan schema management
-- **🐬 MySQL2 3.14.1**: High-performance MySQL driver dengan connection pooling
-- **🚀 Astro Actions**: Server-side API endpoints dengan type safety end-to-end
-- **🔐 Oslo Crypto/Encoding**: Modern cryptographic primitives untuk authentication
-- **⚡ Database Features**:
-  - Computed columns untuk BMI, age calculation, dan scoring
-  - Generated UUID primary keys
-  - Cascade deletes untuk referential integrity
-  - Database views untuk complex reporting
+- **Tailwind CSS 4.1.6** - Latest utility-first CSS framework
+- **DaisyUI 5.0.35** - Pre-built component library
+- **@iconify/json 2.2.337** - Comprehensive icon ecosystem
+- **React Leaflet 5.0.0** - Interactive maps untuk geographic features
 
-### ☁️ State Management & Storage
+### Backend & Database
 
-- **🏪 Nanostores 1.0**: Lightweight state management dengan persistence
-- **📦 AWS S3**: Secure cloud storage untuk foto makanan dengan presigned URLs
-- **🔗 Presigned URLs**: Secure direct upload tanpa expose credentials
-- **💾 Persistent Storage**: Client-side state persistence dengan @nanostores/persistent
+- **Drizzle ORM 0.43.1** - Type-safe database operations
+- **MySQL2 3.14.1** - High-performance MySQL driver
+- **Argon2 0.43.0** - Secure password hashing
+- **Express 5.1.0** - Production server dengan middleware support
 
-### 🔧 Development Tools & Workflow
+### Cloud & Storage
 
-- **📦 Bun Runtime**: Fast JavaScript runtime dan package manager
-- **🔄 Concurrently 9.1.2**: Run multiple development processes simultaneously
-- **🗄️ Drizzle Studio**: Visual database management tool dengan network hosting
-- **📋 Database Migrations**: Version-controlled schema changes
-- **🌱 Seeding System**: Automated initial data population dengan TypeScript
-- **📝 Prettier 3.5.3**: Code formatting dengan Astro dan Tailwind plugins
-- **🎨 Unplugin Icons 22.1**: Icon integration dengan Iconify ecosystem
+- **Cloudinary 2.6.1** - Image storage, optimization, dan CDN
+- **@cloudinary/url-gen 1.21.0** - URL generation untuk responsive images
 
-### 🏗️ Build & Development Infrastructure
+### State Management
 
-- **🐳 Docker Compose**: Development environment dengan service orchestration
-- **⚙️ Express 5.1.0**: Production server dengan Morgan logging
-- **🔍 Astro Check 0.9.4**: Type checking dan validation
-- **📊 React Scan 0.3.3**: Performance monitoring dan debugging
-- **🎯 Node Adapter 9.2.2**: Server-side rendering dengan optimal performance
+- **Nanostores 1.0.1** - Lightweight state management
+- **@nanostores/react 1.0.0** - React integration
+- **@nanostores/persistent 1.0.0** - Client-side persistence
 
-### 📊 Performance & Optimization
+### Development Tools
 
-- **🏝️ Islands Architecture**: Selective hydration untuk optimal performance
-- **📦 Vite Integration**: Fast build system dengan HMR
-- **🖼️ SVG Processing**: Automatic SVG optimization dengan @svgr/core
-- **💾 Caching Strategy**: Static generation dengan dynamic islands
-- **📊 Bundle Analysis**: Size monitoring dan optimization
+- **Vite 6.3.5** - Fast build system dengan HMR
+- **tsx 4.19.4** - TypeScript execution engine
+- **Prettier 3.5.3** - Code formatting dengan plugins
+- **Concurrently 9.1.2** - Multi-process development
+
+### Database & Deployment
+
+- **MariaDB 10.11.10** - Production database (Docker)
+- **Docker** - Containerized deployment
+- **Docker Compose** - Multi-service orchestration
 
 ## 📁 Struktur Database & Schema
 
@@ -325,14 +317,14 @@ Data awal yang di-populate otomatis:
 - **Automatic generation** dari Drizzle schema
 - **Environment-specific** migrations (dev/staging/prod)
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start & Deployment
 
 ### 📋 Prerequisites
 
-- **🏃 Bun Runtime** (recommended) atau Node.js ≥ 18
-- **🐬 MySQL 8.0+** untuk database
-- **☁️ AWS S3 Bucket** untuk file storage
-- **🐳 Docker** (optional, untuk containerized deployment)
+- **Node.js 22.16+** (recommended version for optimal performance)
+- **MySQL/MariaDB 10.11+** untuk database
+- **☁️ Cloudinary Account** untuk image storage dan optimization
+- **🐳 Docker & Docker Compose** (untuk containerized deployment)
 
 ### ⚙️ Environment Setup
 
@@ -340,911 +332,289 @@ Data awal yang di-populate otomatis:
 
 ```bash
 git clone <repository-url>
-cd project-silaras
+cd project-dashat
 ```
 
 #### 2️⃣ Install Dependencies
 
 ```bash
-# Menggunakan Bun (recommended - sesuai project configuration)
-bun install
+# Using npm (with pinned versions for reproducible builds)
+npm ci
 
-# Dependencies akan diinstall berdasarkan bun.lock
+# Verify installation
+npm run check:astro
 ```
 
 #### 3️⃣ Environment Configuration
 
-```bash
-# Copy template environment
-cp .env.example .env
+Copy dan configure environment variables:
 
-# Edit konfigurasi sesuai environment Anda
-nano .env
+```bash
+cp .env.example .env
+```
+
+Update `.env` dengan konfigurasi Anda:
+
+```bash
+# Database Configuration
+DATABASE_URL=mysql://username:password@localhost:3306/silaras_db
+
+# Cloudinary Storage Configuration
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
+PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_FOLDER=silaras-uploads
+
+# Debug Settings
+DB_DEBUG=false
 ```
 
 #### 4️⃣ Database Setup
 
 ```bash
-# Generate migration files dari schema
-bun run db:generate
+# Generate database schema
+npm run db:generate
 
-# Jalankan migrations ke database
-bun run db:migrate
+# Run migrations
+npm run db:migrate
 
-# Populate data awal (wilayah, user admin, templates)
-bun run db:seed
+# Seed initial data (regions, admin user, templates)
+npm run db:seed
+
+# Optional: Open Drizzle Studio for database management
+npm run db:studio
 ```
 
-#### 5️⃣ Start Development
+#### 5️⃣ Development Server
 
 ```bash
-# Development server dengan hot reload
-bun dev
+# Start development environment
+npm run dev
 
-# Server akan berjalan di http://localhost:4321
+# Or run individual services
+npm run dev:astro  # Astro dev server only
 ```
 
-### 🔧 Environment Variables
+Access the application:
 
-#### 📊 **Database Configuration**
+- **Main App**: http://localhost:4321
+- **Database Studio**: http://localhost:4322 (if running db:studio)
 
-```env
-# MySQL Database Connection
-DATABASE_URL=mysql://username:password@localhost:3306/silaras_db
-
-# Database Pool Settings (optional)
-DB_POOL_MIN=5
-DB_POOL_MAX=20
-```
-
-#### ☁️ **AWS S3 Configuration**
-
-```env
-# AWS S3 untuk photo storage
-S3_ACCESS_KEY_ID=your_access_key_here
-S3_SECRET_ACCESS_KEY=your_secret_access_key_here
-S3_REGION=ap-southeast-3
-S3_BUCKET=silaras-food-images
-
-# S3 Advanced Settings (optional)
-S3_ENDPOINT=https://s3.ap-southeast-3.amazonaws.com
-S3_PRESIGNED_URL_EXPIRES=3600
-```
-
-#### 🔐 **Authentication & Security**
-
-```env
-# Session Secret untuk secure authentication
-SESSION_SECRET=your-super-secret-key-here-minimum-32-chars
-
-# Environment Mode
-NODE_ENV=development
-```
-
-#### 🌍 **Regional Configuration**
-
-```env
-# Default kabupaten untuk seeding
-DEFAULT_KABUPATEN_NAME="Kotawaringin Timur"
-DEFAULT_KABUPATEN_CODE="6202"
-
-# Regional data source (optional)
-REGION_DATA_SOURCE=local_seed
-```
-
-### 📦 Available Commands
-
-| Command           | Description                                                | Use Case                    |
-| ----------------- | ---------------------------------------------------------- | --------------------------- |
-| `bun dev`         | Start concurrent development processes (Astro dev)         | Daily development           |
-| `bun build`       | Production build dengan type checking dan style validation | Pre-deployment              |
-| `bun preview`     | Preview production build locally                           | Testing build               |
-| `bun db:generate` | Generate migrations dari schema changes                    | After schema modifications  |
-| `bun db:migrate`  | Apply pending migrations ke database                       | Deploy schema changes       |
-| `bun db:push`     | Push schema changes directly (dev only)                    | Quick development iteration |
-| `bun db:seed`     | Populate initial data (regions, users, templates)          | Initial setup atau reset    |
-| `bun db:studio`   | Launch Drizzle Studio di 0.0.0.0 untuk network access      | Database administration     |
-| `bun check:astro` | Astro type checking dan validation                         | Code validation             |
-| `bun check:style` | Prettier style checking                                    | Code formatting validation  |
-| `bun format`      | Format code dengan Prettier                                | Code beautification         |
-| `bun astro`       | Direct access ke Astro CLI                                 | Advanced Astro operations   |
-
-### 🔧 Development Commands Breakdown
-
-#### **Daily Development**
-
-```bash
-# Start development server dengan hot reload
-bun dev
-# Runs: concurrently bun:dev:* (Astro dev server)
-
-# Format code sebelum commit
-bun format
-# Applies Prettier formatting untuk semua file
-```
-
-#### **Database Operations**
-
-```bash
-# Generate migrations setelah schema changes
-bun db:generate
-
-# Apply migrations ke database
-bun db:migrate
-
-# Quick development schema push (bypasses migrations)
-bun db:push
-
-# Open visual database management
-bun db:studio
-# Available di http://0.0.0.0:4983 untuk network access
-```
-
-#### **Quality Assurance**
-
-```bash
-# Comprehensive build dengan checking
-bun build
-# Runs: concurrently bun:check:* && astro build
-
-# Individual checks
-bun check:astro     # Type checking
-bun check:style     # Style validation
-```
-
-#### **Production Operations**
-
-```bash
-# Preview production build
-bun preview
-
-# Seed production database
-bun db:seed
-```
-
-### 🏥 Initial Data Setup
-
-Setelah menjalankan `bun run db:seed`, sistem akan memiliki:
-
-#### 👤 **Default Admin User**
-
-```
-Username: admin
-Password: admin123
-Access Level: 1 (Admin Dinas)
-Regional Access: Full Kabupaten
-```
-
-#### 🗺️ **Regional Data**
-
-- 1 Kabupaten: Kotawaringin Timur
-- 17 Kecamatan (sesuai data administratif)
-- 1,200+ Desa/Kelurahan
-- Regional hierarchy dengan materialized path
-
-#### 📋 **Assessment Templates**
-
-- Default daily assessment template (5 komponen gizi)
-- Default monthly assessment template (antropometri)
-- Sample assessment data untuk testing
-
-### 🐳 Docker Development
+### 🐳 Docker Deployment
 
 #### Development dengan Docker Compose
 
 ```bash
-# Start services (MySQL + App)
+# Start all services (app + database + phpMyAdmin)
 docker-compose up -d
 
 # View logs
-docker-compose logs -f
+docker-compose logs -f app
 
-# Stop services
+# Stop all services
 docker-compose down
 ```
 
-#### Custom Docker Build
+Services yang tersedia:
+
+- **Main App**: http://localhost:4321
+- **phpMyAdmin**: http://localhost:4322
+- **Database**: MariaDB on port 3306
+
+#### Production Docker Build
 
 ```bash
-# Build image
-docker build -t silaras:latest .
+# Build production image
+docker build -t silaras-app .
 
-# Run container dengan environment
+# Run production container
 docker run -d \
-  --name silaras-app \
+  --name silaras-production \
   -p 4321:4321 \
-  --env-file .env \
-  silaras:latest
+  -e DATABASE_URL="mysql://user:pass@host:3306/db" \
+  -e CLOUDINARY_URL="cloudinary://key:secret@cloud" \
+  silaras-app
 ```
 
-### 🔍 Development Tips
+### 📦 Dependency Management
 
-#### Database Management
+#### Pinned Dependencies Strategy
 
-```bash
-# Open Drizzle Studio untuk visual database management
-bun db:studio
+Proyek ini menggunakan **pinned dependencies** (tanpa caret `^`) untuk:
 
-# Reset database jika diperlukan (HATI-HATI!)
-bun db:reset
+- **🔒 Reproducible Builds**: Semua environment menggunakan versi yang sama persis
+- **🛡️ Stability**: Mencegah breaking changes dari automatic updates
+- **🎯 Predictable Behavior**: Eliminasi version variance yang bisa menyebabkan bugs
 
-# Backup database
-mysqldump -u username -p silaras_db > backup.sql
-
-# Restore database
-mysql -u username -p silaras_db < backup.sql
-```
-
-#### Development Workflow
-
-1. **Code Changes**: Edit files dengan auto-reload
-2. **Schema Changes**: Run `bun db:generate` lalu `bun db:migrate`
-3. **Quality Checks**: `bun check:astro && bun check:style` untuk validasi
-4. **Database Inspection**: `bun db:studio` untuk lihat data (available di network)
-5. **Code Formatting**: `bun format` untuk beautify code
-6. **Testing**: Preview dengan `bun preview` sebelum deploy
-
-### ⚠️ Troubleshooting
-
-#### Common Issues
-
-- **Database Connection Error**: Periksa DATABASE_URL dan MySQL service
-- **S3 Upload Failed**: Validasi AWS credentials dan bucket permissions
-- **Migration Conflicts**: Resolve dengan `bun db:reset` (development only)
-- **Port Already in Use**: Change port dengan `--port 3000` flag
-- **Memory Issues**: Increase Node.js memory dengan `NODE_OPTIONS="--max-old-space-size=4096"`
-
-## 🔌 API Documentation & Actions
-
-SILARAS menggunakan **Astro Actions** untuk type-safe server-side operations. Semua actions memiliki built-in validation dan error handling.
-
-### 🏥 **Target Management Actions**
-
-#### `createTarget`
-
-Membuat data sasaran baru dengan validasi regional assignment.
-
-```typescript
-// Input Schema
+```json
 {
-  name: string
-  birthDate: Date
-  gender: 'L' | 'P'
-  address: string
-  parentName: string
-  parentPhone: string
-  kecamatanId: string
-  desaId: string
-}
-
-// Usage
-const result = await actions.createTarget({
-  name: 'Ahmad Fauzi',
-  birthDate: new Date('2020-05-15'),
-  gender: 'L',
-  address: 'Jl. Merdeka No. 123',
-  parentName: 'Siti Aminah',
-  parentPhone: '081234567890',
-  kecamatanId: 'kec-001',
-  desaId: 'desa-001'
-})
-```
-
-#### `updateTarget`
-
-Update data sasaran dengan authorization check berdasarkan regional assignment user.
-
-#### `deleteTarget`
-
-Soft delete sasaran dengan cascade ke semua assessment records.
-
-#### `getTargetsByRegion`
-
-Mengambil daftar sasaran berdasarkan regional scope user yang login.
-
-### 📊 **Assessment Actions**
-
-#### `createDailyAssessment`
-
-Input asesmen harian dengan scoring otomatis.
-
-```typescript
-// Input Schema
-{
-  targetId: string;
-  date: Date;
-  makananPokok: boolean;
-  laukPauk: boolean;
-  sayuran: boolean;
-  buahBuahan: boolean;
-  sesuaiResep: boolean;
-  photoFile?: File; // Upload ke S3
-}
-
-// Response
-{
-  id: string;
-  score: number; // 0-5 berdasarkan komponen true
-  photoUrl?: string; // AWS S3 URL jika ada upload
-  classification: "On Progress" | "Terbiasa" | "Butuh Pendampingan" | "Butuh Pendampingan dan Penguatan";
-}
-```
-
-#### `createMonthlyAssessment`
-
-Input data antropometri dengan perhitungan BMI otomatis.
-
-```typescript
-// Input Schema
-{
-  targetId: string;
-  date: Date;
-  height: number; // cm
-  weight: number; // kg
-}
-
-// Response (computed di database)
-{
-  id: string;
-  bmi: number; // Calculated: weight / (height/100)²
-  bmiCategory: "Underweight" | "Normal" | "Overweight" | "Obese";
-  previousBmiDelta?: number; // Selisih dengan bulan sebelumnya
-  growthTrend: "Improving" | "Stable" | "Declining";
-}
-```
-
-#### `getAssessmentHistory`
-
-Mengambil riwayat asesmen dengan aggregation data dan trend analysis.
-
-### 🖼️ **File Upload Actions**
-
-#### `uploadFoodPhoto`
-
-Upload foto makanan ke AWS S3 dengan presigned URL.
-
-```typescript
-// Process
-1. Generate presigned URL untuk direct upload
-2. Client upload file ke S3
-3. Return public URL untuk database storage
-4. Validate file type (jpg, jpeg, png)
-5. Resize dan optimize image
-```
-
-### 👥 **User Management Actions**
-
-#### `createUser`
-
-Buat user baru dengan regional assignment dan access level validation.
-
-```typescript
-// Input Schema
-{
-  username: string;
-  password: string;
-  fullName: string;
-  accessLevel: 1 | 2 | 3 | 4;
-  kecamatanAssignment?: string; // Required untuk level 2,3
-  desaAssignment?: string; // Required untuk level 3
-}
-
-// Authorization: Hanya Admin Dinas (level 1) yang bisa create user
-```
-
-#### `updateUserRegionalAssignment`
-
-Update assignment regional user dengan validasi hierarchy.
-
-#### `getUsersByRegion`
-
-List users berdasarkan regional scope dan access level.
-
-### 🗺️ **Regional Actions**
-
-#### `getRegionalHierarchy`
-
-Mengambil struktur hierarkis wilayah (kabupaten → kecamatan → desa).
-
-```typescript
-// Response Structure
-{
-  kabupaten: {
-    id: string;
-    name: "Kotawaringin Timur";
-    kecamatan: [
-      {
-        id: string;
-        name: string;
-        desa: [
-          { id: string; name: string; }
-        ]
-      }
-    ]
+  "dependencies": {
+    "astro": "5.8.1", // Exact version, no ^5.8.1
+    "react": "19.1.0", // Latest React with exact pinning
+    "drizzle-orm": "0.43.1", // Exact ORM version
+    "cloudinary": "2.6.1" // Exact cloud storage version
   }
 }
 ```
 
-#### `getRegionalStats`
-
-Dashboard statistics berdasarkan regional scope user.
-
-```typescript
-// Response berdasarkan access level
-{
-  totalTargets: number;
-  activeAssessments: number;
-  completionRates: {
-    daily: number; // Percentage
-    monthly: number;
-  };
-  classificationDistribution: {
-    terbiasa: number;
-    butuhPendampingan: number;
-    butuhPenguatan: number;
-    onProgress: number;
-  };
-  trendData: MonthlyTrend[];
-}
-```
-
-### 🔐 **Authentication Actions**
-
-#### `login`
-
-Login dengan session creation menggunakan Lucia Auth.
-
-```typescript
-// Input
-{
-  username: string
-  password: string
-}
-
-// Response
-{
-  user: {
-    id: string
-    username: string
-    fullName: string
-    accessLevel: number
-    regionalAssignment: object
-  }
-  session: string
-}
-```
-
-#### `logout`
-
-Invalidate session dan cleanup.
-
-### ⚡ **Action Features**
-
-#### 🛡️ **Built-in Authorization**
-
-Setiap action melakukan pengecekan:
-
-- User authentication status
-- Access level permission
-- Regional assignment scope
-- Data ownership validation
-
-#### 🔍 **Input Validation**
-
-- Zod schema validation untuk semua input
-- Custom validators untuk business logic
-- File type dan size validation untuk uploads
-- SQL injection prevention
-
-#### 📊 **Error Handling**
-
-```typescript
-// Standardized error response
-{
-  success: false;
-  error: {
-    code: "VALIDATION_ERROR" | "AUTHORIZATION_ERROR" | "NOT_FOUND" | "SERVER_ERROR";
-    message: string;
-    details?: object;
-  }
-}
-```
-
-#### 🎯 **Type Safety**
-
-- End-to-end type safety dari client ke database
-- Automatic type inference untuk response
-- TypeScript integration dengan Astro Actions
-- Compile-time error catching
-
-## 🚀 Deployment Guide
-
-### 🐳 **Production Deployment dengan Docker**
-
-#### Dockerfile Production
-
-```dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-#### Environment Production
-
-```env
-# Production Database
-DATABASE_URL=mysql://prod_user:secure_password@db.example.com:3306/silaras_prod
-
-# AWS S3 Production
-S3_BUCKET=silaras-prod-images
-S3_REGION=ap-southeast-3
-
-# Security
-SESSION_SECRET=super-secure-production-key-32-chars-minimum
-NODE_ENV=production
-```
-
-### ☁️ **Cloud Deployment Options**
-
-#### **Option 1: AWS ECS dengan RDS**
+#### Dependency Updates
 
 ```bash
-# Build dan push ke ECR
-aws ecr get-login-password --region ap-southeast-3 | docker login --username AWS --password-stdin <account>.dkr.ecr.ap-southeast-3.amazonaws.com
+# Check outdated packages
+npm outdated
 
-docker build -t silaras-prod .
-docker tag silaras-prod:latest <account>.dkr.ecr.ap-southeast-3.amazonaws.com/silaras:latest
-docker push <account>.dkr.ecr.ap-southeast-3.amazonaws.com/silaras:latest
+# Update specific package (manual)
+npm install package-name@latest --save-exact
 
-# Deploy menggunakan ECS Task Definition
+# Update all dependencies (dengan hati-hati)
+npx npm-check-updates -u
+npm install
 ```
 
-#### **Option 2: Digital Ocean App Platform**
+#### Optimized Dependencies
 
-```yaml
-# app.yaml
-name: silaras-app
-services:
-  - name: web
-    source_dir: /
-    github:
-      repo: your-org/silaras
-      branch: main
-    run_command: npm start
-    environment_slug: node-js
-    instance_count: 2
-    instance_size_slug: basic-xxs
-    envs:
-      - key: DATABASE_URL
-        scope: RUN_TIME
-        value: ${db.CONNECTION_URL}
-```
+- **✅ Unused Dependencies Removed**: AWS SDK packages dihapus setelah migrasi ke Cloudinary
+- **✅ Dev vs Prod Separation**: Build tools di devDependencies, runtime di dependencies
+- **✅ Version Conflicts Resolved**: tsx updated dari 4.7.1 ke 4.19.4 untuk kompatibilitas Vite
+- **✅ Type Safety**: @types packages terpinned untuk consistency
 
-#### **Option 3: VPS Manual Setup**
+## ⚠️ Troubleshooting & Common Issues
+
+### 🐛 Development Issues
+
+#### Dependency Conflicts
 
 ```bash
-# Setup di Ubuntu Server
-sudo apt update && sudo apt install -y docker.io nginx mysql-server
+# Error: tsx version conflict with Vite
+# Solution: Update tsx to compatible version
+npm install tsx@4.19.4 --save-exact
 
-# Clone dan build
-git clone <repo-url> /var/www/silaras
-cd /var/www/silaras
-docker build -t silaras .
-
-# Setup reverse proxy nginx
-sudo nano /etc/nginx/sites-available/silaras
-sudo ln -s /etc/nginx/sites-available/silaras /etc/nginx/sites-enabled/
-sudo systemctl reload nginx
-
-# Run container
-docker run -d --name silaras-app -p 3000:4321 --env-file .env silaras
+# Error: npm ci fails
+# Solution: Delete node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-### 🔒 **SSL & Domain Setup**
+#### Database Connection Issues
 
 ```bash
-# Install Certbot untuk Let's Encrypt
-sudo apt install certbot python3-certbot-nginx
+# Error: ECONNREFUSED ::1:3306
+# Solution: Check database service dan connection string
+docker-compose up db -d
+mysql -h 127.0.0.1 -P 3306 -u test -p test
 
-# Generate SSL certificate
-sudo certbot --nginx -d silaras.example.com
-
-# Auto-renewal setup
-sudo crontab -e
-# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+# Error: Migration failed
+# Solution: Reset database (development only)
+npm run db:reset
+npm run db:migrate
+npm run db:seed
 ```
 
-## 🛠️ Development Workflow
-
-### 📋 **Development Setup Checklist**
-
-- [ ] Clone repository dan install dependencies
-- [ ] Setup MySQL database dan user
-- [ ] Configure AWS S3 bucket dengan CORS
-- [ ] Copy dan edit environment variables
-- [ ] Run database migrations dan seeding
-- [ ] Verify development server berjalan
-- [ ] Test upload foto dan basic functionality
-
-### 🔄 **Git Workflow**
+#### Cloudinary Upload Issues
 
 ```bash
-# Feature development
-git checkout -b feature/target-assessment-improvement
-git add .
-git commit -m "feat: add BMI trend calculation to monthly assessment"
-git push origin feature/target-assessment-improvement
+# Error: Failed to upload to Cloudinary
+# Solution: Verify environment variables
+echo $CLOUDINARY_URL
+echo $PUBLIC_CLOUDINARY_CLOUD_NAME
 
-# Create Pull Request untuk code review
-# Merge setelah approval dan CI passed
+# Check Cloudinary account quota dan permissions
 ```
 
-### 🧪 **Testing Strategy**
+### 🚀 Build & Deployment Issues
+
+#### Docker Build Failures
 
 ```bash
-# Type checking dengan Astro
-bun check:astro
+# Error: npm ci fails during Docker build
+# Solution: Ensure clean package-lock.json
+npm ci --cache .npm --prefer-offline
 
-# Style checking dengan Prettier
-bun check:style
-
-# Format code untuk consistency
-bun format
-
-# Build untuk production testing
-bun build
-
-# Database integrity testing via studio
-bun db:studio
+# Error: Image not found in production
+# Solution: Check PUBLIC_CLOUDINARY_CLOUD_NAME in production
 ```
 
-### 📊 **Code Quality Tools**
+#### Performance Issues
 
 ```bash
-# Prettier untuk code formatting
-bun format
+# Issue: Slow island hydration
+# Solution: Optimize component imports
+import { lazy } from 'react'
+const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
-# Astro type checking
-bun check:astro
-
-# Style validation
-bun check:style
-
-# Combined quality check (as used in build)
-bun run build
+# Issue: Large bundle size
+# Solution: Check bundle analysis
+npm run build -- --stats
 ```
 
-## 📁 Project Structure
+### 📊 Database Performance
 
-```
-project-silaras/
-├── 📁 public/                 # Static assets
-│   ├── 🖼️ images/
-│   └── 📄 favicon.ico
-├── 📁 src/
-│   ├── 📁 actions/            # Server-side API actions
-│   │   ├── 🏥 target.ts       # Target management actions
-│   │   ├── 📊 assessment.ts   # Assessment CRUD operations
-│   │   ├── 👥 user.ts         # User management actions
-│   │   ├── 🗺️ region.ts       # Regional data actions
-│   │   └── 🖼️ upload.ts       # File upload dengan S3
-│   ├── 📁 components/         # React components
-│   │   ├── 📋 forms/          # Form components dengan validation
-│   │   ├── 📊 dashboard/      # Dashboard dan charts
-│   │   ├── 📱 ui/             # Reusable UI components
-│   │   └── 🗺️ regional/       # Regional management components
-│   ├── 📁 pages/              # Astro pages (routes)
-│   │   ├── 🏠 index.astro     # Dashboard utama
-│   │   ├── 👶 targets/        # Target management pages
-│   │   ├── 📊 assessments/    # Assessment pages
-│   │   ├── 👥 users/          # User management
-│   │   └── 🔐 auth/           # Authentication pages
-│   ├── 📁 layouts/            # Page layouts
-│   │   ├── 🎨 BaseLayout.astro
-│   │   └── 📱 AuthLayout.astro
-│   ├── 📁 db/                 # Database layer
-│   │   ├── 📊 schemas/        # Drizzle schema definitions
-│   │   │   ├── 👶 target.ts
-│   │   │   ├── 📋 assessment.ts
-│   │   │   ├── 👥 user.ts
-│   │   │   └── 🗺️ region.ts
-│   │   ├── 🌱 seed/           # Database seeding
-│   │   │   ├── 🗺️ regions.ts  # 1,200+ wilayah data
-│   │   │   ├── 👥 users.ts    # Default admin user
-│   │   │   └── 📋 templates.ts # Assessment templates
-│   │   ├── 🔄 migrations/     # Auto-generated migrations
-│   │   └── 📊 index.ts        # Database connection
-│   ├── 📁 lib/                # Utility libraries
-│   │   ├── ☁️ s3.ts           # AWS S3 integration
-│   │   ├── 🔐 auth.ts         # Lucia auth configuration
-│   │   ├── 📊 scoring.ts      # Assessment scoring logic
-│   │   └── 🎯 validation.ts   # Zod schemas
-│   ├── 📁 utils/              # Helper functions
-│   │   ├── 🛡️ access-control.ts # Permission checking
-│   │   ├── 🗓️ date.ts         # Date utilities
-│   │   └── 📊 statistics.ts   # Data aggregation helpers
-│   ├── 📁 middleware/         # Request middleware
-│   │   └── 🔐 index.ts        # Auth middleware
-│   └── 📁 styles/             # Global styles
-├── 📁 .vscode/                # VS Code configuration
-├── 📄 package.json            # Dependencies dan scripts
-├── 📄 astro.config.mjs        # Astro configuration
-├── 📄 drizzle.config.mjs      # Database configuration
-├── 📄 tailwind.config.mjs     # Tailwind CSS config
-├── 📄 tsconfig.json           # TypeScript configuration
-├── 🐳 Dockerfile              # Container configuration
-├── 🐳 docker-compose.yml      # Development containers
-├── 🌱 .env.example            # Environment template
-└── 📖 README.md               # Documentation
+#### Slow Queries
+
+```sql
+-- Enable query logging untuk debugging
+SET GLOBAL general_log = 'ON';
+SET GLOBAL log_output = 'table';
+
+-- Check slow queries
+SELECT * FROM mysql.slow_log;
+
+-- Optimize computed columns dengan indexes
+ALTER TABLE target ADD INDEX idx_age (age);
 ```
 
-### 🎯 **Key Directories Explained**
+### 🔧 Development Tips
 
-#### `src/actions/` - Server-Side Logic
+#### Hot Reload Issues
 
-Berisi semua server-side operations dengan type safety dan validation. Setiap action melakukan:
+```bash
+# Clear Astro cache
+rm -rf .astro
+npm run dev
 
-- Input validation dengan Zod
-- Authorization check berdasarkan user access level
-- Regional scope filtering
-- Database operations dengan Drizzle ORM
-- Error handling dan response formatting
-
-#### `src/components/` - UI Components
-
-React components yang diorganisir berdasarkan functionality:
-
-- **forms/**: Form components dengan validation dan submission handling
-- **dashboard/**: Charts, statistics cards, dan dashboard widgets
-- **ui/**: Reusable components seperti buttons, modals, tables
-- **regional/**: Components untuk regional selection dan management
-
-#### `src/db/` - Database Layer
-
-- **schemas/**: Type-safe database schema definitions
-- **seed/**: Initial data population scripts
-- **migrations/**: Version-controlled schema changes
-
-#### `src/lib/` - Core Libraries
-
-External integrations dan core functionality:
-
-- S3 untuk file upload
-- Authentication setup
-- Business logic untuk scoring dan classification
-
-## 🤝 Contributing Guidelines
-
-### 📝 **Code Standards**
-
-- **TypeScript**: Semua file harus menggunakan TypeScript dengan strict mode
-- **ESLint**: Follow configuration yang sudah ada untuk code consistency
-- **Prettier**: Auto-format code sebelum commit
-- **Naming**: gunakan camelCase untuk functions, PascalCase untuk components
-
-### 🔄 **Pull Request Process**
-
-1. **Fork** repository dan create feature branch
-2. **Develop** dengan following coding standards
-3. **Test** semua functionality dan add unit tests jika perlu
-4. **Update** documentation jika ada perubahan API atau features
-5. **Submit** PR dengan deskripsi lengkap perubahan
-6. **Code Review** dan address feedback
-7. **Merge** setelah approval dan CI passed
-
-### 🐛 **Bug Reports**
-
-Gunakan template berikut untuk bug reports:
-
-```markdown
-## Bug Description
-
-Brief description of the issue
-
-## Steps to Reproduce
-
-1. Go to...
-2. Click on...
-3. See error
-
-## Expected Behavior
-
-What should happen
-
-## Actual Behavior
-
-What actually happens
-
-## Environment
-
-- Browser: Chrome 120
-- OS: Windows 11
-- User Access Level: 3 (Kader DASHAT)
-- Regional Assignment: Kecamatan X, Desa Y
+# Clear browser cache
+# Hard refresh: Ctrl+Shift+R
 ```
 
-### ✨ **Feature Requests**
+#### Type Checking Errors
 
-```markdown
-## Feature Description
+```bash
+# Run type checking
+npm run check:astro
 
-Clear description of the proposed feature
-
-## Use Case
-
-Who would use this feature and why
-
-## Implementation Ideas
-
-Technical approach (optional)
-
-## Priority
-
-High/Medium/Low
+# Clear TypeScript cache
+rm -rf node_modules/.cache
+npm install
 ```
 
-## 📄 License & Credits
+### 📞 Support & Documentation
 
-### 📜 **License**
-
-Aplikasi ini dikembangkan untuk keperluan kesehatan masyarakat dengan dukungan teknologi modern untuk pencegahan stunting di Indonesia.
-
-**Open Source Components:**
-
-- Astro (MIT License)
-- React (MIT License)
-- Drizzle ORM (Apache 2.0)
-- Tailwind CSS (MIT License)
-- DaisyUI (MIT License)
-
-### 🏥 **Healthcare Impact**
-
-SILARAS berkontribusi pada:
-
-- **🎯 SDG 2**: Zero Hunger - Melalui monitoring gizi anak
-- **🏥 SDG 3**: Good Health and Well-being - Pencegahan stunting
-- **📊 Data-Driven Health**: Evidence-based nutrition intervention
-- **🤝 Community Empowerment**: Pemberdayaan kader kesehatan
-
-### 👨‍💻 **Development Team**
-
-Dikembangkan dengan ❤️ untuk kesehatan anak Indonesia.
-
-### 🙏 **Acknowledgments**
-
-- **Dinas Kesehatan Kotawaringin Timur** - Domain expertise dan requirements
-- **Posyandu & Kader DASHAT** - Field testing dan feedback
-- **Open Source Community** - Tools dan libraries yang digunakan
+- **GitHub Issues**: Create issue untuk bugs atau feature requests
+- **Development Docs**: Check `/docs` folder untuk detailed documentation
+- **Database Schema**: Use `npm run db:studio` untuk visual schema exploration
+- **API Reference**: Check `/src/actions` untuk available server actions
 
 ---
 
-## 📞 Support & Contact
+## 📝 License & Contributing
 
-### 🆘 **Getting Help**
+**SILARAS** dikembangkan untuk membantu upaya pencegahan stunting di Kabupaten Kotawaringin Timur, Kalimantan Tengah.
 
-- **Documentation**: Baca README ini lengkap
-- **Issues**: Create GitHub issue untuk bugs atau feature requests
-- **Email**: [health-tech@example.com](mailto:health-tech@example.com)
+### 🤝 Contributing Guidelines
 
-### 📊 **System Monitoring**
+1. Fork repository ini
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push ke branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
-- **Health Check**: `/api/health` endpoint untuk status monitoring
-- **Database Status**: Drizzle Studio untuk database inspection
-- **Performance**: Built-in Astro dev tools
+### 📋 Development Standards
+
+- **TypeScript**: Semua code harus type-safe
+- **Prettier**: Code formatting otomatis
+- **Database**: Gunakan Drizzle ORM untuk query building
+- **Authentication**: Session-based dengan Oslo crypto
+- **Testing**: Unit tests untuk critical functions
 
 ---
 
-**SILARAS** - _Membangun Generasi Sehat melalui Dapur Sehat, Mencegah Stunting dengan Teknologi_
-
-![Nutrition Monitoring](https://img.shields.io/badge/Nutrition-Monitoring-green?style=for-the-badge)
-![Stunting Prevention](https://img.shields.io/badge/Stunting-Prevention-blue?style=for-the-badge)
-![Community Health](https://img.shields.io/badge/Community-Health-orange?style=for-the-badge)
+**🌟 Built with ❤️ untuk kesehatan anak Indonesia**
