@@ -10,6 +10,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
+  "runArgs": ["--env-file", ".devcontainer/.env"],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [4321, 4322, 3306, 4983],
   "portsAttributes": {
@@ -72,9 +73,9 @@
     }
   },
 
-  "containerEnv": {
-    "DATABASE_URL": "mysql://test:test@localhost:3306/test"
-  },
+  // "containerEnv": {
+  //   "DATABASE_URL": "mysql://test:test@localhost:3306/test"
+  // },
 
   "postCreateCommand": "npm ci && npx astro sync"
 }

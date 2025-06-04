@@ -1,6 +1,7 @@
 import { Dialog } from 'radix-ui'
 import { clsx } from 'clsx/lite'
 import type { FC, PropsWithChildren } from 'react'
+import IconX from '~icons/lucide/x'
 
 export interface DialogProps {
   title?: string | undefined
@@ -82,24 +83,10 @@ export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
           {/* Close button - accessible by screen readers */}
           <Dialog.Close asChild>
             <button
-              className='ring-offset-base-100 focus:ring-primary absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
+              className='btn btn-ghost ring-offset-base-100 focus:ring-primary absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
               aria-label='Close dialog'
             >
-              <svg
-                width='15'
-                height='15'
-                viewBox='0 0 15 15'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-                className='h-4 w-4'
-              >
-                <path
-                  d='m11.7816 4.03157c.0824-.08241.0824-.21569 0-.2981L11.4835 3.43548c-.0824-.08241-.2157-.08241-.2981 0L7.50002 7.12148L3.81496 3.43548c-.08241-.08241-.21569-.08241-.2981 0L3.21887 3.73357c-.08241.08241-.08241.21569 0 .2981L6.90393 7.72157L3.21887 11.4066c-.08241.0824-.08241.2157 0 .2981l.29809.2981c.08241.0824.21569.0824.2981 0L7.50002 8.32167l3.68506 3.68503c.0824.0824.2157.0824.2981 0l.2981-.2981c.0824-.0824.0824-.2157 0-.2981L8.09611 7.72157l3.68549-3.69z'
-                  fill='currentColor'
-                  fillRule='evenodd'
-                  clipRule='evenodd'
-                />
-              </svg>
+              <IconX />
             </button>
           </Dialog.Close>
         </Dialog.Content>
