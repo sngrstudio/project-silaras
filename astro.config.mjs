@@ -9,17 +9,11 @@ import icons from 'unplugin-icons/vite'
 export default defineConfig({
   site: 'https://staging.silaraskotim.com',
   integrations: [react()],
-  image: {
-    domains: []
-  },
   adapter: node({
     mode: 'middleware'
   }),
   output: 'server',
   vite: {
     plugins: [tailwindcss(), icons({ compiler: 'jsx', jsx: 'react' })]
-  },
-  experimental: {
-    responsiveImages: true
   }
 })

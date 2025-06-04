@@ -21,7 +21,7 @@ import {
   deleteSessionTokenCookie
 } from '../auth/cookies'
 import { z } from 'astro:schema'
-import { deleteS3, uploadS3 } from '~/utils/s3'
+import { uploadToCloudinary, deleteFromCloudinary } from '~/utils/cloudinary'
 import { getFileHash } from '~/utils/file-hash'
 import { hashPassword, verifyPassword } from '~/utils/password'
 import { getRegionById, getRegionsByType } from '../db/queries/region' // Added getRegionsByType
@@ -329,12 +329,12 @@ const user = {
       let profilePhoto
       if (profilePhotoFile && profilePhotoFile.name) {
         if (existingUser && existingUser.profilePhoto) {
-          await deleteS3(existingUser.profilePhoto)
+          await deleteFromCloudinary(existingUser.profilePhoto)
         }
 
         const hashHex = await getFileHash(profilePhotoFile)
-        profilePhoto = `user-${input.username}-${hashHex}.${profilePhotoFile.name.split('.').pop() || ''}`
-        await uploadS3(profilePhotoFile, profilePhoto)
+        const fileName = `user-${input.username}-${hashHex}.${profilePhotoFile.name.split('.').pop() || ''}`
+        profilePhoto = await uploadToCloudinary(profilePhotoFile, fileName)
       }
       // Prepare user data, hashing password if provided
       const userData: {

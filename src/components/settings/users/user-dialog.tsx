@@ -10,7 +10,6 @@ import {
 import { $currentUser as $globalCurrentUser } from '~/components/layout/drawer/drawer.store'
 import { actions, isInputError } from 'astro:actions'
 import Image from '~/components/common/image/image'
-import type { GetImageResult } from 'astro'
 import RegionSelect from './region-select'
 import {
   getAllowedAccessLevels,
@@ -44,9 +43,6 @@ const UserDialog: FC = () => {
   const currentUser = useStore($currentUser)
   const globalCurrentUser = useStore($globalCurrentUser)
   const currentPage = useStore($currentPage)
-  const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
-    undefined
-  )
   // Initialize with defaults for a new user; useEffect will populate for existing users.
   const [selectedAccessLevel, setSelectedAccessLevel] = useState<number>(2)
   const [selectedRegionId, setSelectedRegionId] = useState<string | undefined>(
@@ -70,24 +66,11 @@ const UserDialog: FC = () => {
       // User is being edited, or a new user template is provided
       setSelectedAccessLevel(currentUser.accessLevel || 2) // Use DB value or default to 2
       setSelectedRegionId(currentUser.regionId || undefined)
-
-      if (currentUser.profilePhoto) {
-        actions.image.getPresignedImage
-          .orThrow({
-            fileName: currentUser.profilePhoto,
-            height: 80,
-            width: 80
-          })
-          .then((image) => setProfilePhoto(image))
-      } else {
-        setProfilePhoto(undefined)
-      }
     } else {
       // Dialog is closed or opened for a brand new user without a template
       // Reset form state to defaults for a new user
       setSelectedAccessLevel(2) // Default access level for a new user
       setSelectedRegionId(undefined)
-      setProfilePhoto(undefined)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]) // Depend on the currentUser object itself
@@ -324,10 +307,12 @@ const UserDialog: FC = () => {
             Foto Profil
           </label>
           <div className='flex flex-col md:flex-row md:items-center md:gap-4'>
-            {profilePhoto && (
+            {currentUser?.profilePhoto && (
               <div className='mb-4 flex justify-center md:mb-0 md:justify-start'>
                 <Image
-                  image={profilePhoto}
+                  publicId={currentUser.profilePhoto}
+                  width={80}
+                  height={80}
                   className='h-20 w-20 rounded-full border-2 border-gray-200 object-cover'
                   alt='Current profile photo'
                 />

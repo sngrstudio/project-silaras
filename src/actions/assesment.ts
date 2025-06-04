@@ -14,7 +14,7 @@ import {
 } from '../db/queries/assesment'
 import { getTargetById } from '../db/queries/target'
 import { getFileHash } from '../utils/file-hash'
-import { uploadS3 } from '../utils/s3'
+import { uploadToCloudinary } from '../utils/cloudinary'
 import { z } from 'astro:schema'
 
 /**
@@ -308,10 +308,10 @@ const assesment = {
             ''
           )
           const shortHash = fileHash.substring(0, 8)
-          imageFileName = `assesment-${target.slug}-${sanitizedDailyAssesmentId}-${shortHash}.${extension}`
+          const fileName = `assesment-${target.slug}-${sanitizedDailyAssesmentId}-${shortHash}.${extension}`
 
           try {
-            await uploadS3(input.imageFile, imageFileName)
+            imageFileName = await uploadToCloudinary(input.imageFile, fileName)
           } catch (error) {
             throw new ActionError({
               code: 'INTERNAL_SERVER_ERROR',

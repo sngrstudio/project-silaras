@@ -1,5 +1,4 @@
 import { useActionState, useEffect, useRef, useState, type FC } from 'react'
-import type { GetImageResult } from 'astro'
 import { useStore } from '@nanostores/react'
 import {
   $currentUser,
@@ -15,9 +14,7 @@ import {
 const ProfileForm: FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
   const currentUser = useStore($currentUser)
-  const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
-    undefined
-  )
+
   const [formValues, setFormValues] = useState({
     fullName: '',
     phoneNumber: '',
@@ -25,6 +22,7 @@ const ProfileForm: FC = () => {
     confirmPassword: '',
     profilePhotoFile: null as File | null
   })
+
   const [initialValues, setInitialValues] = useState({
     fullName: '',
     phoneNumber: '',
@@ -32,14 +30,6 @@ const ProfileForm: FC = () => {
     confirmPassword: '',
     profilePhotoFile: null as File | null
   })
-
-  useEffect(() => {
-    if (currentUser && currentUser.profilePhoto) {
-      actions.image.getPresignedImage
-        .orThrow({ fileName: currentUser.profilePhoto, height: 50, width: 50 })
-        .then((image) => setProfilePhoto(image))
-    }
-  }, [currentUser?.profilePhoto])
 
   useEffect(() => {
     if (currentUser) {
@@ -66,170 +56,181 @@ const ProfileForm: FC = () => {
   }
 
   const handleInputChange = (field: string, value: string | File | null) => {
-    setFormValues((prev) => ({ ...prev, [field]: value }))
+    setFormValues((prev) => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
-  const handleReset = () => {
-    if (formRef.current) {
-      formRef.current.reset()
-      setFormValues(initialValues)
-    }
-  }
-
-  const handleForm = async (_prev: unknown, formData: FormData) => {
-    const { error, data } = await actions.user.upsert(formData)
-
-    if (error && !data) {
-      if (isInputError(error)) {
-        return error
-      }
-
-      // Handle specific error codes with user-friendly messages
-      switch (error.code) {
-        case 'BAD_REQUEST':
-          if (error.message.includes('Username')) {
-            showErrorToast(
-              'Username yang dipilih sudah digunakan oleh pengguna lain.'
-            )
-          } else if (error.message.includes('Nomor telepon')) {
-            showErrorToast(
-              'Nomor telepon yang dimasukkan sudah digunakan oleh pengguna lain.'
-            )
-          } else {
-            showErrorToast(
-              error.message ||
-                'Data yang dimasukkan tidak valid. Silakan periksa kembali.'
-            )
-          }
-          break
-        case 'FORBIDDEN':
-          showErrorToast(
-            'Anda tidak memiliki izin untuk mengubah data profil ini.'
-          )
-          break
-        case 'INTERNAL_SERVER_ERROR':
-          showErrorToast(
-            'Terjadi masalah pada server. Silakan coba lagi nanti.'
-          )
-          break
-        default:
-          showErrorToast(
-            'Terjadi kesalahan saat menyimpan profil. Silakan coba lagi.'
-          )
-      }
+  const handleSubmit = async (_prev: unknown, formData: FormData) => {
+    if (!currentUser) {
+      showErrorToast(
+        'Tidak dapat memperbarui profil: pengguna tidak ditemukan.'
+      )
       return undefined
     }
 
-    if (data) {
-      setCurrentUser(data)
-      showSuccessToast('Profil berhasil diperbarui!')
+    // Add required fields for upsert action
+    formData.append('id', currentUser.id)
+    formData.append('accessLevel', currentUser.accessLevel.toString())
+    formData.append('username', currentUser.username)
+
+    const result = await actions.user.upsert(formData)
+
+    if (result.error) {
+      if (isInputError(result.error)) {
+        return result.error
+      }
+      showErrorToast(
+        'Terjadi kesalahan saat memperbarui profil. Silakan coba lagi.'
+      )
+      return undefined
     }
+
+    const updatedUser = await actions.user.getCurrent()
+    if (updatedUser.data) {
+      setCurrentUser(updatedUser.data)
+    }
+
+    // Reset form to new values
+    const newValues = {
+      fullName: formValues.fullName,
+      phoneNumber: formValues.phoneNumber,
+      password: '',
+      confirmPassword: '',
+      profilePhotoFile: null
+    }
+    setFormValues(newValues)
+    setInitialValues(newValues)
+
+    // Clear file input
+    if (formRef.current) {
+      const fileInput = formRef.current.querySelector(
+        '#profilePhotoFile'
+      ) as HTMLInputElement
+      if (fileInput) {
+        fileInput.value = ''
+      }
+    }
+
+    showSuccessToast('Profil berhasil diperbarui!')
     return undefined
   }
 
-  const [error, action, isPending] = useActionState(handleForm, undefined)
+  const [error, action, isPending] = useActionState(handleSubmit, undefined)
 
   if (!currentUser) {
-    return <></>
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <span className='loading loading-spinner loading-lg'></span>
+      </div>
+    )
   }
 
   return (
     <form
-      className='flex w-full flex-col gap-y-4'
-      action={action}
       ref={formRef}
+      action={action}
+      className='flex flex-col gap-6 p-6 md:p-8'
     >
-      <input type='hidden' name='id' value={currentUser.id} />
-      <input type='hidden' name='accessLevel' value={currentUser.accessLevel} />
+      <h1 className='text-xl font-bold md:text-2xl'>Profil Pengguna</h1>
 
-      <div>
-        <label className='label' htmlFor='username'>
-          Username
-        </label>
-        <input
-          className='input input-disabled md:input-lg w-full'
-          type='text'
-          id='username'
-          name='username'
-          value={currentUser.username}
-          required
-          readOnly
-          disabled={isPending}
-        />
-      </div>
-
-      <div>
-        <label className='label' htmlFor='fullName'>
-          Nama Lengkap
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='text'
-          id='fullName'
-          name='fullName'
-          defaultValue={currentUser.fullName}
-          onChange={(e) => handleInputChange('fullName', e.target.value)}
-          required
-          disabled={isPending}
-        />
-        {error?.fields?.fullName && (
-          <div className='label text-error'>
-            {error.fields.fullName.join(', ')}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <label className='label' htmlFor='phoneNumber'>
-          Nomor Telepon
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='tel'
-          id='phoneNumber'
-          name='phoneNumber'
-          defaultValue={currentUser.phoneNumber ?? ''}
-          onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-          disabled={isPending}
-        />
-        {error?.fields?.phoneNumber && (
-          <div className='label text-error'>
-            {error.fields.phoneNumber.join(', ')}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <label className='label' htmlFor='profilePhotoFile'>
-          Foto Profil
-        </label>
-        <div className='flex flex-col md:flex-row md:items-center md:gap-4'>
-          {profilePhoto && (
-            <div className='mb-4 flex justify-center md:mb-0 md:justify-start'>
-              <Image
-                image={profilePhoto}
-                className='h-20 w-20 rounded-full border-2 border-gray-200 object-cover'
-                alt='Current profile photo'
-              />
-            </div>
-          )}
+      <div className='grid gap-6 md:grid-cols-2'>
+        <div>
+          <label className='label' htmlFor='username'>
+            Username
+          </label>
           <input
-            className='file-input md:file-input-lg file-input-ghost w-full md:flex-1'
-            type='file'
-            id='profilePhotoFile'
-            name='profilePhotoFile'
-            accept='image/*'
-            onChange={(e) =>
-              handleInputChange('profilePhotoFile', e.target.files?.[0] || null)
-            }
+            className='input md:input-lg w-full'
+            type='text'
+            id='username'
+            name='username'
+            defaultValue={currentUser.username}
+            disabled
+            readOnly
+          />
+          <div className='label text-sm text-gray-500'>
+            Username tidak dapat diubah
+          </div>
+        </div>
+
+        <div>
+          <label className='label' htmlFor='fullName'>
+            Nama Lengkap
+          </label>
+          <input
+            className='input md:input-lg w-full'
+            type='text'
+            id='fullName'
+            name='fullName'
+            required
+            defaultValue={currentUser.fullName}
+            onChange={(e) => handleInputChange('fullName', e.target.value)}
             disabled={isPending}
           />
+          {error?.fields?.fullName && (
+            <div className='label text-error'>
+              {error.fields.fullName.join(', ')}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className='label' htmlFor='phoneNumber'>
+            Nomor Telepon
+          </label>
+          <input
+            className='input md:input-lg w-full'
+            type='tel'
+            id='phoneNumber'
+            name='phoneNumber'
+            defaultValue={currentUser.phoneNumber ?? ''}
+            onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+            disabled={isPending}
+          />
+          {error?.fields?.phoneNumber && (
+            <div className='label text-error'>
+              {error.fields.phoneNumber.join(', ')}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className='label' htmlFor='profilePhotoFile'>
+            Foto Profil
+          </label>
+          <div className='flex flex-col md:flex-row md:items-center md:gap-4'>
+            {currentUser?.profilePhoto && (
+              <div className='mb-4 flex justify-center md:mb-0 md:justify-start'>
+                <Image
+                  publicId={currentUser.profilePhoto}
+                  width={80}
+                  height={80}
+                  className='h-20 w-20 rounded-full border-2 border-gray-200 object-cover'
+                  alt='Current profile photo'
+                />
+              </div>
+            )}
+            <input
+              className='file-input md:file-input-lg file-input-ghost w-full md:flex-1'
+              type='file'
+              id='profilePhotoFile'
+              name='profilePhotoFile'
+              accept='image/*'
+              onChange={(e) =>
+                handleInputChange(
+                  'profilePhotoFile',
+                  e.target.files?.[0] || null
+                )
+              }
+              disabled={isPending}
+            />
+          </div>
         </div>
       </div>
 
       <fieldset className='fieldset'>
         <legend className='fieldset-legend'>Ubah Password (opsional)</legend>
-
         <div>
           <label className='label' htmlFor='password'>
             Password Baru
@@ -273,19 +274,42 @@ const ProfileForm: FC = () => {
         </div>
       </fieldset>
 
-      <div className='flex w-full flex-col-reverse gap-2 md:flex-row-reverse'>
+      <div className='flex flex-col gap-3 sm:flex-row-reverse'>
         <button
-          className='btn btn-primary max-md:w-full'
           type='submit'
+          className='btn btn-primary md:btn-lg'
           disabled={isPending || !hasChanges()}
         >
+          {isPending && <span className='loading loading-spinner'></span>}
           Simpan Perubahan
         </button>
+
         <button
-          className='btn btn-ghost max-md:w-full'
-          type='button'
-          onClick={handleReset}
-          disabled={isPending || !hasChanges()}
+          type='reset'
+          className='btn btn-ghost md:btn-lg'
+          disabled={isPending}
+          onClick={() => {
+            if (currentUser) {
+              const resetValues = {
+                fullName: currentUser.fullName,
+                phoneNumber: currentUser.phoneNumber ?? '',
+                password: '',
+                confirmPassword: '',
+                profilePhotoFile: null
+              }
+              setFormValues(resetValues)
+
+              // Clear file input
+              if (formRef.current) {
+                const fileInput = formRef.current.querySelector(
+                  '#profilePhotoFile'
+                ) as HTMLInputElement
+                if (fileInput) {
+                  fileInput.value = ''
+                }
+              }
+            }
+          }}
         >
           Reset
         </button>

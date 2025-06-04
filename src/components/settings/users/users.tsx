@@ -1,4 +1,4 @@
-import { type FC, useState, useMemo, useEffect } from 'react'
+import { type FC, useState, useMemo } from 'react'
 import clsx from 'clsx'
 import TableTemplate from '../../common/table/desktop'
 import ListTemplate from '../../common/table/mobile'
@@ -26,7 +26,6 @@ import TrashIcon from '~icons/lucide/trash-2'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import UserPlusIcon from '~icons/lucide/user-plus'
 import Image from '~/components/common/image/image'
-import type { GetImageResult } from 'astro'
 import {
   canUserEditUser,
   canUserDeleteUser,
@@ -39,20 +38,26 @@ import {
   showErrorToast
 } from '~/components/common/toast/toast.store'
 
-// Avatar component that handles profile photo fetching
+const columnHelper = createColumnHelper<User>()
+
+// Avatar component that handles profile photo display
 const UserAvatar: FC<{
   profilePhoto: string | null | undefined
   fullName: string
   size?: 'sm' | 'md'
 }> = ({ profilePhoto, fullName, size = 'md' }) => {
-  const profilePhotoUrl = useProfilePhoto(profilePhoto)
   const sizeClass = size === 'sm' ? 'w-8' : 'w-10'
 
   return (
-    <div className={clsx('avatar', { 'avatar-placeholder': !profilePhotoUrl })}>
-      {profilePhotoUrl ? (
+    <div className={clsx('avatar', { 'avatar-placeholder': !profilePhoto })}>
+      {profilePhoto ? (
         <div className={clsx(sizeClass, 'mask mask-circle')}>
-          <Image image={profilePhotoUrl} alt={fullName} />
+          <Image
+            publicId={profilePhoto}
+            width={size === 'sm' ? 32 : 40}
+            height={size === 'sm' ? 32 : 40}
+            alt={fullName}
+          />
         </div>
       ) : (
         <div
@@ -68,43 +73,6 @@ const UserAvatar: FC<{
       )}
     </div>
   )
-}
-
-const columnHelper = createColumnHelper<User>()
-
-// Cache for profile photo URLs to avoid repeated API calls
-const profilePhotoCache = new Map<string, GetImageResult>()
-
-const useProfilePhoto = (fileName: string | null | undefined) => {
-  const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
-    undefined
-  )
-
-  useEffect(() => {
-    if (!fileName) {
-      setProfilePhoto(undefined)
-      return
-    }
-
-    // Check cache first
-    if (profilePhotoCache.has(fileName)) {
-      setProfilePhoto(profilePhotoCache.get(fileName))
-      return
-    }
-
-    // Fetch presigned URL
-    actions.image.getPresignedImage
-      .orThrow({ fileName, width: 40, height: 40 })
-      .then((image) => {
-        profilePhotoCache.set(fileName, image)
-        setProfilePhoto(image)
-      })
-      .catch(() => {
-        setProfilePhoto(undefined)
-      })
-  }, [fileName])
-
-  return profilePhoto
 }
 
 // Component for delete button with self-deletion protection

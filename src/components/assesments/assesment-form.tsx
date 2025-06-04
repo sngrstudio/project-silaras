@@ -1,7 +1,6 @@
-import { useActionState, useRef, useState, useEffect, type FC } from 'react'
+import { useActionState, useRef, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
-import type { GetImageResult } from 'astro'
 import {
   type DailyAssesments,
   setDailyAssesments,
@@ -26,26 +25,6 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 }) => {
   const currentMonthIndex = useStore($currentMonthIndex)
   const formRef = useRef<HTMLFormElement>(null)
-  const [imagePreview, setImagePreview] = useState<GetImageResult | undefined>(
-    undefined
-  )
-
-  // Load existing image when component mounts or image changes
-  useEffect(() => {
-    if (!cell.row.original.image) {
-      setImagePreview(undefined)
-      return
-    }
-
-    actions.image.getPresignedImage
-      .orThrow({ fileName: cell.row.original.image, width: 200, height: 150 })
-      .then((image) => {
-        setImagePreview(image)
-      })
-      .catch(() => {
-        setImagePreview(undefined)
-      })
-  }, [cell.row.original.image])
 
   const handleForm = async (_prev: unknown, data: FormData) => {
     const { error } = await actions.assesment.daily.set(data)
@@ -215,11 +194,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
         </label>
 
         {/* Show existing image if available */}
-        {imagePreview && (
+        {cell.row.original.image && (
           <div className='relative mb-3 inline-block'>
             <div className='overflow-hidden rounded-lg border-2 border-gray-200'>
               <Image
-                image={imagePreview}
+                publicId={cell.row.original.image}
+                width={200}
+                height={150}
                 alt='Foto makanan saat ini'
                 className='max-h-36 max-w-48 object-contain'
               />

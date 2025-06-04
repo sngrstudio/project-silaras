@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect } from 'react'
+import { type FC } from 'react'
 import type { CellContext } from '@tanstack/react-table'
 import type { User } from './users.store'
 import { setCurrentUser, setUsers, $currentPage } from './users.store'
@@ -7,7 +7,6 @@ import EditIcon from '~icons/lucide/pen'
 import TrashIcon from '~icons/lucide/trash-2'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import Image from '~/components/common/image/image'
-import type { GetImageResult } from 'astro'
 import {
   canUserEditUser,
   canUserDeleteUser,
@@ -18,61 +17,30 @@ import {
   showSuccessToast,
   showErrorToast
 } from '~/components/common/toast/toast.store'
-import clsx from 'clsx'
 
 type CurrentUser = Awaited<ReturnType<typeof actions.user.getCurrent.orThrow>>
-
-// Cache for profile photo URLs to avoid repeated API calls
-const profilePhotoCache = new Map<string, GetImageResult>()
-
-const useProfilePhoto = (fileName: string | null | undefined) => {
-  const [profilePhoto, setProfilePhoto] = useState<GetImageResult | undefined>(
-    undefined
-  )
-
-  useEffect(() => {
-    if (!fileName) {
-      setProfilePhoto(undefined)
-      return
-    }
-
-    // Check cache first
-    if (profilePhotoCache.has(fileName)) {
-      setProfilePhoto(profilePhotoCache.get(fileName))
-      return
-    }
-
-    // Fetch presigned URL
-    actions.image.getPresignedImage
-      .orThrow({ fileName, width: 40, height: 40 })
-      .then((image) => {
-        profilePhotoCache.set(fileName, image)
-        setProfilePhoto(image)
-      })
-      .catch(() => {
-        setProfilePhoto(undefined)
-      })
-  }, [fileName])
-
-  return profilePhoto
-}
 
 // Avatar component for mobile list
 const UserAvatar: FC<{
   profilePhoto: string | null | undefined
   fullName: string
 }> = ({ profilePhoto, fullName }) => {
-  const profilePhotoUrl = useProfilePhoto(profilePhoto)
-
   return (
-    <div className={clsx('avatar', !profilePhotoUrl && 'avatar-placeholder')}>
-      <div className='bg-primary text-primary-content aspect-square w-8 rounded-full'>
-        {profilePhotoUrl ? (
-          <Image image={profilePhotoUrl} alt={fullName} />
-        ) : (
+    <div className='avatar avatar-placeholder'>
+      {profilePhoto ? (
+        <div className='mask w-10 mask-circle'>
+          <Image
+            publicId={profilePhoto}
+            width={40}
+            height={40}
+            alt={fullName}
+          />
+        </div>
+      ) : (
+        <div className='bg-primary text-primary-content w-10 rounded-full'>
           <span>{fullName.charAt(0).toUpperCase()}</span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
