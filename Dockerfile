@@ -6,13 +6,24 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 
 FROM base-builder AS prod-deps
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 FROM base-builder AS build-deps
 RUN npm ci
 
 FROM build-deps AS build
-COPY . .
+# Copy configuration files first (these change less frequently)
+COPY astro.config.mjs drizzle.config.mjs tsconfig.json prettier.config.cjs .prettierignore ./
+COPY node.d.ts ./
+
+# Copy source code
+COPY src/ ./src/
+COPY public/ ./public/
+
+# Run the build - this layer will be cached unless:
+# - Dependencies changed (invalidating build-deps)
+# - Configuration files changed
+# - Source code in src/ or public/ changed
 RUN npm run build
 
 # Runner image
