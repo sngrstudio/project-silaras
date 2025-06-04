@@ -6,6 +6,8 @@ import {
 } from '~/auth/cookies'
 import { validateSessionToken } from '~/auth/api'
 
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ?? undefined
+
 export const onRequest = defineMiddleware(async (ctx, next) => {
   const token = ctx.cookies.get(AUTH_COOKIE_NAME)?.value ?? undefined
   if (!token) {
@@ -23,5 +25,6 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
   ctx.locals.user = user
   ctx.locals.session = session
+  ctx.locals.cloudName = CLOUD_NAME
   return next()
 })

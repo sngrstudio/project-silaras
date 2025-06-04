@@ -1,10 +1,9 @@
-import type { FC, ImgHTMLAttributes } from 'react'
+import { useEffect, useState, type FC, type ImgHTMLAttributes } from 'react'
 import { Cloudinary } from '@cloudinary/url-gen'
 import { scale, fit } from '@cloudinary/url-gen/actions/resize'
 import { auto as autoQuality } from '@cloudinary/url-gen/qualifiers/quality'
 import { format } from '@cloudinary/url-gen/actions/delivery'
-
-const CLOUD_NAME = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME
+import { actions } from 'astro:actions'
 
 interface ImageProps
   extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'> {
@@ -22,13 +21,6 @@ interface ImageProps
   contain?: boolean
 }
 
-// Create Cloudinary instance
-const cloudinary = new Cloudinary({
-  cloud: {
-    cloudName: CLOUD_NAME
-  }
-})
-
 const Image: FC<ImageProps> = ({
   publicId,
   width,
@@ -39,6 +31,31 @@ const Image: FC<ImageProps> = ({
   contain = false,
   ...props
 }) => {
+  // Get the cloud name from environment variables
+  const [cloudName, setCloudName] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    actions.site.cloudName.orThrow().then((name) => setCloudName(name))
+  }, [])
+
+  if (!cloudName) {
+    console.error('CLOUDINARY_CLOUD_NAME is not set')
+    return (
+      <div
+        className={`flex items-center justify-center bg-gray-200 ${className}`}
+      >
+        <span className='text-sm text-gray-500'>Image unavailable</span>
+      </div>
+    )
+  }
+
+  // Create Cloudinary instance
+  const cloudinary = new Cloudinary({
+    cloud: {
+      cloudName
+    }
+  })
+
   // Generate srcSet for responsive images with specific format
   const generateSrcSet = (imageFormat?: string) => {
     return breakpoints
