@@ -31,7 +31,7 @@ const Image: FC<ImageProps> = ({
   ...props
 }) => {
   // Get the cloud name from environment variables
-  const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME
+  const cloudName = process.env.PUBLIC_CLOUDINARY_CLOUD_NAME
 
   if (!cloudName) {
     console.error('PUBLIC_CLOUDINARY_CLOUD_NAME is not set')
