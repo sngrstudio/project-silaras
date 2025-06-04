@@ -668,6 +668,20 @@ const user = {
       }
 
       try {
+        // Delete profile picture from Cloudinary if it exists
+        if (targetUser.profilePhoto) {
+          try {
+            await deleteFromCloudinary(targetUser.profilePhoto)
+          } catch (cloudinaryError: any) {
+            // Log the error but don't fail the user deletion
+            // The user record should still be deleted even if Cloudinary deletion fails
+            console.error(
+              'Failed to delete profile picture from Cloudinary:',
+              cloudinaryError.message
+            )
+          }
+        }
+
         await invalidateAllSession(id) // First delete all user sessions
         await deleteUser(id) // Then delete the user
       } catch (dbError: any) {
