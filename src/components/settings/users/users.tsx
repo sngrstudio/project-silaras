@@ -53,9 +53,12 @@ const UserAvatar: FC<{
       {profilePhoto ? (
         <div className={clsx(sizeClass, 'mask mask-circle')}>
           <Image
+            className='object-cover'
             publicId={profilePhoto}
             width={size === 'sm' ? 32 : 40}
             height={size === 'sm' ? 32 : 40}
+            sizes={size === 'sm' ? '32px' : '40px'}
+            breakpoints={[32, 40, 64, 80]}
             alt={fullName}
           />
         </div>

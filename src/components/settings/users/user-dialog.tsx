@@ -313,6 +313,8 @@ const UserDialog: FC = () => {
                   publicId={currentUser.profilePhoto}
                   width={80}
                   height={80}
+                  sizes='80px'
+                  breakpoints={[64, 80, 128]}
                   className='h-20 w-20 rounded-full border-2 border-gray-200 object-cover'
                   alt='Current profile photo'
                 />

@@ -1,3 +1,4 @@
+DROP TABLE `presigned_image_url`;--> statement-breakpoint
 RENAME TABLE `patient_daily_assesment` TO `target_daily_assesment`;--> statement-breakpoint
 RENAME TABLE `patient_monthly_assesment` TO `target_monthly_assesment`;--> statement-breakpoint
 RENAME TABLE `patient` TO `target`;--> statement-breakpoint

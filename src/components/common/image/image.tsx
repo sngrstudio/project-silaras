@@ -1,7 +1,8 @@
 import type { FC, ImgHTMLAttributes } from 'react'
 import { Cloudinary } from '@cloudinary/url-gen'
-import { scale } from '@cloudinary/url-gen/actions/resize'
+import { scale, fit } from '@cloudinary/url-gen/actions/resize'
 import { auto as autoQuality } from '@cloudinary/url-gen/qualifiers/quality'
+import { format } from '@cloudinary/url-gen/actions/delivery'
 
 interface ImageProps
   extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'srcSet'> {
@@ -15,6 +16,8 @@ interface ImageProps
   sizes?: string
   /** Custom breakpoints for srcSet generation (defaults to common breakpoints) */
   breakpoints?: number[]
+  /** Whether to contain the image (object-fit: contain) instead of cropping. Default: false (crop/fill) */
+  contain?: boolean
 }
 
 const Image: FC<ImageProps> = ({
@@ -24,6 +27,7 @@ const Image: FC<ImageProps> = ({
   className,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   breakpoints = [320, 640, 768, 1024, 1280, 1536],
+  contain = false,
   ...props
 }) => {
   // Get the cloud name from environment variables
@@ -47,19 +51,31 @@ const Image: FC<ImageProps> = ({
     }
   })
 
-  // Generate srcSet for responsive images
-  const generateSrcSet = () => {
+  // Generate srcSet for responsive images with specific format
+  const generateSrcSet = (imageFormat?: string) => {
     return breakpoints
       .map((breakpointWidth) => {
         const image = cloudinary.image(publicId)
 
+        // Apply format if specified
+        if (imageFormat) {
+          image.delivery(format(imageFormat))
+        }
+
         // Apply dimensions based on breakpoint
         if (width || height) {
           if (width && height) {
-            // Scale proportionally based on the breakpoint
-            const aspectRatio = height / width
-            const scaledHeight = Math.round(breakpointWidth * aspectRatio)
-            image.resize(scale().width(breakpointWidth).height(scaledHeight))
+            if (contain) {
+              // Use scale to maintain aspect ratio (object-fit: contain behavior)
+              const aspectRatio = width / height
+              const scaledHeight = Math.round(breakpointWidth * aspectRatio)
+              image.resize(scale().width(breakpointWidth).height(scaledHeight))
+            } else {
+              // Use fit to fill dimensions
+              const aspectRatio = width / height
+              const scaledHeight = Math.round(breakpointWidth * aspectRatio)
+              image.resize(fit().width(breakpointWidth).height(scaledHeight))
+            }
           } else if (width) {
             image.resize(scale().width(breakpointWidth))
           } else if (height) {
@@ -79,33 +95,58 @@ const Image: FC<ImageProps> = ({
       .join(', ')
   }
 
-  // Create the main image with original dimensions
-  const mainImage = cloudinary.image(publicId)
+  // Create image with specific format
+  const createImageWithFormat = (imageFormat?: string) => {
+    const image = cloudinary.image(publicId)
 
-  // Apply dimensions if provided
-  if (width || height) {
-    if (width && height) {
-      mainImage.resize(scale().width(width).height(height))
-    } else if (width) {
-      mainImage.resize(scale().width(width))
-    } else if (height) {
-      mainImage.resize(scale().height(height))
+    // Apply format if specified
+    if (imageFormat) {
+      image.delivery(format(imageFormat))
     }
+
+    // Apply dimensions if provided
+    if (width || height) {
+      if (width && height) {
+        if (contain) {
+          // Use scale to maintain aspect ratio (object-fit: contain behavior)
+          image.resize(scale().width(width).height(height))
+        } else {
+          // Use fit to fill dimensions
+          image.resize(fit().width(width).height(height))
+        }
+      } else if (width) {
+        image.resize(scale().width(width))
+      } else if (height) {
+        image.resize(scale().height(height))
+      }
+    }
+
+    // Apply auto quality for optimal file size
+    image.quality(autoQuality())
+
+    return image
   }
 
-  // Apply auto quality for optimal file size
-  mainImage.quality(autoQuality())
-
   return (
-    <img
-      className={className}
-      src={mainImage.toURL()}
-      srcSet={generateSrcSet()}
-      sizes={sizes}
-      width={width}
-      height={height}
-      {...props}
-    />
+    <picture>
+      {/* AVIF format source */}
+      <source srcSet={generateSrcSet('avif')} sizes={sizes} type='image/avif' />
+
+      {/* WebP format source */}
+      <source srcSet={generateSrcSet('webp')} sizes={sizes} type='image/webp' />
+
+      {/* Original format source */}
+      <source srcSet={generateSrcSet()} sizes={sizes} />
+
+      {/* Fallback img element */}
+      <img
+        className={className}
+        src={createImageWithFormat().toURL()}
+        width={width}
+        height={height}
+        {...props}
+      />
+    </picture>
   )
 }
 

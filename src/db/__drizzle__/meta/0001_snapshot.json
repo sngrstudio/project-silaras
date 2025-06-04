@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "f5b27468-00e5-4a48-9c9b-340087e668e7",
+  "id": "fcd5c7b1-c089-4a54-bbc4-393d66b6ce3e",
   "prevId": "01c39096-ccca-443f-bf9f-c3a8082dc510",
   "tables": {
     "daily_assesment": {
@@ -338,44 +338,6 @@
           "columns": [
             "target_id",
             "monthly_assesment_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "presigned_image_url": {
-      "name": "presigned_image_url",
-      "columns": {
-        "file_name": {
-          "name": "file_name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "presigned_url": {
-          "name": "presigned_url",
-          "type": "varchar(511)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "presigned_image_url_file_name": {
-          "name": "presigned_image_url_file_name",
-          "columns": [
-            "file_name"
           ]
         }
       },

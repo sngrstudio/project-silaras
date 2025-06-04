@@ -201,6 +201,9 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
                 publicId={cell.row.original.image}
                 width={200}
                 height={150}
+                sizes='(max-width: 640px) 180px, 200px'
+                breakpoints={[180, 200, 300, 400]}
+                contain
                 alt='Foto makanan saat ini'
                 className='max-h-36 max-w-48 object-contain'
               />

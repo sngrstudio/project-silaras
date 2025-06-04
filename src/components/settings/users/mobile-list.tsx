@@ -33,6 +33,8 @@ const UserAvatar: FC<{
             publicId={profilePhoto}
             width={40}
             height={40}
+            sizes='40px'
+            breakpoints={[32, 40, 64]}
             alt={fullName}
           />
         </div>
