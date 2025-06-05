@@ -38,3 +38,13 @@
   --depth: 1;
   --noise: 1;
 }
+
+/*
+Z-INDEX HIERARCHY (highest to lowest):
+- z-[9999]: Toast notifications (highest priority)
+- z-[9998]: Dialog overlays and content
+- z-[9997]: Drawer side menu and overlay
+- z-[9996]: Dropdown menus and selects
+- z-[9995]: Dropdown overlays
+- z-50 and below: Regular components, buttons, etc.
+*/

@@ -219,7 +219,7 @@ const RegionSelect: FC<RegionSelectProps> = ({
 
       {/* Dropdown */}
       {isOpen && !isDisabled && (
-        <div className='bg-base-100 border-base-300 absolute z-50 mt-1 max-h-60 w-full overflow-hidden rounded-lg border shadow-lg'>
+        <div className='bg-base-100 border-base-300 absolute z-[9996] mt-1 max-h-60 w-full overflow-hidden rounded-lg border shadow-lg'>
           {/* Search input */}
           <div className='border-base-300 border-b p-2'>
             <input
@@ -270,7 +270,10 @@ const RegionSelect: FC<RegionSelectProps> = ({
 
       {/* Click outside to close */}
       {isOpen && (
-        <div className='fixed inset-0 z-40' onClick={() => setIsOpen(false)} />
+        <div
+          className='fixed inset-0 z-[9995]'
+          onClick={() => setIsOpen(false)}
+        />
       )}
 
       {/* Error message */}

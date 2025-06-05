@@ -59,7 +59,7 @@ const Navigation: FC = () => {
   }
 
   return (
-    <div className='mt-8 flex justify-center w-full'>
+    <div className='mt-8 flex w-full justify-center'>
       <div className='border-base-300 bg-base-100 inline-flex items-center overflow-hidden rounded-full border shadow-lg'>
         <button
           className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'

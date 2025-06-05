@@ -36,10 +36,10 @@ const DrawerRC: FC<DrawerProps> = ({ children, user }) => {
       <div className='drawer-content h-[calc(100vh-4rem)] overflow-auto p-4 md:p-8'>
         {children}
       </div>
-      <div className='drawer-side xl:max-h-[calc(100dvh-4rem)]'>
+      <div className='drawer-side z-[9997] xl:max-h-[calc(100dvh-4rem)]'>
         <label
           htmlFor='drawer'
-          className='drawer-overlay'
+          className='drawer-overlay z-[9997]'
           aria-label='close sidebar'
         />
         <DrawerMenuRC />

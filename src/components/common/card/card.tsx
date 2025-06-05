@@ -22,7 +22,7 @@ const CardTemplate: FC<PropsWithChildren<CardTemplateProps>> = ({
   title
 }) => {
   return (
-    <div className='card border-base-300/50 bg-base-100 group hover:border-primary/30 hover:shadow-primary/5 relative overflow-hidden border shadow-lg transition-all duration-300 hover:shadow-xl'>
+    <div className='card border-base-300/50 bg-base-100 group hover:border-primary/30 hover:shadow-primary/5 relative overflow-hidden border shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl'>
       {/* Subtle gradient overlay for depth */}
       <div className='from-base-100/50 to-base-200/30 pointer-events-none absolute inset-0 bg-gradient-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
 

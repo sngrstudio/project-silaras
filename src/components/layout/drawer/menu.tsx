@@ -33,7 +33,7 @@ const SETTINGS_MENU = [
 
 const DrawerMenuRC: FC = () => {
   return (
-    <ul className='menu bg-base-200 pointer-coarse:menu-lg h-full w-64 p-4 max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
+    <ul className='menu bg-base-200 pointer-coarse:menu-lg relative z-[9997] h-full w-64 p-4 max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
       <MainMenu />
       <RegionsMenu />
       <SettingsMenu />

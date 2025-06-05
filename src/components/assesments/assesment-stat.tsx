@@ -202,7 +202,7 @@ const AssesmentStatRC: FC = () => {
           <div className='flex flex-1 items-center justify-center'>
             <div className='text-center'>
               <input
-                className='text-primary focus:ring-primary/20 w-28 rounded bg-transparent px-1 text-center text-3xl font-bold focus:ring-2 focus:outline-none'
+                className='text-primary focus:ring-primary/20 w-36 rounded bg-transparent px-2 text-center text-3xl font-bold transition-all duration-200 focus:ring-2 focus:outline-none'
                 name='height'
                 id='height'
                 type='number'
@@ -258,7 +258,7 @@ const AssesmentStatRC: FC = () => {
           <div className='flex flex-1 items-center justify-center'>
             <div className='text-center'>
               <input
-                className='text-warning focus:ring-warning/20 w-28 rounded bg-transparent px-1 text-center text-3xl font-bold focus:ring-2 focus:outline-none'
+                className='text-warning focus:ring-warning/20 w-36 rounded bg-transparent px-2 text-center text-3xl font-bold transition-all duration-200 focus:ring-2 focus:outline-none'
                 name='weight'
                 id='weight'
                 type='number'

@@ -6,6 +6,11 @@ import {
   showErrorToast,
   showSuccessToast
 } from '~/components/common/toast/toast.store'
+import SettingsIcon from '~icons/lucide/settings'
+import SaveIcon from '~icons/lucide/save'
+import RotateCcwIcon from '~icons/lucide/rotate-ccw'
+import GlobeIcon from '~icons/lucide/globe'
+import FileTextIcon from '~icons/lucide/file-text'
 
 const SiteForm: FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
@@ -65,68 +70,123 @@ const SiteForm: FC = () => {
     return undefined
   }
 
-  const [_error, action, isPending] = useActionState(handleForm, undefined)
+  const [error, action, isPending] = useActionState(handleForm, undefined)
 
   if (!siteSettings) {
-    return <></>
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <span className='loading loading-spinner loading-lg'></span>
+      </div>
+    )
   }
 
   return (
-    <form
-      className='flex w-full flex-col gap-y-4'
-      action={action}
-      ref={formRef}
-    >
-      <div>
-        <label className='label' htmlFor='siteName'>
-          Site Name
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='text'
-          id='siteName'
-          name='siteName'
-          defaultValue={siteSettings.SITE_NAME}
-          onChange={(e) => handleInputChange('siteName', e.target.value)}
-          required
-          disabled={isPending}
-        />
+    <div className='flex flex-col gap-6 p-6 md:p-8'>
+      <div className='mb-2'>
+        <h1 className='text-base-content text-2xl font-bold md:text-3xl'>
+          Setelan Situs
+        </h1>
+        <p className='text-base-content/70 mt-1 text-sm'>
+          Kelola pengaturan dasar situs dan informasi umum
+        </p>
       </div>
 
-      <div>
-        <label className='label' htmlFor='siteDescription'>
-          Site Description
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='text'
-          id='siteDescription'
-          name='siteDescription'
-          defaultValue={siteSettings.SITE_DESCRIPTION}
-          onChange={(e) => handleInputChange('siteDescription', e.target.value)}
-          required
-          disabled={isPending}
-        />
-      </div>
+      <form ref={formRef} action={action} className='flex flex-col gap-6'>
+        {/* Site Configuration Section */}
+        <fieldset className='border-primary/20 from-primary/5 to-primary/10 space-y-4 rounded-lg border bg-gradient-to-r p-4'>
+          <legend className='border-primary/30 bg-base-100 text-primary flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
+            <SettingsIcon className='h-5 w-5' />
+            Konfigurasi Situs
+          </legend>
 
-      <div className='flex w-full flex-col-reverse gap-2 md:flex-row-reverse'>
-        <button
-          className='btn btn-primary max-md:w-full'
-          type='submit'
-          disabled={isPending || !hasChanges()}
-        >
-          Save Changes
-        </button>
-        <button
-          className='btn btn-ghost max-md:w-full'
-          type='button'
-          onClick={handleReset}
-          disabled={isPending || !hasChanges()}
-        >
-          Reset
-        </button>
-      </div>
-    </form>
+          <div className='grid gap-4'>
+            {/* Site Name */}
+            <div className='space-y-1'>
+              <label
+                className='label-text flex items-center gap-2 text-sm font-medium'
+                htmlFor='siteName'
+              >
+                <GlobeIcon className='text-base-content/60 h-4 w-4' />
+                Nama Situs
+              </label>
+              <input
+                className='input input-bordered w-full'
+                type='text'
+                id='siteName'
+                name='siteName'
+                defaultValue={siteSettings.SITE_NAME}
+                onChange={(e) => handleInputChange('siteName', e.target.value)}
+                required
+                disabled={isPending}
+                placeholder='Masukkan nama situs'
+              />
+              {error?.fields?.siteName && (
+                <div className='text-error text-xs'>
+                  {error.fields.siteName.join(', ')}
+                </div>
+              )}
+            </div>
+
+            {/* Site Description */}
+            <div className='space-y-1'>
+              <label
+                className='label-text flex items-center gap-2 text-sm font-medium'
+                htmlFor='siteDescription'
+              >
+                <FileTextIcon className='text-base-content/60 h-4 w-4' />
+                Deskripsi Situs
+              </label>
+              <textarea
+                className='textarea textarea-bordered w-full resize-none'
+                rows={3}
+                id='siteDescription'
+                name='siteDescription'
+                defaultValue={siteSettings.SITE_DESCRIPTION}
+                onChange={(e) =>
+                  handleInputChange('siteDescription', e.target.value)
+                }
+                required
+                disabled={isPending}
+                placeholder='Masukkan deskripsi situs'
+              />
+              {error?.fields?.siteDescription && (
+                <div className='text-error text-xs'>
+                  {error.fields.siteDescription.join(', ')}
+                </div>
+              )}
+              <div className='text-base-content/60 text-xs'>
+                Deskripsi akan ditampilkan pada meta tag halaman
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        {/* Action Buttons */}
+        <div className='border-base-300 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:justify-end'>
+          <button
+            type='button'
+            className='btn btn-ghost'
+            onClick={handleReset}
+            disabled={isPending || !hasChanges()}
+          >
+            <RotateCcwIcon className='h-4 w-4' />
+            Reset
+          </button>
+
+          <button
+            type='submit'
+            className='btn btn-primary'
+            disabled={isPending || !hasChanges()}
+          >
+            {isPending && (
+              <span className='loading loading-spinner loading-sm'></span>
+            )}
+            <SaveIcon className='h-4 w-4' />
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 
