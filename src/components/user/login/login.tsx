@@ -1,13 +1,50 @@
-import { useActionState, useRef, type FC } from 'react'
+import { useActionState, useRef, useEffect, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
 import {
   showErrorToast,
   showSuccessToast
 } from '~/components/common/toast/toast.store'
+import UserIcon from '~icons/lucide/user'
+import LockIcon from '~icons/lucide/lock'
+import LoaderIcon from '~icons/lucide/loader'
+import LogInIcon from '~icons/lucide/log-in'
+import UserPlusIcon from '~icons/lucide/user-plus'
 
 const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
   const formRef = useRef<HTMLFormElement>(null)
+
+  // Handle password confirmation validation
+  useEffect(() => {
+    const usernameInput = document.getElementById(
+      'username'
+    ) as HTMLInputElement
+    const passwordInput = document.getElementById(
+      'password'
+    ) as HTMLInputElement
+
+    if (usernameInput && passwordInput) {
+      const validateUsername = () => {
+        if (
+          usernameInput.value.length > 0 &&
+          !/^[a-z0-9]{4,}$/.test(usernameInput.value)
+        ) {
+          usernameInput.setCustomValidity(
+            'Username harus terdiri dari huruf kecil dan angka, minimal 4 karakter'
+          )
+        } else {
+          usernameInput.setCustomValidity('')
+        }
+      }
+
+      usernameInput.addEventListener('input', validateUsername)
+
+      return () => {
+        usernameInput.removeEventListener('input', validateUsername)
+      }
+    }
+    return undefined
+  }, [])
 
   const handleForm = async (_prev: unknown, formData: FormData) => {
     const { error } = await actions.user.auth.login(formData)
@@ -49,52 +86,109 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
     return undefined
   }
 
-  const [_error, action, isPending] = useActionState(handleForm, undefined)
+  const [error, action, isPending] = useActionState(handleForm, undefined)
 
   return (
     <form
-      className='flex w-full flex-col gap-y-4'
+      className='flex w-full flex-col gap-6'
       action={action}
       ref={formRef}
+      noValidate={false}
     >
-      <div>
-        <label className='label' htmlFor='username'>
-          Username
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='text'
-          id='username'
-          name='username'
-          defaultValue={userName}
-          required
-          disabled={isPending}
-        />
-      </div>
+      {/* Basic Information Section */}
+      <fieldset className='border-primary/20 from-primary/5 to-primary/10 space-y-4 rounded-lg border bg-gradient-to-r p-4'>
+        <legend className='border-primary/30 bg-base-100 text-primary flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
+          <UserIcon className='h-5 w-5' />
+          Informasi Login
+        </legend>
 
-      <div>
-        <label className='label' htmlFor='password'>
-          Password
-        </label>
-        <input
-          className='input md:input-lg w-full'
-          type='password'
-          id='password'
-          name='password'
-          required
-          disabled={isPending}
-        />
-      </div>
+        <div className='space-y-4'>
+          <div>
+            <label className='label' htmlFor='username'>
+              <span className='label-text flex items-center gap-2 font-medium'>
+                <UserIcon className='text-base-content/60 h-4 w-4' />
+                Username
+              </span>
+            </label>
+            <input
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 validator w-full transition-all duration-200 focus:ring-2'
+              type='text'
+              id='username'
+              name='username'
+              defaultValue={userName}
+              required
+              disabled={isPending}
+              placeholder='Masukkan username'
+              autoComplete='username'
+              pattern='[a-z0-9]{4,}'
+              title='Username harus terdiri dari huruf kecil dan angka, minimal 4 karakter'
+            />
+            {error?.fields?.username && (
+              <div className='label'>
+                <span className='label-text-alt text-error'>
+                  {error.fields.username.join(', ')}
+                </span>
+              </div>
+            )}
+          </div>
 
-      <div className='mt-4 flex w-full flex-col-reverse gap-y-2'>
+          <div>
+            <label className='label' htmlFor='password'>
+              <span className='label-text flex items-center gap-2 font-medium'>
+                <LockIcon className='text-base-content/60 h-4 w-4' />
+                Password
+              </span>
+            </label>
+            <input
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 validator w-full transition-all duration-200 focus:ring-2'
+              type='password'
+              id='password'
+              name='password'
+              required
+              disabled={isPending}
+              placeholder='Masukkan password'
+              autoComplete='current-password'
+              minLength={8}
+            />
+            {error?.fields?.password && (
+              <div className='label'>
+                <span className='label-text-alt text-error'>
+                  {error.fields.password.join(', ')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </fieldset>
+
+      {/* Action Buttons */}
+      <div className='border-base-300 flex flex-col gap-3 border-t pt-6'>
         <button
-          className='btn btn-primary w-full'
+          className={`btn border transition-all duration-200 hover:scale-105 ${
+            isPending
+              ? 'bg-base-200 border-base-300 text-base-content/50 cursor-not-allowed'
+              : 'from-primary to-primary/80 border-primary/30 text-primary-content hover:shadow-primary/25 bg-gradient-to-r hover:shadow-lg'
+          }`}
           type='submit'
           disabled={isPending}
         >
-          Login
+          {isPending ? (
+            <>
+              <LoaderIcon className='h-4 w-4 animate-spin' />
+              Sedang Login...
+            </>
+          ) : (
+            <>
+              <LogInIcon className='h-4 w-4' />
+              Login
+            </>
+          )}
         </button>
-        <a className='btn btn-link' href='/user/signup'>
+        <a
+          className='btn btn-ghost border-base-300 hover:border-base-400 hover:bg-base-200 border transition-all duration-200'
+          href='/user/signup'
+        >
+          <UserPlusIcon className='h-4 w-4' />
           Daftarkan akun
         </a>
       </div>
