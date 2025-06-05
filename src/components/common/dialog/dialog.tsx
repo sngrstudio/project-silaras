@@ -5,6 +5,7 @@ import IconX from '~icons/lucide/x'
 
 export interface DialogProps {
   title?: string | undefined
+  description?: string | undefined
   open: boolean
   onOpenChange?: (open: boolean) => void
   closeAction?: () => void
@@ -25,6 +26,7 @@ export interface DialogTemplateProps {
 export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
   children,
   title,
+  description,
   open = false,
   onOpenChange,
   closeAction,
@@ -76,6 +78,11 @@ export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
               <Dialog.Title className='mb-4 text-lg font-bold'>
                 {title}
               </Dialog.Title>
+            )}
+            {description && (
+              <Dialog.Description className='text-base-content/70 mb-4 text-sm'>
+                {description}
+              </Dialog.Description>
             )}
             {children}
           </div>

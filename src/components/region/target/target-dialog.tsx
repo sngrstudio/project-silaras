@@ -75,12 +75,15 @@ const TargetDialog: FC = () => {
   const currentRegion = useStore($currentRegion)
   const currentTarget = useStore($currentTarget)
   const openTargetModal = useStore($openTargetModal)
+
+  // Initialize with safe defaults to prevent hydration mismatch
   const [latLng, setLatLng] = useState<L.LatLng>({
-    lat: currentTarget?.latitude ?? 0,
-    lng: currentTarget?.longitude ?? 0
+    lat: 0,
+    lng: 0
   } as L.LatLng)
-  const [address, setAddress] = useState<string>(currentTarget?.address || '')
+  const [address, setAddress] = useState<string>('')
   const [isGettingLocation, setIsGettingLocation] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState<string>('')
 
   useEffect(() => {
     document.addEventListener('astro:page-load', () => {
@@ -88,20 +91,20 @@ const TargetDialog: FC = () => {
     })
   })
 
-  // Update address when current target changes
-  useEffect(() => {
-    if (currentTarget?.address) {
-      setAddress(currentTarget.address)
-    }
-  }, [currentTarget?.address])
-
-  // Update latLng when current target changes
+  // Update all state when current target changes to prevent hydration mismatch
   useEffect(() => {
     if (currentTarget) {
       setLatLng({
         lat: currentTarget.latitude ?? 0,
         lng: currentTarget.longitude ?? 0
       } as L.LatLng)
+      setSelectedStatus(currentTarget.status || '')
+      setAddress(currentTarget.address || '')
+    } else {
+      // Reset to defaults when no target is selected
+      setLatLng({ lat: 0, lng: 0 } as L.LatLng)
+      setSelectedStatus('')
+      setAddress('')
     }
   }, [currentTarget])
 
@@ -227,37 +230,44 @@ const TargetDialog: FC = () => {
   return (
     <DialogComponent
       title='Tambah atau Ubah Sasaran'
+      description='Lengkapi formulir berikut untuk menambah atau mengubah data sasaran. Semua field yang ditandai wajib diisi.'
       open={openTargetModal}
       onOpenChange={(open) => !open && setCurrentTarget(undefined)}
     >
       <form className='flex flex-col gap-6 p-1' action={action}>
         {/* Personal Information Section */}
-        <fieldset className='space-y-4 rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-4'>
-          <legend className='flex items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-1 font-medium text-blue-700 shadow-sm'>
+        <fieldset className='border-primary/20 from-primary/5 to-primary/10 space-y-4 rounded-lg border bg-gradient-to-r p-4'>
+          <legend className='border-primary/30 bg-base-100 text-primary flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
             <IconUser className='h-5 w-5' />
             <span>Informasi Personal</span>
           </legend>
 
           {/* Nama */}
           <div className='space-y-2'>
-            <label className='label font-medium text-gray-700' htmlFor='name'>
+            <label
+              className='label text-base-content font-medium'
+              htmlFor='name'
+            >
               <span className='flex items-center gap-2'>
-                <IconEdit className='h-4 w-4 text-blue-600' />
+                <IconEdit className='text-primary h-4 w-4' />
                 Nama Sasaran
               </span>
             </label>
             <input
               id='name'
               name='name'
-              className='input input-bordered w-full border-blue-200 bg-white transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 validator w-full transition-all duration-200 focus:ring-2'
               type='text'
               defaultValue={currentTarget.name}
               disabled={isPending}
               required
+              minLength={2}
+              pattern='[a-zA-Z\s]+'
               placeholder='Masukkan nama lengkap'
+              title='Nama hanya boleh mengandung huruf dan spasi, minimal 2 karakter'
             />
             {error && error.fields.name && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.name.join(', ')}
@@ -269,26 +279,29 @@ const TargetDialog: FC = () => {
           {/* Nama Ibu */}
           <div className='space-y-2'>
             <label
-              className='label font-medium text-gray-700'
+              className='label text-base-content font-medium'
               htmlFor='motherName'
             >
               <span className='flex items-center gap-2'>
-                <IconHeart className='h-4 w-4 text-pink-600' />
+                <IconHeart className='text-primary h-4 w-4' />
                 Nama Ibu
               </span>
             </label>
             <input
               id='motherName'
               name='motherName'
-              className='input input-bordered w-full border-blue-200 bg-white transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 validator w-full transition-all duration-200 focus:ring-2'
               type='text'
               defaultValue={currentTarget.motherName}
               disabled={isPending}
               required
+              minLength={2}
+              pattern='[a-zA-Z\s]+'
               placeholder='Masukkan nama ibu'
+              title='Nama hanya boleh mengandung huruf dan spasi, minimal 2 karakter'
             />
             {error && error.fields.motherName && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.motherName.join(', ')}
@@ -300,18 +313,18 @@ const TargetDialog: FC = () => {
           {/* Tanggal Lahir */}
           <div className='space-y-2'>
             <label
-              className='label font-medium text-gray-700'
+              className='label text-base-content font-medium'
               htmlFor='birthDate'
             >
               <span className='flex items-center gap-2'>
-                <IconCake className='h-4 w-4 text-green-600' />
+                <IconCake className='text-primary h-4 w-4' />
                 Tanggal Lahir
               </span>
             </label>
             <input
               id='birthDate'
               name='birthDate'
-              className='input input-bordered w-full border-blue-200 bg-white transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 validator w-full transition-all duration-200 focus:ring-2'
               type='date'
               defaultValue={
                 typeof currentTarget.birthDate === 'string'
@@ -320,9 +333,10 @@ const TargetDialog: FC = () => {
               }
               disabled={isPending}
               required
+              max={new Date().toISOString().split('T')[0]}
             />
             {error && error.fields.birthDate && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.birthDate.join(', ')}
@@ -333,89 +347,152 @@ const TargetDialog: FC = () => {
 
           {/* Status */}
           <div className='space-y-3'>
-            <label className='label font-medium text-gray-700'>
+            <label className='label text-base-content font-medium'>
               <span className='flex items-center gap-2'>
-                <IconTag className='h-4 w-4 text-purple-600' />
+                <IconTag className='text-primary h-4 w-4' />
                 Status
               </span>
             </label>
             <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
               {/* Hamil Status Card */}
-              <label className='cursor-pointer'>
+              <label className='relative cursor-pointer'>
                 <input
                   type='radio'
                   name='status'
                   value='HAMIL'
-                  defaultChecked={currentTarget.status === 'HAMIL'}
+                  checked={selectedStatus === 'HAMIL'}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   disabled={isPending}
                   required
                   className='sr-only'
                 />
-                <div className='card card-compact h-24 border-2 border-gray-200 bg-white transition-all duration-200 hover:scale-105 hover:border-pink-300 hover:shadow-sm has-[:checked]:border-pink-400 has-[:checked]:bg-pink-50 has-[:checked]:shadow-md'>
+                <div
+                  className={`card card-compact h-24 border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
+                    selectedStatus === 'HAMIL'
+                      ? 'border-primary bg-primary/20 text-primary ring-primary/30 shadow-lg ring-2'
+                      : 'border-base-300 bg-base-100 hover:border-primary'
+                  }`}
+                >
                   <div className='card-body items-center justify-center p-3 text-center'>
-                    <IconUsers className='h-8 w-8 text-pink-600' />
+                    <IconUsers className='h-8 w-8 transition-colors duration-200' />
                     <div className='flex flex-col items-center'>
-                      <span className='font-medium text-gray-700'>Hamil</span>
-                      <span className='text-xs text-transparent'>
-                        placeholder
-                      </span>
+                      <span className='font-medium'>Hamil</span>
+                      <span className='text-xs opacity-60'>Ibu Hamil</span>
                     </div>
                   </div>
                 </div>
+                {/* Selected indicator */}
+                {selectedStatus === 'HAMIL' && (
+                  <div className='bg-primary text-primary-content absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full shadow-md'>
+                    <svg
+                      className='h-3 w-3'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
+                      />
+                    </svg>
+                  </div>
+                )}
               </label>
 
               {/* Menyusui Status Card */}
-              <label className='cursor-pointer'>
+              <label className='relative cursor-pointer'>
                 <input
                   type='radio'
                   name='status'
                   value='MENYUSUI'
-                  defaultChecked={currentTarget.status === 'MENYUSUI'}
+                  checked={selectedStatus === 'MENYUSUI'}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   disabled={isPending}
                   required
                   className='sr-only'
                 />
-                <div className='card card-compact h-24 border-2 border-gray-200 bg-white transition-all duration-200 hover:scale-105 hover:border-blue-300 hover:shadow-sm has-[:checked]:border-blue-400 has-[:checked]:bg-blue-50 has-[:checked]:shadow-md'>
+                <div
+                  className={`card card-compact h-24 border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
+                    selectedStatus === 'MENYUSUI'
+                      ? 'border-accent bg-accent/20 text-accent ring-accent/30 shadow-lg ring-2'
+                      : 'border-base-300 bg-base-100 hover:border-accent'
+                  }`}
+                >
                   <div className='card-body items-center justify-center p-3 text-center'>
-                    <IconMilk className='h-8 w-8 text-blue-600' />
+                    <IconMilk className='h-8 w-8 transition-colors duration-200' />
                     <div className='flex flex-col items-center'>
-                      <span className='font-medium text-gray-700'>
-                        Menyusui
-                      </span>
-                      <span className='text-xs text-transparent'>
-                        placeholder
-                      </span>
+                      <span className='font-medium'>Menyusui</span>
+                      <span className='text-xs opacity-60'>Ibu Menyusui</span>
                     </div>
                   </div>
                 </div>
+                {/* Selected indicator */}
+                {selectedStatus === 'MENYUSUI' && (
+                  <div className='bg-accent text-accent-content absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full shadow-md'>
+                    <svg
+                      className='h-3 w-3'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
+                      />
+                    </svg>
+                  </div>
+                )}
               </label>
 
               {/* Baduta Status Card */}
-              <label className='cursor-pointer'>
+              <label className='relative cursor-pointer'>
                 <input
                   type='radio'
                   name='status'
                   value='ANAK-ANAK'
-                  defaultChecked={currentTarget.status === 'ANAK-ANAK'}
+                  checked={selectedStatus === 'ANAK-ANAK'}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   disabled={isPending}
                   required
                   className='sr-only'
                 />
-                <div className='card card-compact h-24 border-2 border-gray-200 bg-white transition-all duration-200 hover:scale-105 hover:border-green-300 hover:shadow-sm has-[:checked]:border-green-400 has-[:checked]:bg-green-50 has-[:checked]:shadow-md'>
+                <div
+                  className={`card card-compact h-24 border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-md ${
+                    selectedStatus === 'ANAK-ANAK'
+                      ? 'border-success bg-success/20 text-success ring-success/30 shadow-lg ring-2'
+                      : 'border-base-300 bg-base-100 hover:border-success'
+                  }`}
+                >
                   <div className='card-body items-center justify-center p-3 text-center'>
-                    <IconBaby className='h-8 w-8 text-green-600' />
+                    <IconBaby className='h-8 w-8 transition-colors duration-200' />
                     <div className='flex flex-col items-center'>
-                      <span className='font-medium text-gray-700'>Baduta</span>
-                      <span className='text-xs text-gray-500'>
+                      <span className='font-medium'>Baduta</span>
+                      <span className='text-xs opacity-60'>
                         Bawah Dua Tahun
                       </span>
                     </div>
                   </div>
                 </div>
+                {/* Selected indicator */}
+                {selectedStatus === 'ANAK-ANAK' && (
+                  <div className='bg-success text-success-content absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full shadow-md'>
+                    <svg
+                      className='h-3 w-3'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
+                      />
+                    </svg>
+                  </div>
+                )}
               </label>
             </div>
             {error && error.fields.status && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.status.join(', ')}
@@ -426,8 +503,8 @@ const TargetDialog: FC = () => {
         </fieldset>
 
         {/* Health Metrics Section */}
-        <fieldset className='space-y-4 rounded-lg border border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 p-4'>
-          <legend className='flex items-center gap-2 rounded-md border border-green-200 bg-white px-3 py-1 font-medium text-green-700 shadow-sm'>
+        <fieldset className='border-info/20 from-info/5 to-info/10 space-y-4 rounded-lg border bg-gradient-to-r p-4'>
+          <legend className='border-info/30 bg-base-100 text-info flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
             <IconActivity className='h-5 w-5' />
             <span>Data Kesehatan</span>
           </legend>
@@ -436,11 +513,11 @@ const TargetDialog: FC = () => {
             {/* Initial Weight */}
             <div className='space-y-2'>
               <label
-                className='label font-medium text-gray-700'
+                className='label text-base-content font-medium'
                 htmlFor='initialWeight'
               >
                 <span className='flex items-center gap-2'>
-                  <IconWeight className='h-4 w-4 text-orange-600' />
+                  <IconWeight className='text-info h-4 w-4' />
                   Berat Badan Awal
                 </span>
               </label>
@@ -448,21 +525,22 @@ const TargetDialog: FC = () => {
                 <input
                   id='initialWeight'
                   name='initialWeight'
-                  className='input input-bordered w-full border-green-200 bg-white pr-12 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-100'
+                  className='input input-bordered border-info/30 bg-base-100 focus:border-info focus:ring-info/20 validator w-full pr-12 transition-all duration-200 focus:ring-2'
                   type='number'
                   step='0.01'
-                  min='0'
+                  min='0.01'
                   defaultValue={currentTarget.initialWeight}
                   disabled={isPending}
                   required
                   placeholder='0.00'
+                  title='Masukkan berat badan dalam kilogram (harus lebih dari 0)'
                 />
-                <span className='absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500'>
+                <span className='text-base-content/60 absolute top-1/2 right-3 -translate-y-1/2 text-sm'>
                   kg
                 </span>
               </div>
               {error && error.fields.initialWeight && (
-                <div className='label text-sm text-red-500'>
+                <div className='label text-error text-sm'>
                   <span className='flex items-center gap-1'>
                     <IconAlertTriangle className='h-3 w-3' />
                     {error.fields.initialWeight.join(', ')}
@@ -474,11 +552,11 @@ const TargetDialog: FC = () => {
             {/* Initial Height */}
             <div className='space-y-2'>
               <label
-                className='label font-medium text-gray-700'
+                className='label text-base-content font-medium'
                 htmlFor='initialHeight'
               >
                 <span className='flex items-center gap-2'>
-                  <IconRuler className='h-4 w-4 text-blue-600' />
+                  <IconRuler className='text-info h-4 w-4' />
                   Tinggi Badan Awal
                 </span>
               </label>
@@ -486,21 +564,22 @@ const TargetDialog: FC = () => {
                 <input
                   id='initialHeight'
                   name='initialHeight'
-                  className='input input-bordered w-full border-green-200 bg-white pr-12 transition-all duration-200 focus:border-green-400 focus:ring-2 focus:ring-green-100'
+                  className='input input-bordered border-info/30 bg-base-100 focus:border-info focus:ring-info/20 validator w-full pr-12 transition-all duration-200 focus:ring-2'
                   type='number'
                   step='0.1'
-                  min='0'
+                  min='0.1'
                   defaultValue={currentTarget.initialHeight}
                   disabled={isPending}
                   required
                   placeholder='0.0'
+                  title='Masukkan tinggi badan dalam sentimeter (harus lebih dari 0)'
                 />
-                <span className='absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500'>
+                <span className='text-base-content/60 absolute top-1/2 right-3 -translate-y-1/2 text-sm'>
                   cm
                 </span>
               </div>
               {error && error.fields.initialHeight && (
-                <div className='label text-sm text-red-500'>
+                <div className='label text-error text-sm'>
                   <span className='flex items-center gap-1'>
                     <IconAlertTriangle className='h-3 w-3' />
                     {error.fields.initialHeight.join(', ')}
@@ -512,9 +591,9 @@ const TargetDialog: FC = () => {
         </fieldset>
 
         {/* Location Section */}
-        <fieldset className='space-y-4 rounded-lg border border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50 p-4'>
+        <fieldset className='border-accent/20 from-accent/5 to-accent/10 space-y-4 rounded-lg border bg-gradient-to-r p-4'>
           <div className='flex items-center justify-between'>
-            <legend className='flex items-center gap-2 rounded-md border border-amber-200 bg-white px-3 py-1 font-medium text-amber-700 shadow-sm'>
+            <legend className='border-accent/30 bg-base-100 text-accent flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
               <IconMap className='h-5 w-5' />
               <span>Informasi Lokasi</span>
             </legend>
@@ -522,8 +601,8 @@ const TargetDialog: FC = () => {
               type='button'
               className={`btn btn-sm transition-all duration-200 ${
                 isGettingLocation
-                  ? 'btn-disabled bg-amber-200 text-amber-600'
-                  : 'btn-outline btn-warning hover:btn-warning hover:scale-105'
+                  ? 'btn-disabled bg-accent/20 text-accent/60'
+                  : 'btn-outline btn-accent hover:btn-accent hover:scale-105'
               }`}
               onClick={getCurrentLocation}
               disabled={isPending || isGettingLocation}
@@ -551,8 +630,8 @@ const TargetDialog: FC = () => {
           <div
             className={`relative overflow-hidden rounded-lg border-2 transition-all duration-300 ${
               isGettingLocation
-                ? 'border-amber-300 shadow-lg'
-                : 'border-amber-200 hover:border-amber-300'
+                ? 'border-accent shadow-lg'
+                : 'border-accent/30 hover:border-accent/50'
             }`}
           >
             <MapContainer
@@ -563,7 +642,7 @@ const TargetDialog: FC = () => {
                 currentTarget.latitude || -2.537956,
                 currentTarget.longitude || 112.940995
               ]}
-              zoom={15}
+              zoom={20}
             >
               <TileLayer
                 url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -588,8 +667,8 @@ const TargetDialog: FC = () => {
               />
             </MapContainer>
             {isGettingLocation && (
-              <div className='absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm'>
-                <div className='flex flex-col items-center gap-3 text-amber-700'>
+              <div className='bg-base-100/80 absolute inset-0 flex items-center justify-center backdrop-blur-sm'>
+                <div className='text-accent flex flex-col items-center gap-3'>
                   <IconLoader className='h-8 w-8 animate-spin' />
                   <span className='font-medium'>Mengambil lokasi Anda...</span>
                 </div>
@@ -600,7 +679,7 @@ const TargetDialog: FC = () => {
           <input type='hidden' name='latitude' value={latLng.lat} />
           <input type='hidden' name='longitude' value={latLng.lng} />
           {error && (error.fields.latitude || error.fields.longitude) && (
-            <div className='label text-sm text-red-500'>
+            <div className='label text-error text-sm'>
               <span className='flex items-center gap-1'>
                 <IconAlertTriangle className='h-3 w-3' />
                 {[
@@ -614,18 +693,18 @@ const TargetDialog: FC = () => {
           {/* Alamat */}
           <div className='space-y-2'>
             <label
-              className='label font-medium text-gray-700'
+              className='label text-base-content font-medium'
               htmlFor='address'
             >
               <span className='flex items-center gap-2'>
-                <IconHome className='h-4 w-4 text-red-600' />
+                <IconHome className='text-accent h-4 w-4' />
                 Alamat
               </span>
             </label>
             <textarea
               id='address'
               name='address'
-              className='textarea textarea-bordered min-h-[80px] w-full resize-none border-amber-200 bg-white transition-all duration-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100'
+              className='textarea textarea-bordered border-accent/30 bg-base-100 focus:border-accent focus:ring-accent/20 min-h-[80px] w-full resize-none transition-all duration-200 focus:ring-2'
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               disabled={isPending || isGettingLocation}
@@ -633,7 +712,7 @@ const TargetDialog: FC = () => {
               rows={3}
             />
             {error && error.fields.address && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.address.join(', ')}
@@ -644,8 +723,8 @@ const TargetDialog: FC = () => {
         </fieldset>
 
         {/* Contact Information Section */}
-        <fieldset className='space-y-4 rounded-lg border border-violet-100 bg-gradient-to-r from-violet-50 to-purple-50 p-4'>
-          <legend className='flex items-center gap-2 rounded-md border border-violet-200 bg-white px-3 py-1 font-medium text-violet-700 shadow-sm'>
+        <fieldset className='border-success/30 bg-success/20 space-y-4 rounded-lg border p-4'>
+          <legend className='border-success/30 bg-base-100 text-success flex items-center gap-2 rounded-md border px-3 py-1 font-medium shadow-sm'>
             <IconPhone className='h-5 w-5' />
             <span>Informasi Kontak</span>
           </legend>
@@ -653,25 +732,27 @@ const TargetDialog: FC = () => {
           {/* Nomor Telepon */}
           <div className='space-y-2'>
             <label
-              className='label font-medium text-gray-700'
+              className='label text-base-content font-medium'
               htmlFor='phoneNumber'
             >
               <span className='flex items-center gap-2'>
-                <IconSmartphone className='h-4 w-4 text-green-600' />
+                <IconSmartphone className='text-success h-4 w-4' />
                 Nomor Telepon
               </span>
             </label>
             <input
               id='phoneNumber'
               name='phoneNumber'
-              className='input input-bordered w-full border-violet-200 bg-white transition-all duration-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100'
+              className='input input-bordered border-success/30 bg-base-100 focus:border-success focus:ring-success/20 validator w-full transition-all duration-200 focus:ring-2'
               type='tel'
               defaultValue={currentTarget.phoneNumber || ''}
               disabled={isPending}
               placeholder='Contoh: 08123456789 (opsional)'
+              pattern='08[0-9]{8,13}'
+              title='Nomor telepon harus dimulai dengan 08 diikuti 8-13 digit angka'
             />
             {error && error.fields.phoneNumber && (
-              <div className='label text-sm text-red-500'>
+              <div className='label text-error text-sm'>
                 <span className='flex items-center gap-1'>
                   <IconAlertTriangle className='h-3 w-3' />
                   {error.fields.phoneNumber.join(', ')}
@@ -688,12 +769,10 @@ const TargetDialog: FC = () => {
         <input type='hidden' name='regionId' value={currentRegion.id} />
 
         {/* Action Buttons */}
-        <div className='flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 md:flex-row-reverse md:gap-4'>
+        <div className='border-base-content/20 flex flex-col-reverse gap-3 border-t pt-4 md:flex-row-reverse md:gap-4'>
           <button
             className={`btn btn-primary min-h-12 flex-1 transition-all duration-200 md:flex-none md:px-8 ${
-              isPending
-                ? 'loading'
-                : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg'
+              isPending ? 'loading' : 'hover:scale-105 hover:shadow-lg'
             }`}
             type='submit'
             disabled={isPending}
@@ -712,7 +791,7 @@ const TargetDialog: FC = () => {
           </button>
 
           <button
-            className='btn btn-ghost min-h-12 flex-1 transition-all duration-200 hover:bg-gray-100 md:flex-none md:px-6'
+            className='btn btn-ghost hover:bg-base-content/10 min-h-12 flex-1 transition-all duration-200 md:flex-none md:px-6'
             type='button'
             onClick={() => setCurrentTarget(undefined)}
             disabled={isPending}
