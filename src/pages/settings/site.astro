@@ -23,9 +23,14 @@ const props = {
   <SiteComponent transition:name='settings-menu' transition:animate='none' />
 
   <Fragment slot='controls'>
-    <a class='btn btn-ghost md:btn-sm' href='/'>
-      <BackIcon />
-      Beranda
+    <a
+      class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'
+      href='/'
+    >
+      <BackIcon
+        className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
+      />
+      <span>Beranda</span>
     </a>
   </Fragment>
 </DLayout>

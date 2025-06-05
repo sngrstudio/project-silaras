@@ -15,7 +15,7 @@ const { class: className, ...props } = Astro.props
     <Drawer>
       {
         Astro.slots.has('controls') && (
-          <div class='-mx-4 mb-4 flex w-auto pr-4'>
+          <div class='mb-4 flex w-auto pr-4'>
             <slot name='controls' />
           </div>
         )
