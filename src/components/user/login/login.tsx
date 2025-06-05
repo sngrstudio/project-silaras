@@ -10,9 +10,15 @@ import LockIcon from '~icons/lucide/lock'
 import LoaderIcon from '~icons/lucide/loader'
 import LogInIcon from '~icons/lucide/log-in'
 import UserPlusIcon from '~icons/lucide/user-plus'
+import { useState } from 'react'
 
 const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
   const formRef = useRef<HTMLFormElement>(null)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [formValues, setFormValues] = useState({
+    username: userName || '',
+    password: ''
+  })
 
   // Handle password confirmation validation
   useEffect(() => {
@@ -50,6 +56,12 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
     const { error } = await actions.user.auth.login(formData)
 
     if (error) {
+      // Preserve username but clear password on error
+      setFormValues((prev) => ({
+        ...prev,
+        password: ''
+      }))
+
       if (isInputError(error)) {
         return error
       }
@@ -82,6 +94,7 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
 
     // Show success message and redirect to dashboard on successful login
     showSuccessToast('Login berhasil! Mengarahkan ke dashboard...')
+    setIsSuccess(true)
     setTimeout(() => navigate('/'), 1000) // Small delay to show toast
     return undefined
   }
@@ -115,9 +128,12 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
               type='text'
               id='username'
               name='username'
-              defaultValue={userName}
+              value={formValues.username}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, username: e.target.value }))
+              }
               required
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Masukkan username'
               autoComplete='username'
               pattern='[a-z0-9]{4,}'
@@ -144,8 +160,12 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
               type='password'
               id='password'
               name='password'
+              value={formValues.password}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, password: e.target.value }))
+              }
               required
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Masukkan password'
               autoComplete='current-password'
               minLength={8}
@@ -165,14 +185,14 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
       <div className='border-base-300 flex flex-col gap-3 border-t pt-6'>
         <button
           className={`btn border transition-all duration-200 hover:scale-105 ${
-            isPending
+            isPending || isSuccess
               ? 'bg-base-200 border-base-300 text-base-content/50 cursor-not-allowed'
               : 'from-primary to-primary/80 border-primary/30 text-primary-content hover:shadow-primary/25 bg-gradient-to-r hover:shadow-lg'
           }`}
           type='submit'
-          disabled={isPending}
+          disabled={isPending || isSuccess}
         >
-          {isPending ? (
+          {isPending || isSuccess ? (
             <>
               <LoaderIcon className='h-4 w-4 animate-spin' />
               Sedang Login...
@@ -185,8 +205,12 @@ const LoginForm: FC<{ userName?: string | undefined }> = ({ userName }) => {
           )}
         </button>
         <a
-          className='btn btn-ghost border-base-300 hover:border-base-400 hover:bg-base-200 border transition-all duration-200'
+          className={`btn btn-ghost border-base-300 hover:border-base-400 hover:bg-base-200 border transition-all duration-200${
+            isPending || isSuccess ? 'pointer-events-none opacity-60' : ''
+          }`}
           href='/user/signup'
+          tabIndex={isPending || isSuccess ? -1 : 0}
+          aria-disabled={isPending || isSuccess}
         >
           <UserPlusIcon className='h-4 w-4' />
           Daftarkan akun

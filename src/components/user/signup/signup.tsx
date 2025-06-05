@@ -16,6 +16,14 @@ import LogInIcon from '~icons/lucide/log-in'
 const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
   const formRef = useRef<HTMLFormElement>(null)
   const [regionId, setRegionId] = useState<string | undefined>(undefined)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [formValues, setFormValues] = useState({
+    username: '',
+    fullName: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: ''
+  })
 
   // Fetch KABUPATEN region ID when first is true (first administrator signup)
   useEffect(() => {
@@ -122,6 +130,13 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
     const { error, data } = await actions.user.upsert(formData)
 
     if (error && !data) {
+      // Preserve all values except clear password fields on error
+      setFormValues((prev) => ({
+        ...prev,
+        password: '',
+        confirmPassword: ''
+      }))
+
       if (isInputError(error)) {
         return error
       }
@@ -161,6 +176,7 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
     }
 
     showSuccessToast('Pendaftaran berhasil! Mengarahkan ke halaman login...')
+    setIsSuccess(true)
     setTimeout(() => navigate(`/user/login/?user=${data?.username}`), 1000)
     return undefined
   }
@@ -194,8 +210,12 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
               type='text'
               id='username'
               name='username'
+              value={formValues.username}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, username: e.target.value }))
+              }
               required
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Masukkan username (huruf kecil & angka)'
               autoComplete='username'
               pattern='[a-z0-9]{4,}'
@@ -222,8 +242,12 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
               type='text'
               id='fullName'
               name='fullName'
+              value={formValues.fullName}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, fullName: e.target.value }))
+              }
               required
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Masukkan nama lengkap'
               autoComplete='name'
               pattern='[a-zA-Z\s]+'
@@ -250,7 +274,14 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
               type='tel'
               id='phoneNumber'
               name='phoneNumber'
-              disabled={isPending}
+              value={formValues.phoneNumber}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  phoneNumber: e.target.value
+                }))
+              }
+              disabled={isPending || isSuccess}
               placeholder='Contoh: 08123456789 atau +6281234567890'
               autoComplete='tel'
               pattern='(\+62|62|0)[0-9]{9,12}'
@@ -287,9 +318,13 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
               type='password'
               id='password'
               name='password'
+              value={formValues.password}
+              onChange={(e) =>
+                setFormValues((prev) => ({ ...prev, password: e.target.value }))
+              }
               required
               minLength={8}
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Masukkan password minimal 8 karakter'
               autoComplete='new-password'
             />
@@ -314,9 +349,16 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
               type='password'
               id='confirmPassword'
               name='confirmPassword'
+              value={formValues.confirmPassword}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  confirmPassword: e.target.value
+                }))
+              }
               required
               minLength={8}
-              disabled={isPending}
+              disabled={isPending || isSuccess}
               placeholder='Ulangi password yang sama'
               autoComplete='new-password'
             />
@@ -340,14 +382,14 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
       <div className='border-base-300 flex flex-col gap-3 border-t pt-6'>
         <button
           className={`btn border transition-all duration-200 hover:scale-105 ${
-            isPending
+            isPending || isSuccess
               ? 'bg-base-200 border-base-300 text-base-content/50 cursor-not-allowed'
               : 'from-primary to-primary/80 border-primary/30 text-primary-content hover:shadow-primary/25 bg-gradient-to-r hover:shadow-lg'
           }`}
           type='submit'
-          disabled={isPending}
+          disabled={isPending || isSuccess}
         >
-          {isPending ? (
+          {isPending || isSuccess ? (
             <>
               <LoaderIcon className='h-4 w-4 animate-spin' />
               Sedang Mendaftar...
@@ -361,8 +403,10 @@ const SignupFormRC: FC<{ first?: boolean | undefined }> = ({ first }) => {
         </button>
         {!first && (
           <a
-            className='btn btn-ghost border-base-300 hover:border-base-400 hover:bg-base-200 border transition-all duration-200'
+            className={`btn btn-ghost border-base-300 hover:border-base-400 hover:bg-base-200 border transition-all duration-200${isPending || isSuccess ? 'pointer-events-none opacity-60' : ''}`}
             href='/user/login'
+            tabIndex={isPending || isSuccess ? -1 : 0}
+            aria-disabled={isPending || isSuccess}
           >
             <LogInIcon className='h-4 w-4' />
             Sudah mendaftar?
