@@ -33,7 +33,7 @@ const SETTINGS_MENU = [
 
 const DrawerMenuRC: FC = () => {
   return (
-    <ul className='menu bg-base-200 pointer-coarse:menu-lg relative z-[9997] h-full w-64 p-4 max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
+    <ul className='menu bg-base-200/95 border-primary/70 pointer-coarse:menu-lg relative z-[9997] h-full w-64 border-r-2 p-4 backdrop-blur-sm max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
       <MainMenu />
       <RegionsMenu />
       <SettingsMenu />
@@ -48,9 +48,12 @@ const MainMenu: FC = () => {
   return (
     <>
       <li>
-        <a href='/'>
-          <HomeIcon className='h-5 w-5' />
-          Beranda
+        <a
+          href='/'
+          className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+        >
+          <HomeIcon className='h-5 w-5 transition-colors duration-200' />
+          <span className='font-medium'>Beranda</span>
         </a>
       </li>
     </>
@@ -71,22 +74,30 @@ const RegionsMenu: FC = () => {
 
   return (
     <>
-      <li className='menu-title mt-4 uppercase'>Tautan Cepat</li>
+      <li className='menu-title text-primary/70 mt-6 mb-2 text-xs font-bold tracking-wide uppercase'>
+        Tautan Cepat
+      </li>
       {/* Admin gets link to main kabupaten */}
       {user.accessLevel >= 4 && (
         <li>
-          <a href='/region/kotawaringin-timur-6202'>
-            <MapIcon className='h-5 w-5' />
-            Kotawaringin Timur
+          <a
+            href='/region/kotawaringin-timur-6202'
+            className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+          >
+            <MapIcon className='h-5 w-5 transition-colors duration-200' />
+            <span className='font-medium'>Kotawaringin Timur</span>
           </a>
         </li>
       )}
       {/* Users with region assignment get quick link to their region */}
       {user.regionId && user.accessLevel < 4 && (
         <li>
-          <a href='/'>
-            <MapIcon className='h-5 w-5' />
-            Wilayah Saya
+          <a
+            href='/'
+            className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+          >
+            <MapIcon className='h-5 w-5 transition-colors duration-200' />
+            <span className='font-medium'>Wilayah Saya</span>
           </a>
         </li>
       )}
@@ -124,14 +135,19 @@ const SettingsMenu: FC = () => {
   return (
     <>
       {/* Pengaturan Aplikasi */}
-      <li className='menu-title mt-4 uppercase'>Pengaturan Aplikasi</li>
+      <li className='menu-title text-primary/70 mt-6 mb-2 text-xs font-bold tracking-wide uppercase'>
+        Pengaturan Aplikasi
+      </li>
       {availableMenuItems.map((item, i) => {
         const IconComponent = item.icon
         return (
           <li key={i}>
-            <a href={item.href}>
-              <IconComponent className='h-5 w-5' />
-              {item.label}
+            <a
+              href={item.href}
+              className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+            >
+              <IconComponent className='h-5 w-5 transition-colors duration-200' />
+              <span className='font-medium'>{item.label}</span>
             </a>
           </li>
         )
@@ -163,21 +179,26 @@ const UserMenu: FC = () => {
 
   return (
     <>
-      <li className='menu-title mt-auto uppercase'>{user.fullName}</li>
+      <li className='menu-title text-primary/70 mt-auto mb-2 text-xs font-bold tracking-wide uppercase'>
+        {user.fullName}
+      </li>
       <li>
-        <a href='/user/profile'>
-          <UserIcon className='h-5 w-5' />
-          Profil Pengguna
+        <a
+          href='/user/profile'
+          className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+        >
+          <UserIcon className='h-5 w-5 transition-colors duration-200' />
+          <span className='font-medium'>Profil Pengguna</span>
         </a>
       </li>
       <li>
         <div
           role='button'
           onClick={handleLogout}
-          className='flex items-center gap-2'
+          className='group hover:border-error/30 hover:bg-error/10 hover:text-error flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
         >
-          <LogOutIcon className='h-5 w-5' />
-          Logout
+          <LogOutIcon className='h-5 w-5 transition-colors duration-200' />
+          <span className='font-medium'>Logout</span>
         </div>
       </li>
     </>
