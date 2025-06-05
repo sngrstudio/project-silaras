@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { region } from '../schemas/region'
 import { target } from '../schemas/target'
+import { user } from '../schemas/user'
 import { eq, count, sql } from 'drizzle-orm'
 
 /**
@@ -278,4 +279,57 @@ export const getAllRegionsWithCounts = async (
       total: Math.ceil(total / size)
     }
   }
+}
+
+/**
+ * Get child regions by parent ID
+ * @param parentId Parent region id
+ * @returns Array of child regions
+ */
+export const getRegionsByParentId = async (parentId: string) => {
+  return db
+    .select()
+    .from(region)
+    .where(eq(region.parentId, parentId))
+    .orderBy(region.name)
+}
+
+/**
+ * Get child regions by parent ID that have at least one user attached
+ * @param parentId Parent region id
+ * @returns Array of child regions with users
+ */
+export const getRegionsByParentIdWithUsers = async (parentId: string) => {
+  return db
+    .select({
+      id: region.id,
+      name: region.name,
+      slug: region.slug,
+      type: region.type,
+      parentId: region.parentId
+    })
+    .from(region)
+    .innerJoin(user, eq(user.regionId, region.id))
+    .where(eq(region.parentId, parentId))
+    .groupBy(region.id, region.name, region.slug, region.type, region.parentId)
+    .orderBy(region.name)
+}
+
+/**
+ * Get targets by region ID for quick access
+ * @param regionId Region id
+ * @returns Array of targets in the region
+ */
+export const getTargetsByRegionId = async (regionId: string) => {
+  return db
+    .select({
+      id: target.id,
+      name: target.name,
+      slug: target.slug,
+      status: target.status
+    })
+    .from(target)
+    .where(eq(target.regionId, regionId))
+    .orderBy(target.name)
+    .limit(8)
 }

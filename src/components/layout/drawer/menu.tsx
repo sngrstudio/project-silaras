@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/react'
 import { $currentUser, setCurrentUser } from './drawer.store'
 import { actions } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'
+import { useState, useEffect } from 'react'
 
 // Icons
 import HomeIcon from '~icons/lucide/home'
@@ -12,6 +13,9 @@ import MenuIcon from '~icons/lucide/menu'
 import UsersIcon from '~icons/lucide/users'
 import UserIcon from '~icons/lucide/user'
 import LogOutIcon from '~icons/lucide/log-out'
+import BuildingIcon from '~icons/lucide/building'
+import MapPinIcon from '~icons/lucide/map-pin'
+import TargetIcon from '~icons/lucide/target'
 
 const SETTINGS_MENU = [
   {
@@ -62,6 +66,44 @@ const MainMenu: FC = () => {
 
 const RegionsMenu: FC = () => {
   const user = useStore($currentUser)
+  const [userRegion, setUserRegion] = useState<any>(null)
+  const [childRegions, setChildRegions] = useState<any[]>([])
+  const [targets, setTargets] = useState<any[]>([])
+
+  // Fetch user's region data when component mounts
+  useEffect(() => {
+    async function fetchUserRegionData() {
+      if (!user?.regionId) return
+
+      try {
+        const region = await actions.region.getById.orThrow({
+          id: user.regionId
+        })
+        setUserRegion(region)
+
+        // For level 2 (Kader DASHAT), show targets from their assigned DESA region
+        if (user.accessLevel === 2 && region) {
+          // Level 2 users are assigned to DESA regions, show targets directly from that DESA
+          const regionTargets = await actions.region.getTargetsByRegion.orThrow(
+            {
+              regionId: region.id
+            }
+          )
+          setTargets(regionTargets)
+        } else if (region && shouldShowChildRegions(user, region)) {
+          // For other levels (3+), get child regions with users
+          const children = await actions.region.getByParentIdWithUsers.orThrow({
+            parentId: region.id
+          })
+          setChildRegions(children)
+        }
+      } catch (error) {
+        console.error('Failed to fetch region data:', error)
+      }
+    }
+
+    fetchUserRegionData()
+  }, [user?.regionId])
 
   if (!user) {
     return <></>
@@ -77,11 +119,12 @@ const RegionsMenu: FC = () => {
       <li className='menu-title text-primary/70 mt-6 mb-2 text-xs font-bold tracking-wide uppercase'>
         Tautan Cepat
       </li>
-      {/* Admin gets link to main kabupaten */}
-      {user.accessLevel >= 4 && (
+
+      {/* Super Admin and Admin get link to main kabupaten (only if they don't have a specific region assignment) */}
+      {user.accessLevel >= 4 && !user.regionId && (
         <li>
           <a
-            href='/region/kotawaringin-timur-6202'
+            href='/region/kotawaringin-timur'
             className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
           >
             <MapIcon className='h-5 w-5 transition-colors duration-200' />
@@ -89,20 +132,164 @@ const RegionsMenu: FC = () => {
           </a>
         </li>
       )}
-      {/* Users with region assignment get quick link to their region */}
-      {user.regionId && user.accessLevel < 4 && (
-        <li>
-          <a
-            href='/'
-            className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
-          >
-            <MapIcon className='h-5 w-5 transition-colors duration-200' />
-            <span className='font-medium'>Wilayah Saya</span>
-          </a>
-        </li>
+
+      {/* Users with region assignment get contextual quick links */}
+      {user.regionId && userRegion && (
+        <>
+          {/* Main region link */}
+          <li>
+            <a
+              href={`/region/${userRegion.slug}`}
+              className='group hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+            >
+              {getRegionIcon(userRegion.type)}
+              <span className='font-medium'>{userRegion.name}</span>
+            </a>
+          </li>
+
+          {/* Child regions listed below as separate menu items (only for regions with users) */}
+          {childRegions.length > 0 && (
+            <>
+              <li className='menu-title text-primary/50 mt-4 mb-2 text-xs font-bold tracking-wide uppercase'>
+                {getChildRegionSectionTitle(userRegion.type)}
+              </li>
+              {childRegions.slice(0, 8).map((region) => (
+                <li key={region.id}>
+                  <a
+                    href={`/region/${region.slug}`}
+                    className='group hover:border-primary/20 hover:bg-primary/5 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+                  >
+                    {getRegionIcon(region.type)}
+                    <span className='font-medium'>{region.name}</span>
+                  </a>
+                </li>
+              ))}
+              {childRegions.length > 8 && (
+                <li>
+                  <a
+                    href={`/region/${userRegion.slug}`}
+                    className='text-primary/70 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 text-sm font-medium transition-all duration-200'
+                  >
+                    <span>
+                      +{childRegions.length - 8}{' '}
+                      {getChildRegionTypeName(userRegion.type)} lainnya...
+                    </span>
+                  </a>
+                </li>
+              )}
+            </>
+          )}
+
+          {/* Targets listed below for level 2 users */}
+          {targets.length > 0 && user.accessLevel === 2 && (
+            <>
+              <li className='menu-title text-primary/50 mt-4 mb-2 text-xs font-bold tracking-wide uppercase'>
+                Sasaran Binaan
+              </li>
+              {targets.map((target) => (
+                <li key={target.id}>
+                  <a
+                    href={`/target/${target.slug}`}
+                    className='group hover:border-primary/20 hover:bg-primary/5 hover:text-primary flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all duration-200'
+                  >
+                    <TargetIcon className='h-5 w-5 transition-colors duration-200' />
+                    <span className='font-medium'>{target.name}</span>
+                    <span className='ml-auto text-xs opacity-70'>
+                      {getStatusText(target.status)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </>
+          )}
+        </>
       )}
     </>
   )
+}
+
+/**
+ * Helper function to determine if child regions should be shown
+ */
+function shouldShowChildRegions(user: any, region: any): boolean {
+  // Level 2 (Kader DASHAT) shows targets instead of child regions
+  if (user.accessLevel === 2) return false
+
+  // Level 3 (PLKB Kecamatan) shows child regions (desa/kelurahan)
+  if (user.accessLevel === 3 && region.type === 'KECAMATAN') return true
+
+  // Level 4+ (Admin, Super Admin) can see child regions if they have a region assignment
+  if (
+    user.accessLevel >= 4 &&
+    region &&
+    (region.type === 'KABUPATEN' || region.type === 'KECAMATAN')
+  )
+    return true
+
+  return false
+}
+
+/**
+ * Helper function to get appropriate icon for region type
+ */
+function getRegionIcon(
+  regionType: string,
+  className: string = 'h-5 w-5 transition-colors duration-200'
+) {
+  switch (regionType) {
+    case 'KABUPATEN':
+      return <BuildingIcon className={className} />
+    case 'KECAMATAN':
+      return <MapIcon className={className} />
+    case 'DESA':
+      return <MapPinIcon className={className} />
+    default:
+      return <MapIcon className={className} />
+  }
+}
+
+/**
+ * Helper function to get section title for child regions
+ */
+function getChildRegionSectionTitle(parentRegionType: string): string {
+  switch (parentRegionType) {
+    case 'KABUPATEN':
+      return 'Kecamatan'
+    case 'KECAMATAN':
+      return 'Desa/Kelurahan'
+    default:
+      return 'Sub Wilayah'
+  }
+}
+
+/**
+ * Helper function to get child region type name for "more" indicator
+ */
+function getChildRegionTypeName(parentRegionType: string): string {
+  switch (parentRegionType) {
+    case 'KABUPATEN':
+      return 'kecamatan'
+    case 'KECAMATAN':
+      return 'desa'
+    default:
+      return 'wilayah'
+  }
+}
+
+/**
+ * Helper function to get status text in Indonesian
+ */
+function getStatusText(status: string): string {
+  switch (status) {
+    case 'HAMIL':
+      return 'Hamil'
+    case 'MENYUSUI':
+      return 'Menyusui'
+    case 'ANAK-ANAK':
+      return 'Anak'
+    default:
+      return status
+  }
 }
 
 const SettingsMenu: FC = () => {

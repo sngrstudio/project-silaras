@@ -6,6 +6,9 @@ import {
   getAllRegions,
   getAllRegionsWithCounts,
   getRegionsByType,
+  getRegionsByParentId,
+  getRegionsByParentIdWithUsers,
+  getTargetsByRegionId,
   deleteRegion
 } from '../db/queries/region'
 import { z } from 'astro:schema'
@@ -103,6 +106,36 @@ const region = {
       type: z.enum(['KABUPATEN', 'KECAMATAN', 'DESA'])
     }),
     handler: async ({ type }) => getRegionsByType(type)
+  }),
+
+  /**
+   * Get child regions by parent ID.
+   * @param parentId Parent region id
+   * @returns Array of child regions
+   */
+  getByParentId: defineAction({
+    input: z.object({ parentId: z.string() }),
+    handler: async ({ parentId }) => getRegionsByParentId(parentId)
+  }),
+
+  /**
+   * Get child regions by parent ID that have at least one user attached.
+   * @param parentId Parent region id
+   * @returns Array of child regions with users
+   */
+  getByParentIdWithUsers: defineAction({
+    input: z.object({ parentId: z.string() }),
+    handler: async ({ parentId }) => getRegionsByParentIdWithUsers(parentId)
+  }),
+
+  /**
+   * Get targets by region ID for quick access.
+   * @param regionId Region id
+   * @returns Array of targets in the region
+   */
+  getTargetsByRegion: defineAction({
+    input: z.object({ regionId: z.string() }),
+    handler: async ({ regionId }) => getTargetsByRegionId(regionId)
   }),
 
   /**
