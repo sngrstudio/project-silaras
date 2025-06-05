@@ -20,18 +20,13 @@ interface CompletionProgress {
 }
 
 interface MetricsComparison {
-  current: any
-  previous: any
-  initial: any
   deltas: {
     weight: number
     height: number
     bmi: number
     score: number
   }
-  isFirstMonth: boolean
   currentScore: number
-  previousScore: number | null
 }
 
 interface TargetData {
@@ -92,42 +87,6 @@ const formatAge = (ageInMonths: number | null) => {
   }
 
   return `${years}.${remainingMonths}`
-}
-
-// Delta indicator component
-const DeltaIndicator: FC<{
-  delta: number
-  unit: string
-  type: 'weight' | 'height' | 'bmi'
-}> = ({ delta, unit, type }) => {
-  const isPositive = delta > 0
-  const isZero = delta === 0
-
-  const getColorClass = () => {
-    if (isZero) return 'text-base-content'
-
-    if (type === 'height') {
-      return isPositive ? 'text-success' : 'text-warning' // Height increase is good
-    }
-
-    if (type === 'weight') {
-      return isPositive ? 'text-warning' : 'text-success' // Weight loss might be good depending on context
-    }
-
-    // type === 'bmi'
-    return isPositive ? 'text-warning' : 'text-success' // BMI decrease is generally good
-  }
-
-  return (
-    <div className={clsx('stat-desc flex items-center gap-1', getColorClass())}>
-      <span className='text-xs'>{isZero ? '●' : isPositive ? '▲' : '▼'}</span>
-      <span className='text-xs'>
-        {isZero
-          ? 'Tidak berubah'
-          : `${isPositive ? '+' : ''}${delta.toFixed(type === 'height' ? 1 : 2)} ${unit}`}
-      </span>
-    </div>
-  )
 }
 
 const AssesmentStatRC: FC = () => {
@@ -215,172 +174,260 @@ const AssesmentStatRC: FC = () => {
 
   return (
     <form
-      className='stats max-md:stats-vertical border-base-300 w-full border'
+      className='grid w-full grid-cols-2 gap-3 lg:grid-cols-3'
       action={action}
       ref={formRef}
       onBlur={handleSave}
       key={`form-${monthlyAssesments.monthlyAssesmentId}`}
     >
-      <div className='stat place-items-center'>
-        <label className='stat-title' htmlFor='height'>
-          Tinggi Badan (cm)
-        </label>
-        <input
-          className='stat-value w-[124px] text-center'
-          name='height'
-          id='height'
-          type='number'
-          step={0.1}
-          min={0}
-          disabled={isPending}
-          defaultValue={monthlyAssesments.height}
-        />
-        {metricsComparison && (
-          <DeltaIndicator
-            delta={metricsComparison.deltas.height}
-            unit='cm'
-            type='height'
-          />
-        )}
-      </div>
-
-      <div className='stat place-items-center'>
-        <span className='stat-title'>Usia</span>
-        <span className='stat-value'>
-          {targetData ? formatAge(targetData.age) : '-'}
-        </span>
-        <div className='stat-desc'>
-          {targetData && targetData.age
-            ? targetData.age < 24
-              ? 'bulan'
-              : (() => {
-                  const remainingMonths = targetData.age % 12
-                  return remainingMonths === 0
-                    ? 'tahun'
-                    : `tahun ${remainingMonths} bulan`
-                })()
-            : 'Usia saat ini'}
-        </div>
-      </div>
-
-      <div className='stat place-items-center'>
-        <label className='stat-title' htmlFor='weight'>
-          Berat Badan (kg)
-        </label>
-        <input
-          className='stat-value w-[124px] text-center'
-          name='weight'
-          id='weight'
-          type='number'
-          step={0.01}
-          min={0}
-          disabled={isPending}
-          defaultValue={monthlyAssesments.weight}
-        />
-        {metricsComparison && (
-          <DeltaIndicator
-            delta={metricsComparison.deltas.weight}
-            unit='kg'
-            type='weight'
-          />
-        )}
-      </div>
-
-      <div className='stat place-items-center'>
-        <span className='stat-title'>Indeks Massa Tubuh</span>
-        <span
-          className={clsx(
-            'stat-value',
-            getBMIClassification(Number(monthlyAssesments.bmi)).color
-          )}
-        >
-          {monthlyAssesments.bmi}
-        </span>
-        <div className='stat-desc flex items-center gap-2'>
-          <span>
-            {getBMIClassification(Number(monthlyAssesments.bmi)).category}
-          </span>
-          {metricsComparison && (
-            <span
-              className={clsx('flex items-center gap-1', {
-                'text-base-content': metricsComparison.deltas.bmi === 0,
-                'text-warning': metricsComparison.deltas.bmi > 0,
-                'text-success': metricsComparison.deltas.bmi < 0
-              })}
+      {/* Height Card */}
+      <div className='card bg-primary/5 border-primary/20 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-primary h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
-              <span className='text-xs'>
-                {metricsComparison.deltas.bmi === 0
-                  ? '●'
-                  : metricsComparison.deltas.bmi > 0
-                    ? '▲'
-                    : '▼'}
-              </span>
-              <span className='text-xs'>
-                {metricsComparison.deltas.bmi === 0
-                  ? 'Tidak berubah'
-                  : `${metricsComparison.deltas.bmi > 0 ? '+' : ''}${metricsComparison.deltas.bmi.toFixed(2)}`}
-              </span>
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className='stat place-items-center'>
-        <span className='stat-title'>Progress Bulan Ini</span>
-        <span className='stat-value'>
-          {completionProgress ? `${completionProgress.percentage}%` : '0%'}
-        </span>
-        <div className='stat-figure'>
-          {completionProgress ? (
-            <div
-              className='radial-progress text-success'
-              style={
-                {
-                  '--value': completionProgress.percentage,
-                  '--size': '4rem',
-                  '--thickness': '4px'
-                } as React.CSSProperties
-              }
-              role='progressbar'
-              aria-valuenow={completionProgress.percentage}
-            >
-              {completionProgress.percentage}%
-            </div>
-          ) : (
-            <div
-              className='radial-progress'
-              style={
-                {
-                  '--value': 0,
-                  '--size': '4rem',
-                  '--thickness': '4px'
-                } as React.CSSProperties
-              }
-              role='progressbar'
-              aria-valuenow={0}
-            >
-              0%
-            </div>
-          )}
-        </div>
-        {completionProgress && (
-          <div className='stat-desc'>
-            {completionProgress.completed} dari {completionProgress.total} hari
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M5 3v18M19 3v18M8 12h8'
+              />
+            </svg>
+            <label htmlFor='height'>Tinggi Badan</label>
           </div>
-        )}
-      </div>
-
-      <div className='stat place-items-center'>
-        <span className='stat-title'>Skor Bulan Ini</span>
-        <span className='stat-value'>
-          {metricsComparison ? metricsComparison.currentScore : '0'}
-        </span>
-        <div className='stat-desc flex flex-col items-center gap-1'>
-          {metricsComparison && completionProgress ? (
-            <>
+          <div className='flex flex-1 items-center justify-center'>
+            <div className='text-center'>
+              <input
+                className='text-primary focus:ring-primary/20 w-28 rounded bg-transparent px-1 text-center text-3xl font-bold focus:ring-2 focus:outline-none'
+                name='height'
+                id='height'
+                type='number'
+                step={0.1}
+                min={0}
+                disabled={isPending}
+                defaultValue={monthlyAssesments.height}
+              />
+              <span className='text-primary ml-1 text-xl font-bold'>cm</span>
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {metricsComparison ? (
               <span
                 className={clsx(
-                  'text-sm font-medium',
+                  metricsComparison.deltas.height === 0
+                    ? 'text-base-content/50'
+                    : metricsComparison.deltas.height > 0
+                      ? 'text-success'
+                      : 'text-warning'
+                )}
+              >
+                {metricsComparison.deltas.height === 0
+                  ? 'Tidak berubah'
+                  : `${metricsComparison.deltas.height > 0 ? '+' : ''}${metricsComparison.deltas.height.toFixed(1)} cm`}
+              </span>
+            ) : (
+              'Masukkan tinggi badan'
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Weight Card */}
+      <div className='card bg-warning/5 border-warning/20 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-warning h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3'
+              />
+            </svg>
+            <label htmlFor='weight'>Berat Badan</label>
+          </div>
+          <div className='flex flex-1 items-center justify-center'>
+            <div className='text-center'>
+              <input
+                className='text-warning focus:ring-warning/20 w-28 rounded bg-transparent px-1 text-center text-3xl font-bold focus:ring-2 focus:outline-none'
+                name='weight'
+                id='weight'
+                type='number'
+                step={0.01}
+                min={0}
+                disabled={isPending}
+                defaultValue={monthlyAssesments.weight}
+              />
+              <span className='text-warning ml-1 text-xl font-bold'>kg</span>
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {metricsComparison ? (
+              <span
+                className={clsx(
+                  metricsComparison.deltas.weight === 0
+                    ? 'text-base-content/50'
+                    : metricsComparison.deltas.weight > 0
+                      ? 'text-warning'
+                      : 'text-success'
+                )}
+              >
+                {metricsComparison.deltas.weight === 0
+                  ? 'Tidak berubah'
+                  : `${metricsComparison.deltas.weight > 0 ? '+' : ''}${metricsComparison.deltas.weight.toFixed(2)} kg`}
+              </span>
+            ) : (
+              'Masukkan berat badan'
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* BMI Card */}
+      <div className='card bg-info/5 border-info/20 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-info h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+              />
+            </svg>
+            IMT
+          </div>
+          <div className='flex flex-1 items-center justify-center'>
+            <div
+              className={clsx(
+                'text-3xl font-bold',
+                getBMIClassification(Number(monthlyAssesments.bmi)).color
+              )}
+            >
+              {monthlyAssesments.bmi}
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {getBMIClassification(Number(monthlyAssesments.bmi)).category}
+          </div>
+        </div>
+      </div>
+
+      {/* Age Card */}
+      <div className='card bg-base-200/30 border-base-300 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-base-content/60 h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
+            Usia
+          </div>
+          <div className='flex flex-1 items-center justify-center'>
+            <div className='text-base-content text-3xl font-bold'>
+              {targetData ? formatAge(targetData.age) : '-'}
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {targetData && targetData.age
+              ? targetData.age < 24
+                ? 'bulan'
+                : (() => {
+                    const remainingMonths = targetData.age % 12
+                    return remainingMonths === 0
+                      ? 'tahun'
+                      : `${Math.floor(targetData.age / 12)} thn ${remainingMonths} bln`
+                  })()
+              : 'Usia saat ini'}
+          </div>
+        </div>
+      </div>
+
+      {/* Progress Card */}
+      <div className='card bg-info/5 border-info/20 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-info h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
+            Progress
+          </div>
+          <div className='flex flex-1 items-center justify-center'>
+            <div className='text-info text-3xl font-bold'>
+              {completionProgress
+                ? `${Math.round(completionProgress.percentage)}%`
+                : '0%'}
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {completionProgress
+              ? `${completionProgress.completed}/${completionProgress.total} hari`
+              : 'Belum ada data'}
+          </div>
+        </div>
+      </div>
+
+      {/* Score Card */}
+      <div className='card bg-accent/5 border-accent/20 border shadow-sm transition-shadow hover:shadow-md'>
+        <div className='card-body flex min-h-[120px] flex-col items-center justify-between p-4 text-center'>
+          <div className='text-base-content/70 flex items-center gap-2 text-xs font-medium'>
+            <svg
+              className='text-accent h-4 w-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'
+              />
+            </svg>
+            Skor
+          </div>
+          <div className='flex flex-1 items-center justify-center'>
+            <div className='text-accent text-3xl font-bold'>
+              {metricsComparison ? metricsComparison.currentScore : '0'}
+            </div>
+          </div>
+          <div className='text-base-content/50 w-full truncate text-xs'>
+            {metricsComparison && completionProgress ? (
+              <span
+                className={clsx(
                   getScoreClassification(
                     metricsComparison.currentScore,
                     completionProgress.percentage
@@ -394,41 +441,10 @@ const AssesmentStatRC: FC = () => {
                   ).category
                 }
               </span>
-              {!metricsComparison.isFirstMonth &&
-                completionProgress.percentage >= 75 && (
-                  <div className='flex items-center gap-1'>
-                    <span
-                      className={clsx('text-xs', {
-                        'text-base-content':
-                          metricsComparison.deltas.score === 0,
-                        'text-success': metricsComparison.deltas.score > 0,
-                        'text-warning': metricsComparison.deltas.score < 0
-                      })}
-                    >
-                      {metricsComparison.deltas.score === 0
-                        ? '●'
-                        : metricsComparison.deltas.score > 0
-                          ? '▲'
-                          : '▼'}
-                    </span>
-                    <span
-                      className={clsx('text-xs', {
-                        'text-base-content':
-                          metricsComparison.deltas.score === 0,
-                        'text-success': metricsComparison.deltas.score > 0,
-                        'text-warning': metricsComparison.deltas.score < 0
-                      })}
-                    >
-                      {metricsComparison.deltas.score === 0
-                        ? 'Tidak berubah'
-                        : `${metricsComparison.deltas.score > 0 ? '+' : ''}${metricsComparison.deltas.score}`}
-                    </span>
-                  </div>
-                )}
-            </>
-          ) : (
-            <span className='text-base-content text-sm'>-</span>
-          )}
+            ) : (
+              'Belum ada skor'
+            )}
+          </div>
         </div>
       </div>
 

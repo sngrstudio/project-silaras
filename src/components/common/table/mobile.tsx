@@ -21,13 +21,19 @@ export interface ListTemplateProps extends OlHTMLAttributes<HTMLOListElement> {
  */
 const ListTemplate: FC<ListTemplateProps> = ({ table, className }) => {
   return (
-    <div className={clsx('space-y-3', className)}>
+    <div className={clsx('space-y-4', className)}>
       {table.getRowModel().rows.map((row) => (
         <div
           key={row.id}
-          className='card bg-base-100 border-base-300/50 border shadow-md transition-all duration-200 hover:scale-[1.01] hover:shadow-lg'
+          className='card bg-base-100 border-base-300/50 group hover:border-primary/30 hover:shadow-primary/5 relative overflow-hidden border shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl'
         >
-          <div className='card-body p-4'>
+          {/* Subtle gradient overlay */}
+          <div className='from-primary/5 to-accent/5 pointer-events-none absolute inset-0 bg-gradient-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+
+          {/* Left accent border */}
+          <div className='bg-primary absolute top-0 left-0 h-full w-1 scale-y-0 transition-transform duration-300 group-hover:scale-y-100' />
+
+          <div className='card-body relative z-10 p-4'>
             {row.getVisibleCells().map((cell) => (
               <Fragment key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

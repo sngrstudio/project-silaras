@@ -74,7 +74,7 @@ const Image: FC<ImageProps> = ({
               // Use scale to maintain aspect ratio (object-fit: contain behavior)
               const aspectRatio = width / height
               const scaledHeight = Math.round(breakpointWidth * aspectRatio)
-              image.resize(scale().width(breakpointWidth).height(scaledHeight))
+              image.resize(fit().width(breakpointWidth).height(scaledHeight))
             } else {
               // Use fit to fill dimensions
               const aspectRatio = width / height

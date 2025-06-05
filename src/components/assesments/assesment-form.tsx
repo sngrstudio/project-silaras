@@ -1,4 +1,4 @@
-import { useActionState, useRef, type FC } from 'react'
+import { useActionState, useRef, useState, useEffect, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
 import {
@@ -13,6 +13,15 @@ import {
   showSuccessToast
 } from '~/components/common/toast/toast.store'
 import XIcon from '~icons/lucide/x'
+import CheckSquareIcon from '~icons/lucide/check-square'
+import CameraIcon from '~icons/lucide/camera'
+import UploadIcon from '~icons/lucide/upload'
+import WheatIcon from '~icons/lucide/wheat'
+import DrumstickIcon from '~icons/lucide/beef'
+import LeafIcon from '~icons/lucide/leaf'
+import AppleIcon from '~icons/lucide/apple'
+import BookOpenIcon from '~icons/lucide/book-open'
+import clsx from 'clsx'
 
 interface AssesmentFormProps {
   cell: CellContext<DailyAssesments[number], unknown>
@@ -25,6 +34,10 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 }) => {
   const currentMonthIndex = useStore($currentMonthIndex)
   const formRef = useRef<HTMLFormElement>(null)
+
+  // Simple state for file selection and preview
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const handleForm = async (_prev: unknown, data: FormData) => {
     const { error } = await actions.assesment.daily.set(data)
@@ -52,12 +65,22 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
       delete removeImageInput.dataset.intentionallyChecked
     }
 
-    // Clear file input to prevent re-submission
+    // Only reset file-related state if a file was actually uploaded
     const fileInput = formRef.current?.querySelector(
       'input[name="imageFile"]'
     ) as HTMLInputElement
-    if (fileInput) {
+    const hasFileData =
+      data.get('imageFile') instanceof File &&
+      (data.get('imageFile') as File).size > 0
+
+    if (hasFileData && fileInput) {
+      // Clear file input to prevent re-submission
       fileInput.value = ''
+
+      // Don't reset selectedFile and previewUrl immediately
+      // Let them persist so the preview remains visible until the page refreshes
+      // or user navigates away. The server now has the image, so the preview
+      // serves as confirmation that the upload was successful.
     }
 
     // Reset after successful submission
@@ -67,15 +90,41 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
   const [_error, action, isPending] = useActionState(handleForm, undefined)
 
-  const handleFileChange = () => {
-    if (!formRef.current || isPending || isDisabled) return
-    const form = formRef.current
-    const fileInput = form.querySelector(
-      'input[name="imageFile"]'
-    ) as HTMLInputElement
+  // Clean up preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
-    // Only submit if a file was selected
-    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isPending || isDisabled) {
+      return
+    }
+
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setSelectedFile(file)
+
+    // Clean up previous preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
+    // Create preview URL
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+
+    // Auto-submit after 3 seconds
+    if (formRef.current) {
+      const form = formRef.current
+
       // Ensure removeImage is unchecked when uploading new file
       const removeImageInput = form.querySelector(
         'input[name="removeImage"]'
@@ -84,7 +133,24 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
         removeImageInput.checked = false
         delete removeImageInput.dataset.intentionallyChecked
       }
-      form.requestSubmit()
+
+      // Store current file in closure to avoid race conditions
+      const currentFile = file
+      setTimeout(() => {
+        // Check if form still exists and file input still has the same file
+        if (formRef.current) {
+          const fileInput = formRef.current.querySelector(
+            'input[name="imageFile"]'
+          ) as HTMLInputElement
+          // Submit if file input still has files or if we have the original file
+          if (
+            (fileInput && fileInput.files && fileInput.files.length > 0) ||
+            currentFile
+          ) {
+            formRef.current.requestSubmit()
+          }
+        }
+      }, 3000)
     }
   }
 
@@ -125,141 +191,309 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
   }
 
   return (
-    <form
-      ref={formRef}
-      className={`flex w-full flex-col gap-y-1 md:grid lg:grid-cols-2 ${isDisabled ? 'pointer-events-none opacity-50' : ''}`}
-      action={action}
-      onChange={handleFormChange}
-    >
-      <label className='label'>
-        <input
-          className='checkbox checkbox-lg md:checkbox-xs'
-          type='checkbox'
-          name='containsStapleFood'
-          id='containsStapleFood'
-          disabled={isPending || isDisabled}
-          defaultChecked={!!cell.row.original.containsStapleFood}
-        />
-        <span>Makanan pokok?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox checkbox-lg md:checkbox-xs'
-          type='checkbox'
-          name='containsSideDish'
-          id='containsSideDish'
-          disabled={isPending || isDisabled}
-          defaultChecked={!!cell.row.original.containsSideDish}
-        />
-        <span>Mengandung lauk-pauk?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox checkbox-lg md:checkbox-xs'
-          type='checkbox'
-          name='containsVegetables'
-          id='containsVegetables'
-          disabled={isPending || isDisabled}
-          defaultChecked={!!cell.row.original.containsVegetables}
-        />
-        <span>Mengandung sayuran?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox checkbox-lg md:checkbox-xs'
-          type='checkbox'
-          name='containsFruits'
-          id='containsFruits'
-          disabled={isPending || isDisabled}
-          defaultChecked={!!cell.row.original.containsFruits}
-        />
-        <span>Mengandung buah-buahan?</span>
-      </label>
-      <label className='label'>
-        <input
-          className='checkbox checkbox-lg md:checkbox-xs'
-          type='checkbox'
-          name='isFollowingRecipe'
-          id='isFollowingRecipe'
-          disabled={isPending || isDisabled}
-          defaultChecked={!!cell.row.original.isFollowingRecipe}
-        />
-        <span>Sesuai dengan resep?</span>
-      </label>
+    <div className='flex flex-col gap-4'>
+      {/* Assessment Criteria Section */}
+      <div className='bg-base-100 border-base-300/50 rounded-lg border p-4'>
+        <div className='mb-3 flex items-center gap-2'>
+          <CheckSquareIcon className='text-info h-4 w-4' />
+          <span className='text-base-content/80 text-sm font-semibold'>
+            Kriteria Penilaian
+          </span>
+        </div>
 
-      {/* Image Upload Section */}
-      <div className='col-span-full mt-4 mb-2 lg:col-span-2'>
-        <label className='mb-1 block text-sm font-medium text-gray-700'>
-          Foto Makanan (Opsional)
-        </label>
-
-        {/* Show existing image if available */}
-        {cell.row.original.image && (
-          <div className='relative mb-3 inline-block'>
-            <div className='overflow-hidden rounded-lg border-2 border-gray-200'>
-              <Image
-                publicId={cell.row.original.image}
-                width={200}
-                height={150}
-                sizes='(max-width: 640px) 180px, 200px'
-                breakpoints={[180, 200, 300, 400]}
-                contain
-                alt='Foto makanan saat ini'
-                className='max-h-36 max-w-48 object-contain'
-              />
-            </div>
-
-            {/* Corner X button to remove image - disabled for future dates */}
-            {!isDisabled && (
-              <button
-                type='button'
-                onClick={() => {
-                  // Set the hidden removeImage checkbox and submit
-                  const removeImageInput = formRef.current?.querySelector(
-                    'input[name="removeImage"]'
-                  ) as HTMLInputElement
-                  if (removeImageInput && formRef.current) {
-                    removeImageInput.checked = true
-                    removeImageInput.dataset.intentionallyChecked = 'true'
-                    formRef.current.requestSubmit()
-                  }
-                }}
-                disabled={isPending}
-                className='bg-error hover:bg-error-focus text-error-content focus:ring-error absolute -top-2 -right-2 rounded-full p-1 shadow-lg transition-all duration-200 hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none'
-                aria-label='Hapus foto'
-              >
-                <XIcon className='h-4 w-4' />
-              </button>
-            )}
-
-            <p className='mt-1 text-xs text-gray-500'>Foto saat ini</p>
+        {/* Form submission status */}
+        {isPending && (
+          <div className='mb-3 flex items-center gap-2'>
+            <div className='loading loading-spinner loading-xs text-base-content/50'></div>
+            <span className='text-base-content/50 text-xs'>
+              Menyimpan perubahan kriteria penilaian...
+            </span>
           </div>
         )}
 
-        <input
-          type='file'
-          name='imageFile'
-          accept='image/*'
-          disabled={isPending || isDisabled}
-          onChange={handleFileChange}
-          className='file:bg-primary hover:file:bg-primary-focus block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-50'
-        />
+        <form
+          ref={formRef}
+          className={clsx(
+            'space-y-4',
+            isDisabled && 'pointer-events-none opacity-50'
+          )}
+          action={action}
+          onChange={handleFormChange}
+        >
+          {/* Assessment Checkboxes - Card Layout */}
+          <div className='grid gap-3 sm:grid-cols-2'>
+            {/* First Row */}
+            <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
+              <div className='card-body flex-row items-center gap-3'>
+                <input
+                  className='checkbox checkbox-primary'
+                  type='checkbox'
+                  name='containsStapleFood'
+                  id='containsStapleFood'
+                  disabled={isPending || isDisabled}
+                  defaultChecked={!!cell.row.original.containsStapleFood}
+                />
+                <WheatIcon className='h-5 w-5 flex-shrink-0 text-amber-600' />
+                <div className='flex-1'>
+                  <span className='text-base-content text-sm font-semibold'>
+                    Makanan pokok
+                  </span>
+                  <div className='text-base-content/60 text-xs'>
+                    Nasi, roti, kentang
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
+              <div className='card-body flex-row items-center gap-3'>
+                <input
+                  className='checkbox checkbox-primary'
+                  type='checkbox'
+                  name='containsSideDish'
+                  id='containsSideDish'
+                  disabled={isPending || isDisabled}
+                  defaultChecked={!!cell.row.original.containsSideDish}
+                />
+                <DrumstickIcon className='h-5 w-5 flex-shrink-0 text-red-600' />
+                <div className='flex-1'>
+                  <span className='text-base-content text-sm font-semibold'>
+                    Lauk-pauk
+                  </span>
+                  <div className='text-base-content/60 text-xs'>
+                    Protein hewani/nabati
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            {/* Second Row */}
+            <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
+              <div className='card-body flex-row items-center gap-3'>
+                <input
+                  className='checkbox checkbox-primary'
+                  type='checkbox'
+                  name='containsVegetables'
+                  id='containsVegetables'
+                  disabled={isPending || isDisabled}
+                  defaultChecked={!!cell.row.original.containsVegetables}
+                />
+                <LeafIcon className='h-5 w-5 flex-shrink-0 text-green-600' />
+                <div className='flex-1'>
+                  <span className='text-base-content text-sm font-semibold'>
+                    Sayuran
+                  </span>
+                  <div className='text-base-content/60 text-xs'>
+                    Sayuran hijau & warna
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
+              <div className='card-body flex-row items-center gap-3'>
+                <input
+                  className='checkbox checkbox-primary'
+                  type='checkbox'
+                  name='containsFruits'
+                  id='containsFruits'
+                  disabled={isPending || isDisabled}
+                  defaultChecked={!!cell.row.original.containsFruits}
+                />
+                <AppleIcon className='h-5 w-5 flex-shrink-0 text-orange-500' />
+                <div className='flex-1'>
+                  <span className='text-base-content text-sm font-semibold'>
+                    Buah-buahan
+                  </span>
+                  <div className='text-base-content/60 text-xs'>
+                    Buah segar atau olahan
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {/* Recipe Following - Full Width */}
+          <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
+            <div className='card-body flex-row items-center gap-3'>
+              <input
+                className='checkbox checkbox-primary'
+                type='checkbox'
+                name='isFollowingRecipe'
+                id='isFollowingRecipe'
+                disabled={isPending || isDisabled}
+                defaultChecked={!!cell.row.original.isFollowingRecipe}
+              />
+              <BookOpenIcon className='h-5 w-5 flex-shrink-0 text-blue-600' />
+              <div className='flex-1'>
+                <span className='text-base-content text-sm font-semibold'>
+                  Sesuai dengan resep
+                </span>
+                <div className='text-base-content/60 text-xs'>
+                  Mengikuti panduan resep yang diberikan
+                </div>
+              </div>
+            </div>
+          </label>
+
+          {/* Hidden inputs */}
+          <input
+            type='hidden'
+            name='targetId'
+            value={cell.row.original.targetId}
+          />
+          <input
+            type='hidden'
+            name='dailyAssesmentId'
+            value={cell.row.original.dailyAssesmentId}
+          />
+          <input
+            type='checkbox'
+            name='removeImage'
+            className='hidden'
+            defaultChecked={false}
+          />
+
+          {/* File upload input - moved inside form */}
+          <input
+            type='file'
+            name='imageFile'
+            accept='image/*'
+            disabled={isPending || isDisabled}
+            onChange={handleFileChange}
+            className='hidden'
+            id={`imageFile-${cell.row.original.dailyAssesmentId}`}
+          />
+        </form>
       </div>
 
-      {/* Hidden inputs */}
-      <input type='hidden' name='targetId' value={cell.row.original.targetId} />
-      <input
-        type='hidden'
-        name='dailyAssesmentId'
-        value={cell.row.original.dailyAssesmentId}
-      />
-      <input
-        type='checkbox'
-        name='removeImage'
-        className='hidden'
-        defaultChecked={false}
-      />
-    </form>
+      {/* Image Upload Section */}
+      <div className='bg-base-100 border-base-300/50 rounded-lg border p-4'>
+        <div className='mb-3 flex items-center gap-2'>
+          <CameraIcon className='text-secondary h-4 w-4' />
+          <span className='text-base-content/80 text-sm font-semibold'>
+            Foto
+          </span>
+          <span className='badge badge-outline badge-xs'>Opsional</span>
+        </div>
+
+        {/* Show selected file preview above existing image */}
+        {selectedFile && previewUrl && (
+          <div className='mb-4'>
+            <div className='relative'>
+              <div className='border-success ring-success/30 overflow-hidden rounded-lg border-2 shadow-lg ring-2'>
+                <img
+                  src={previewUrl}
+                  alt='Preview foto yang akan disimpan'
+                  className='bg-base-200/30 aspect-[4/3] w-full object-contain'
+                />
+              </div>
+              <div className='bg-success text-success-content absolute -top-2 left-1/2 flex -translate-x-1/2 transform items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-lg'>
+                {isPending && (
+                  <div className='loading loading-spinner loading-xs'></div>
+                )}
+                {isPending ? 'MENYIMPAN...' : 'BARU'}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Show existing image if available and no new file selected */}
+        {cell.row.original.image && !selectedFile && (
+          <div className='mb-4'>
+            <div className='relative w-full'>
+              <div className='border-base-300/50 ring-base-300/20 overflow-hidden rounded-lg border-2 shadow-lg ring-2'>
+                <Image
+                  publicId={cell.row.original.image}
+                  width={300}
+                  height={400}
+                  sizes='(max-width: 640px) 100vw, (max-width: 768px) 50vw, 400px'
+                  breakpoints={[300, 400, 500, 600]}
+                  alt='Foto saat ini'
+                  className='bg-base-200/30 aspect-[4/3] w-full object-cover'
+                />
+              </div>
+
+              {/* Corner X button to remove image - disabled for future dates */}
+              {!isDisabled && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    // Set the hidden removeImage checkbox and submit
+                    const removeImageInput = formRef.current?.querySelector(
+                      'input[name="removeImage"]'
+                    ) as HTMLInputElement
+                    if (removeImageInput && formRef.current) {
+                      removeImageInput.checked = true
+                      removeImageInput.dataset.intentionallyChecked = 'true'
+                      formRef.current.requestSubmit()
+                    }
+                  }}
+                  disabled={isPending}
+                  className='btn btn-circle btn-xs btn-error absolute -top-2 -right-2 z-10 shadow-lg transition-all duration-200 hover:scale-110'
+                  aria-label='Hapus foto'
+                >
+                  <XIcon className='h-3 w-3' />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* File upload input */}
+        <div className='relative'>
+          <label
+            htmlFor={`imageFile-${cell.row.original.dailyAssesmentId}`}
+            className={clsx(
+              'flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-3 transition-all duration-200 md:p-4',
+              isPending || isDisabled
+                ? 'border-base-300/30 bg-base-200/30 cursor-not-allowed opacity-50'
+                : selectedFile
+                  ? 'border-success bg-success/10 ring-success/20 ring-2'
+                  : 'border-base-300 hover:border-primary hover:bg-primary/5'
+            )}
+          >
+            <UploadIcon
+              className={clsx(
+                'h-4 w-4',
+                isPending || isDisabled
+                  ? 'text-base-content/30'
+                  : selectedFile
+                    ? 'text-success'
+                    : 'text-primary'
+              )}
+            />
+            <div className='flex flex-col items-center gap-1'>
+              <span
+                className={clsx(
+                  'text-sm font-medium',
+                  isPending || isDisabled
+                    ? 'text-base-content/30'
+                    : selectedFile
+                      ? 'text-success'
+                      : 'text-base-content/70'
+                )}
+              >
+                {selectedFile
+                  ? `File terpilih: ${selectedFile.name}`
+                  : cell.row.original.image
+                    ? 'Ganti foto'
+                    : 'Upload foto'}
+              </span>
+              {selectedFile && (
+                <span className='text-success text-xs font-medium'>
+                  ✓ Siap untuk disimpan
+                </span>
+              )}
+            </div>
+          </label>
+        </div>
+
+        <div className='text-base-content/50 mt-2 text-xs'>
+          Format yang didukung: JPG, PNG, WebP (Maks. 5MB)
+        </div>
+      </div>
+    </div>
   )
 }
 

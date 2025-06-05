@@ -14,7 +14,10 @@ import {
 } from '../db/queries/assesment'
 import { getTargetById } from '../db/queries/target'
 import { getFileHash } from '../utils/file-hash'
-import { uploadToCloudinary } from '../utils/cloudinary'
+import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary'
+import { db } from '../db/db'
+import { targetDailyAssesment } from '../db/schemas/assesment'
+import { eq, and } from 'drizzle-orm'
 import { z } from 'astro:schema'
 
 /**
@@ -226,6 +229,19 @@ const assesment = {
           })
         }
 
+        // Get existing assessment to check for current image (for Cloudinary cleanup)
+        const existingAssessment = await db
+          .select({ image: targetDailyAssesment.image })
+          .from(targetDailyAssesment)
+          .where(
+            and(
+              eq(targetDailyAssesment.targetId, input.targetId),
+              eq(targetDailyAssesment.dailyAssesmentId, input.dailyAssesmentId)
+            )
+          )
+          .limit(1)
+          .then((rows) => rows[0])
+
         let imageFileName: string | null | undefined = undefined
 
         // Handle the three cases for image handling:
@@ -235,6 +251,15 @@ const assesment = {
 
         if (input.removeImage === true) {
           // Case 3: Explicitly removing image
+          // Delete old image from Cloudinary if it exists
+          if (existingAssessment?.image) {
+            try {
+              await deleteFromCloudinary(existingAssessment.image)
+            } catch (error) {
+              console.error('Failed to delete image from Cloudinary:', error)
+              // Continue with removal even if Cloudinary deletion fails
+            }
+          }
           imageFileName = null
         } else if (input.imageFile && input.imageFile.size > 0) {
           // Case 2: New file provided - replace existing image
@@ -311,6 +336,19 @@ const assesment = {
           const fileName = `assesment-${target.slug}-${sanitizedDailyAssesmentId}-${shortHash}.${extension}`
 
           try {
+            // Delete old image from Cloudinary before uploading new one
+            if (existingAssessment?.image) {
+              try {
+                await deleteFromCloudinary(existingAssessment.image)
+              } catch (error) {
+                console.error(
+                  'Failed to delete old image from Cloudinary:',
+                  error
+                )
+                // Continue with upload even if old image deletion fails
+              }
+            }
+
             imageFileName = await uploadToCloudinary(input.imageFile, fileName)
           } catch (error) {
             throw new ActionError({

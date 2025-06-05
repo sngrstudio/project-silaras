@@ -22,9 +22,20 @@ const CardTemplate: FC<PropsWithChildren<CardTemplateProps>> = ({
   title
 }) => {
   return (
-    <div className='card border-base-300 border'>
-      <div className='card-body'>
-        {title && <h2 className='card-title'>{title}</h2>}
+    <div className='card border-base-300/50 bg-base-100 group hover:border-primary/30 hover:shadow-primary/5 relative overflow-hidden border shadow-lg transition-all duration-300 hover:shadow-xl'>
+      {/* Subtle gradient overlay for depth */}
+      <div className='from-base-100/50 to-base-200/30 pointer-events-none absolute inset-0 bg-gradient-to-br via-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+
+      {/* Content container */}
+      <div className='card-body relative z-10'>
+        {title && (
+          <h2 className='card-title text-base-content group-hover:text-primary mb-4 flex items-center gap-3 transition-colors duration-200'>
+            <div className='bg-primary/10 border-primary/20 group-hover:bg-primary/20 flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-300 group-hover:scale-110'>
+              <div className='bg-primary h-2 w-2 rounded-full transition-all duration-300 group-hover:h-3 group-hover:w-3' />
+            </div>
+            {title}
+          </h2>
+        )}
         {children}
       </div>
     </div>

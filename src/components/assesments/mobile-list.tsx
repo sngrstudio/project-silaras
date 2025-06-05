@@ -4,6 +4,12 @@ import { type CellContext } from '@tanstack/react-table'
 import { type DailyAssesments } from './assesment.store'
 import { useStore } from '@nanostores/react'
 import { $currentUser } from '~/components/layout/drawer/drawer.store'
+import CalendarIcon from '~icons/lucide/calendar'
+import UtensilsIcon from '~icons/lucide/utensils'
+import TrophyIcon from '~icons/lucide/trophy'
+import ClockIcon from '~icons/lucide/clock'
+import UserIcon from '~icons/lucide/user'
+import clsx from 'clsx'
 
 // Helper function to check if a date is in the future (after today)
 const isDateInFuture = (date: Date | null | undefined): boolean => {
@@ -23,55 +29,120 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
   const assessment = cell.row.original
   const isFuture = isDateInFuture(assessment.date)
   const currentUser = useStore($currentUser)
+  const maxScore = 5 // Assuming max score is 5 based on the assessment criteria
+  const score = assessment.score || 0
+  const percentage = (score / maxScore) * 100
+
+  // Show metadata if assessment is completed, has been modified, and user has access level 3+
+  const showMetadata =
+    assessment.isCompleted &&
+    assessment.lastModifiedAt &&
+    assessment.lastModifiedBy &&
+    currentUser &&
+    currentUser.accessLevel >= 3
 
   return (
-    <>
-      <div className='list-col-grow flex flex-col justify-start gap-y-1'>
-        <div className='mb-2 flex items-center gap-2'>
-          <span
-            className={`text-lg font-bold ${isFuture ? 'text-gray-400' : ''}`}
-          >
-            {assessment.date?.toLocaleDateString('id-ID', {
-              dateStyle: 'full'
-            })}
-          </span>
-          {isFuture && (
-            <span className='badge badge-outline badge-sm text-gray-400'>
-              Akan datang
-            </span>
-          )}
-        </div>
-        <div
-          className={`badge badge-soft badge-sm badge-primary rounded-full ${isFuture ? 'opacity-50' : ''}`}
-        >
-          {assessment.menu1}
-        </div>
-        <div
-          className={`badge badge-soft badge-sm badge-accent rounded-full ${isFuture ? 'opacity-50' : ''}`}
-        >
-          {assessment.menu2}
+    <div className='flex flex-col gap-4'>
+      {/* Header Section */}
+      <div className='flex items-start justify-between'>
+        <div className='flex-1'>
+          <div className='mb-3 flex items-center gap-2'>
+            <CalendarIcon
+              className={clsx(
+                'h-4 w-4',
+                isFuture ? 'text-gray-400' : 'text-primary'
+              )}
+            />
+            <div className='flex flex-col'>
+              <span
+                className={clsx(
+                  'text-lg font-bold',
+                  isFuture ? 'text-gray-400' : 'text-base-content'
+                )}
+              >
+                {assessment.date?.toLocaleDateString('id-ID', {
+                  dateStyle: 'full'
+                })}
+              </span>
+              {isFuture && (
+                <span className='badge badge-outline badge-sm mt-1 w-fit text-gray-400'>
+                  Akan datang
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Show "last modified" metadata when assessment is completed and user has access level 3+ */}
-        {assessment.isCompleted &&
-          assessment.lastModifiedAt &&
-          assessment.lastModifiedBy &&
-          currentUser &&
-          currentUser.accessLevel >= 3 && (
-            <div className='mt-2 text-xs text-gray-500'>
-              <div>
-                terakhir diubah oleh{' '}
-                {assessment.lastModifiedByUser?.fullName || 'Unknown'}
-              </div>
-              <div>
-                pada{' '}
-                {new Date(assessment.lastModifiedAt!).toLocaleString('id-ID')}
-              </div>
-            </div>
-          )}
+        {/* Score Section */}
+        <div className='flex flex-col items-end gap-1'>
+          <div className='flex items-center gap-2'>
+            <TrophyIcon className='text-warning h-4 w-4' />
+            <span className='text-warning text-2xl font-bold'>{score}</span>
+          </div>
+          <div className='text-base-content/60 text-xs'>dari {maxScore}</div>
+          <div className='bg-base-200 h-2 w-16 rounded-full'>
+            <div
+              className={clsx(
+                'h-2 rounded-full transition-all duration-300',
+                percentage >= 80
+                  ? 'bg-success'
+                  : percentage >= 60
+                    ? 'bg-warning'
+                    : 'bg-error'
+              )}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className='list-col-wrap'>
+      {/* Menu Section */}
+      <div className='bg-base-200/30 rounded-lg p-3'>
+        <div className='mb-2 flex items-center gap-2'>
+          <UtensilsIcon className='text-secondary h-4 w-4' />
+          <span className='text-base-content/80 text-sm font-semibold'>
+            Menu Hari Ini
+          </span>
+        </div>
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center gap-2'>
+            <UtensilsIcon
+              className={clsx('text-primary h-3 w-3', isFuture && 'opacity-50')}
+            />
+            <span
+              className={clsx(
+                'badge badge-sm rounded-full px-3 py-1 font-medium',
+                'badge-primary bg-primary/20 text-primary border-primary/30',
+                isFuture && 'opacity-50'
+              )}
+            >
+              {assessment.menu1}
+            </span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <UtensilsIcon
+              className={clsx('text-accent h-3 w-3', isFuture && 'opacity-50')}
+            />
+            <span
+              className={clsx(
+                'badge badge-sm rounded-full px-3 py-1 font-medium',
+                'badge-accent bg-accent/20 text-accent border-accent/30',
+                isFuture && 'opacity-50'
+              )}
+            >
+              {assessment.menu2}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Assessment Form Section */}
+      <div
+        className={clsx(
+          'transition-all duration-200',
+          isFuture && 'opacity-50'
+        )}
+      >
         <AssesmentForm
           cell={cell}
           key={assessment.dailyAssesmentId}
@@ -79,15 +150,34 @@ const MobileList: FC<MobileListProps> = ({ cell }) => {
         />
       </div>
 
-      <div>
-        <div className='stats'>
-          <div className='stat'>
-            <div className='stat-value'>{assessment.score}</div>
-            <div className='stat-desc'>Skor</div>
+      {/* Metadata Section */}
+      {showMetadata && (
+        <div className='bg-info/5 border-info/20 rounded-lg border p-3'>
+          <div className='mb-2 flex items-center gap-2'>
+            <ClockIcon className='text-info h-4 w-4' />
+            <span className='text-info text-sm font-semibold'>
+              Informasi Perubahan
+            </span>
+          </div>
+          <div className='text-base-content/70 text-xs'>
+            <div className='flex items-center gap-1'>
+              <UserIcon className='text-base-content/50 h-3 w-3' />
+              <span className='font-medium'>Diubah oleh:</span>
+              <span>
+                {assessment.lastModifiedByUser?.fullName || 'Unknown'}
+              </span>
+            </div>
+            <div className='mt-1 flex items-center gap-1'>
+              <ClockIcon className='text-base-content/50 h-3 w-3' />
+              <span className='font-medium'>Pada:</span>
+              <span>
+                {new Date(assessment.lastModifiedAt!).toLocaleString('id-ID')}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   )
 }
 
