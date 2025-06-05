@@ -25,6 +25,10 @@ import EditIcon from '~icons/lucide/pen'
 import TrashIcon from '~icons/lucide/trash-2'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import UserPlusIcon from '~icons/lucide/user-plus'
+import SearchIcon from '~icons/lucide/search'
+import KeyIcon from '~icons/lucide/key'
+import MapPinIcon from '~icons/lucide/map-pin'
+import PhoneIcon from '~icons/lucide/phone'
 import Image from '~/components/common/image/image'
 import {
   canUserEditUser,
@@ -40,42 +44,77 @@ import {
 
 const columnHelper = createColumnHelper<User>()
 
-// Avatar component that handles profile photo display
+// Enhanced Avatar component with modern styling
 const UserAvatar: FC<{
   profilePhoto: string | null | undefined
   fullName: string
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'lg'
 }> = ({ profilePhoto, fullName, size = 'md' }) => {
-  const sizeClass = size === 'sm' ? 'w-8' : 'w-10'
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-xs',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-12 h-12 text-base'
+  }
+
+  const sizeClass = sizeClasses[size]
 
   return (
-    <div className={clsx('avatar', { 'avatar-placeholder': !profilePhoto })}>
+    <div className={clsx('avatar', !profilePhoto && 'avatar-placeholder')}>
       {profilePhoto ? (
-        <div className={clsx(sizeClass, 'mask mask-circle')}>
+        <div
+          className={clsx(
+            sizeClass,
+            'mask ring-primary/20 ring-offset-base-100 mask-circle ring-2 ring-offset-2'
+          )}
+        >
           <Image
             className='object-cover'
             publicId={profilePhoto}
-            width={size === 'sm' ? 32 : 40}
-            height={size === 'sm' ? 32 : 40}
-            sizes={size === 'sm' ? '32px' : '40px'}
-            breakpoints={[32, 40, 64, 80]}
+            width={size === 'sm' ? 32 : size === 'md' ? 40 : 48}
+            height={size === 'sm' ? 32 : size === 'md' ? 40 : 48}
+            sizes={size === 'sm' ? '32px' : size === 'md' ? '40px' : '48px'}
+            breakpoints={[32, 40, 48, 64, 80]}
             alt={fullName}
           />
         </div>
       ) : (
         <div
           className={clsx(
-            'bg-primary text-primary-content aspect-square rounded-full',
+            'from-primary to-primary/80 text-primary-content ring-primary/20 ring-offset-base-100 flex aspect-square items-center justify-center rounded-full bg-gradient-to-br font-bold ring-2 ring-offset-2 transition-all duration-300 hover:scale-105',
             sizeClass
           )}
         >
-          <span className={size === 'sm' ? 'text-xs' : 'text-xl'}>
+          <span
+            className={
+              size === 'sm'
+                ? 'text-xs'
+                : size === 'md'
+                  ? 'text-sm'
+                  : 'text-base'
+            }
+          >
             {fullName.charAt(0).toUpperCase()}
           </span>
         </div>
       )}
     </div>
   )
+}
+
+// Helper function to get access level color
+const getAccessLevelColor = (accessLevel: number) => {
+  switch (accessLevel) {
+    case 1:
+      return 'text-gray-600'
+    case 2:
+      return 'text-blue-600'
+    case 3:
+      return 'text-green-600'
+    case 4:
+      return 'text-purple-600'
+    default:
+      return 'text-gray-600'
+  }
 }
 
 // Component for delete button with self-deletion protection
@@ -89,12 +128,12 @@ const UserDeleteButton: FC<{ user: User; onDelete: () => void }> = ({
   if (isSelf) {
     return (
       <button
-        className='btn btn-soft btn-error btn-xs cursor-not-allowed opacity-50'
+        className='btn btn-sm cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-60'
         disabled
         title='Anda tidak dapat menghapus akun Anda sendiri'
         aria-label={`Cannot delete own account: ${user.fullName}`}
       >
-        <TrashIcon />
+        <TrashIcon className='h-4 w-4' />
         <span>Hapus</span>
       </button>
     )
@@ -102,11 +141,11 @@ const UserDeleteButton: FC<{ user: User; onDelete: () => void }> = ({
 
   return (
     <button
-      className='btn btn-soft btn-error btn-xs'
+      className='btn btn-sm from-error to-error/80 border-error/30 text-error-content bg-gradient-to-r transition-all duration-300 hover:scale-105'
       onClick={onDelete}
       aria-label={`Delete ${user.fullName}`}
     >
-      <TrashIcon />
+      <TrashIcon className='h-4 w-4' />
       <span>Hapus</span>
     </button>
   )
@@ -114,18 +153,19 @@ const UserDeleteButton: FC<{ user: User; onDelete: () => void }> = ({
 
 const dColumns = [
   columnHelper.accessor('fullName', {
-    header: 'Nama Lengkap',
+    header: 'Pengguna',
     enableSorting: true,
     cell: (cell) => (
-      <div className='flex items-center gap-3'>
+      <div className='flex items-center gap-4'>
         <UserAvatar
           profilePhoto={cell.row.original.profilePhoto}
           fullName={cell.getValue()}
+          size='md'
         />
-        <div>
-          <div className='font-bold'>{cell.getValue()}</div>
-          <div className='text-sm opacity-75'>
-            @{cell.row.original.username}
+        <div className='flex flex-col'>
+          <div className='text-base-content font-bold'>{cell.getValue()}</div>
+          <div className='text-base-content/60 flex items-center gap-1 text-sm'>
+            <span>@{cell.row.original.username}</span>
           </div>
         </div>
       </div>
@@ -134,14 +174,19 @@ const dColumns = [
   columnHelper.accessor('accessLevel', {
     header: 'Level Akses',
     enableSorting: true,
-    cell: (cell) => (
-      <span
-        className='badge badge-soft badge-primary badge-sm line-clamp-1'
-        title={getAccessLevelName(cell.getValue())}
-      >
-        {getAccessLevelName(cell.getValue())}
-      </span>
-    )
+    cell: (cell) => {
+      const accessLevel = cell.getValue()
+      const colorClass = getAccessLevelColor(accessLevel)
+
+      return (
+        <div className='flex items-start gap-2'>
+          <KeyIcon className={clsx('mt-0.5 h-4 w-4', colorClass)} />
+          <span className={clsx('text-sm font-medium', colorClass)}>
+            {getAccessLevelName(accessLevel)}
+          </span>
+        </div>
+      )
+    }
   }),
   columnHelper.accessor('regionName', {
     header: 'Wilayah',
@@ -149,36 +194,65 @@ const dColumns = [
     cell: (cell) => {
       const regionName = cell.getValue()
       const regionType = cell.row.original.regionType
-      if (!regionName) return <span className='text-gray-400'>-</span>
+      if (!regionName) {
+        return (
+          <div className='flex items-start gap-2'>
+            <MapPinIcon className='mt-0.5 h-4 w-4 text-gray-400' />
+            <span className='text-base-content/40 text-sm'>
+              Tidak ada wilayah
+            </span>
+          </div>
+        )
+      }
 
       return (
-        <div>
-          <div className='font-medium'>{regionName}</div>
-          <div className='text-xs text-gray-500 capitalize'>
-            {regionType?.toLowerCase()}
+        <div className='flex items-start gap-2'>
+          <MapPinIcon className='text-info mt-0.5 h-4 w-4' />
+          <div className='flex flex-col'>
+            <span className='text-base-content text-sm font-medium'>
+              {regionName}
+            </span>
+            <span className='text-base-content/60 text-xs capitalize'>
+              {regionType?.toLowerCase()}
+            </span>
           </div>
         </div>
       )
     }
   }),
   columnHelper.accessor('phoneNumber', {
-    header: 'Nomor Telepon',
+    header: 'Kontak',
     enableSorting: false,
     cell: (cell) => {
       const phone = cell.getValue()
-      if (!phone) return <span className='text-gray-400'>-</span>
+      if (!phone) {
+        return (
+          <div className='flex items-start gap-2'>
+            <PhoneIcon className='mt-0.5 h-4 w-4 text-gray-400' />
+            <span className='text-base-content/40 text-sm'>
+              Tidak ada nomor
+            </span>
+          </div>
+        )
+      }
 
       return (
-        <div className='flex items-center gap-2'>
-          <span>{phone}</span>
-          <a
-            className='btn btn-ghost btn-xs'
-            href={`https://wa.me/${phone.replace(/^08/, '628')}`}
-            target='_blank'
-            aria-label='WhatsApp'
-          >
-            <WhatsAppIcon />
-          </a>
+        <div className='flex items-start gap-3'>
+          <PhoneIcon className='text-success mt-0.5 h-4 w-4' />
+          <div className='flex items-center gap-2'>
+            <span className='text-base-content text-sm font-medium'>
+              {phone}
+            </span>
+            <a
+              className='flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white transition-all duration-300 hover:scale-110 hover:bg-green-600'
+              href={`https://wa.me/${phone.replace(/^08/, '628')}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label='WhatsApp'
+            >
+              <WhatsAppIcon className='h-3 w-3' />
+            </a>
+          </div>
         </div>
       )
     }
@@ -273,13 +347,14 @@ const dColumns = [
       }
 
       return (
-        <div className='flex gap-2'>
+        <div className='flex items-center gap-2'>
           {canEdit ? (
             <button
-              className='btn btn-soft btn-primary btn-xs'
+              className='btn btn-sm from-primary to-primary/80 border-primary/30 text-primary-content bg-gradient-to-r transition-all duration-300 hover:scale-105'
               onClick={handleEditBtn}
+              aria-label={`Edit ${user.fullName}`}
             >
-              <EditIcon />
+              <EditIcon className='h-4 w-4' />
               <span>Edit</span>
             </button>
           ) : (
@@ -287,11 +362,11 @@ const dColumns = [
             currentUser?.accessLevel === 4 &&
             user.accessLevel === 4 && (
               <button
-                className='btn btn-soft btn-primary btn-xs cursor-not-allowed opacity-50'
+                className='btn btn-sm cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-60'
                 disabled
                 title='Tidak dapat mengedit sesama administrator'
               >
-                <EditIcon />
+                <EditIcon className='h-4 w-4' />
                 <span>Edit</span>
               </button>
             )
@@ -306,11 +381,11 @@ const dColumns = [
             currentUser?.accessLevel === 4 &&
             user.accessLevel === 4 && (
               <button
-                className='btn btn-soft btn-error btn-xs cursor-not-allowed opacity-50'
+                className='btn btn-sm cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-60'
                 disabled
                 title='Tidak dapat menghapus sesama administrator'
               >
-                <TrashIcon />
+                <TrashIcon className='h-4 w-4' />
                 <span>Hapus</span>
               </button>
             )
@@ -359,29 +434,43 @@ const UsersRC: FC = () => {
 
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='mb-3 text-lg font-semibold'>Daftar Pengguna</h2>
-        <div className='flex flex-col gap-3 sm:flex-row-reverse sm:items-center sm:gap-2'>
-          {canCreateUsers && (
-            <button
-              className='btn btn-primary btn-sm w-full sm:w-auto'
-              onClick={() => setCurrentUser({} as User)} // Empty user for new user creation
-            >
-              <UserPlusIcon />
-              <span>Tambah Pengguna</span>
-            </button>
-          )}
-          <div className='relative flex-1 sm:flex-none'>
+      {/* Header Section with Search and Add Button */}
+      <div className='mb-8'>
+        <div className='mb-6'>
+          <h2 className='text-base-content mb-2 text-2xl font-bold'>
+            Manajemen Pengguna
+          </h2>
+          <p className='text-base-content/60'>
+            Kelola pengguna dan hak akses sistem
+          </p>
+        </div>
+
+        <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+          {/* Search Input */}
+          <div className='relative max-w-md flex-1'>
+            <SearchIcon className='text-base-content/40 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
             <input
               type='text'
-              placeholder='Cari pengguna...'
-              className='input input-bordered input-sm w-full sm:w-48'
+              placeholder='Cari pengguna, wilayah, atau nomor telepon...'
+              className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 w-full pl-10 transition-all duration-200 focus:ring-2'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          {/* Add User Button */}
+          {canCreateUsers && (
+            <button
+              className='btn from-primary to-primary/80 border-primary/30 text-primary-content bg-gradient-to-r shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl'
+              onClick={() => setCurrentUser({} as User)} // Empty user for new user creation
+            >
+              <UserPlusIcon className='h-5 w-5' />
+              <span>Tambah Pengguna</span>
+            </button>
+          )}
         </div>
       </div>
+
       <UsersTableRenderer users={filteredUsers} />
       <Navigation />
     </>

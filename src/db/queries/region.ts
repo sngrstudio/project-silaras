@@ -244,6 +244,21 @@ export const getAllRegionsWithCounts = async (
           WHERE r1.parent_id = region.id
         )
       )`,
+      userCount: sql<number>`(
+        SELECT COUNT(*) 
+        FROM user u 
+        WHERE u.region_id = region.id
+      )`,
+      managedByUsers: sql<string>`(
+        SELECT GROUP_CONCAT(
+          JSON_OBJECT(
+            'fullName', u.full_name,
+            'phoneNumber', u.phone_number
+          )
+        ) 
+        FROM user u 
+        WHERE u.region_id = region.id
+      )`,
       totalCount: sql<number>`COUNT(*) OVER()`
     })
     .from(region)

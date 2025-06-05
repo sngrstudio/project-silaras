@@ -21,6 +21,11 @@ import AddTargetIcon from '~icons/lucide/user-plus'
 import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 import GMapsIcon from '~icons/simple-icons/googlemaps'
+import IconUser from '~icons/lucide/user'
+import IconClock from '~icons/lucide/clock'
+import IconTag from '~icons/lucide/tag'
+import IconPhone from '~icons/lucide/phone'
+import IconMapPin from '~icons/lucide/map-pin'
 import { canUserAccessTargetSync } from '../../../utils/access-control'
 import { useUserRegion } from '../../../utils/hooks/useUserRegion'
 import {
@@ -29,6 +34,20 @@ import {
 } from '~/components/common/toast/toast.store'
 
 type Target = Targets[number]
+
+// Helper function to get display name for status
+const getStatusDisplayName = (status: string) => {
+  switch (status) {
+    case 'HAMIL':
+      return 'Hamil'
+    case 'MENYUSUI':
+      return 'Menyusui'
+    case 'ANAK-ANAK':
+      return 'Baduta'
+    default:
+      return status
+  }
+}
 
 // Helper function to copy text to clipboard
 const copyToClipboard = async (text: string) => {
@@ -50,7 +69,12 @@ const createDesktopColumns = (
   loading: boolean
 ) => [
   columnHelper.accessor('name', {
-    header: 'Nama',
+    header: () => (
+      <div className='flex items-center gap-2'>
+        <IconUser className='text-primary h-4 w-4' />
+        <span>Nama</span>
+      </div>
+    ),
     enableSorting: true,
     cell: (cell) => {
       const url = `/target/${cell.row.original.slug}`
@@ -64,7 +88,10 @@ const createDesktopColumns = (
 
       if (canAccess) {
         return (
-          <a className='link font-bold' href={url}>
+          <a
+            className='link link-primary hover:text-primary/80 font-bold transition-colors duration-200'
+            href={url}
+          >
             {cell.getValue()}
           </a>
         )
@@ -81,40 +108,67 @@ const createDesktopColumns = (
     }
   }),
   columnHelper.accessor('age', {
-    header: 'Umur',
+    header: () => (
+      <div className='flex items-center gap-2'>
+        <IconClock className='text-accent h-4 w-4' />
+        <span>Umur</span>
+      </div>
+    ),
     enableSorting: true,
     cell: (cell) => {
       const age = cell.getValue()
       if (!age) {
-        return <></>
+        return <span className='text-base-content/40'>-</span>
       }
 
       return (
-        <span>
-          {age <= 24
-            ? `${age} bulan`
-            : `${Math.floor(age / 12)} tahun ${age % 12} bulan`}
-        </span>
+        <div className='flex items-center gap-2'>
+          <span className='font-medium'>
+            {age <= 24
+              ? `${age} bulan`
+              : `${Math.floor(age / 12)} tahun ${age % 12} bulan`}
+          </span>
+        </div>
       )
     }
   }),
   columnHelper.accessor('status', {
-    header: 'Status',
+    header: () => (
+      <div className='flex items-center gap-2'>
+        <IconTag className='text-info h-4 w-4' />
+        <span>Status</span>
+      </div>
+    ),
     enableSorting: true,
     cell: (cell) => {
+      const status = cell.getValue()
       return (
-        <span className='badge badge-soft badge-primary badge-sm'>
-          {cell.getValue()}
+        <span
+          className={clsx('badge badge-sm rounded-full px-3 py-1 font-medium', {
+            'badge-primary bg-primary/20 text-primary border-primary/30':
+              status === 'HAMIL',
+            'badge-accent bg-accent/20 text-accent border-accent/30':
+              status === 'MENYUSUI',
+            'badge-success bg-success/20 text-success border-success/30':
+              status === 'ANAK-ANAK'
+          })}
+        >
+          {getStatusDisplayName(status)}
         </span>
       )
     }
   }),
   columnHelper.accessor('phoneNumber', {
-    header: 'No. Telepon',
+    header: () => (
+      <div className='flex items-center gap-2'>
+        <IconPhone className='text-success h-4 w-4' />
+        <span>No. Telepon</span>
+      </div>
+    ),
     enableSorting: false,
     cell: (cell) => {
       const phone = cell.getValue()
-      if (!phone) return <span className='text-gray-400'>-</span>
+      if (!phone) return <span className='text-base-content/40'>-</span>
 
       const handleCopyPhone = () => {
         copyToClipboard(phone)
@@ -124,18 +178,18 @@ const createDesktopColumns = (
         <div className='flex items-center gap-2'>
           <button
             onClick={handleCopyPhone}
-            className='hover:text-primary cursor-pointer'
+            className='text-success hover:text-success/80 cursor-pointer font-medium transition-colors duration-200'
             title='Klik untuk menyalin nomor telepon'
           >
             {phone}
           </button>
           <a
-            className='btn btn-ghost btn-xs'
+            className='btn btn-ghost btn-xs text-success hover:bg-success/10 transition-colors duration-200'
             href={`https://wa.me/${phone.replace(/^08/, '628')}`}
             target='_blank'
             aria-label='WhatsApp'
           >
-            <WhatsAppIcon />
+            <WhatsAppIcon className='h-4 w-4' />
           </a>
         </div>
       )
@@ -143,7 +197,12 @@ const createDesktopColumns = (
   }),
   columnHelper.display({
     id: 'd-actions',
-    header: 'Aksi',
+    header: () => (
+      <div className='flex items-center gap-2'>
+        <IconMapPin className='text-neutral h-4 w-4' />
+        <span>Aksi</span>
+      </div>
+    ),
     enableSorting: false,
     cell: (cell) => {
       const canAccess =
@@ -159,9 +218,13 @@ const createDesktopColumns = (
       return (
         <div className='flex gap-2'>
           <button
-            className={clsx('btn btn-soft btn-primary btn-xs', {
-              'btn-disabled': !canAccess
-            })}
+            className={clsx(
+              'btn btn-sm transition-all duration-200 hover:scale-105',
+              {
+                'btn-primary hover:shadow-md': canAccess,
+                'btn-disabled cursor-not-allowed opacity-50': !canAccess
+              }
+            )}
             onClick={handleEditBtn}
             disabled={!canAccess}
             title={
@@ -170,16 +233,16 @@ const createDesktopColumns = (
                 : 'Edit sasaran'
             }
           >
-            <EditIcon />
+            <EditIcon className='h-4 w-4' />
             <span>Edit</span>
           </button>
 
           <a
-            className='btn btn-soft btn-neutral btn-xs'
+            className='btn btn-neutral btn-sm transition-all duration-200 hover:scale-105 hover:shadow-md'
             href={`https://www.google.com/maps/search/?api=1&query=${cell.row.original.latitude},${cell.row.original.longitude}`}
             target='_blank'
           >
-            <GMapsIcon />
+            <GMapsIcon className='h-4 w-4' />
             <span>Lokasi</span>
           </a>
         </div>

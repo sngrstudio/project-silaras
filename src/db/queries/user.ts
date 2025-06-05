@@ -54,7 +54,7 @@ export const upsertUser = async (data: {
         passwordHash: data.passwordHash,
         fullName: data.fullName,
         phoneNumber: data.phoneNumber ?? undefined,
-        profilePhoto: data.profilePhoto ?? undefined,
+        profilePhoto: data.profilePhoto, // Don't convert null to undefined - we want to explicitly set null
         regionId: data.regionId ?? undefined
       }
     })

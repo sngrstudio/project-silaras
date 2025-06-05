@@ -54,6 +54,7 @@ const user = {
         fullName: z.string(),
         phoneNumber: z.string().optional(),
         profilePhotoFile: z.instanceof(File).optional(),
+        removeProfilePhoto: z.string().optional(),
         regionId: z
           .string()
           .optional()
@@ -94,7 +95,10 @@ const user = {
           path: ['confirmPassword']
         }
       ),
-    handler: async ({ profilePhotoFile, ...input }, ctx) => {
+    handler: async (
+      { profilePhotoFile, removeProfilePhoto, ...input },
+      ctx
+    ) => {
       const currentUser = ctx.locals.user
       const isCreatingNewUser = !input.id
       let isFirstAdminSignupScenario = false
@@ -326,8 +330,20 @@ const user = {
         }
       }
 
-      let profilePhoto
-      if (profilePhotoFile && profilePhotoFile.name) {
+      let profilePhoto = undefined
+
+      // Handle profile photo removal
+      if (removeProfilePhoto === 'true' && existingUser?.profilePhoto) {
+        await deleteFromCloudinary(existingUser.profilePhoto)
+        profilePhoto = null // Explicitly set to null to remove from database
+      }
+
+      // Handle profile photo upload (only if not removing)
+      if (
+        profilePhotoFile &&
+        profilePhotoFile.name &&
+        removeProfilePhoto !== 'true'
+      ) {
         if (existingUser && existingUser.profilePhoto) {
           await deleteFromCloudinary(existingUser.profilePhoto)
         }
@@ -351,7 +367,10 @@ const user = {
         accessLevel: input.accessLevel,
         fullName: input.fullName,
         phoneNumber: input.phoneNumber ?? null,
-        profilePhoto: profilePhoto ?? null,
+        profilePhoto:
+          profilePhoto !== undefined
+            ? profilePhoto
+            : (existingUser?.profilePhoto ?? null),
         regionId: input.regionId ?? null,
         passwordHash: null, // Initialize with null, will be set below
         ...(input.id ? { id: input.id } : {})

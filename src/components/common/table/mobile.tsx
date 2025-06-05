@@ -19,23 +19,24 @@ export interface ListTemplateProps extends OlHTMLAttributes<HTMLOListElement> {
  * Usage:
  * `<ListTemplate table={tableInstance} className="my-list" />`
  */
-const ListTemplate: FC<ListTemplateProps> = ({
-  table,
-  className,
-  ...props
-}) => {
+const ListTemplate: FC<ListTemplateProps> = ({ table, className }) => {
   return (
-    <ol className={clsx('list', className)} {...props}>
+    <div className={clsx('space-y-3', className)}>
       {table.getRowModel().rows.map((row) => (
-        <li className='list-row' key={row.id}>
-          {row.getVisibleCells().map((cell) => (
-            <Fragment key={cell.id}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </Fragment>
-          ))}
-        </li>
+        <div
+          key={row.id}
+          className='card bg-base-100 border-base-300/50 border shadow-md transition-all duration-200 hover:scale-[1.01] hover:shadow-lg'
+        >
+          <div className='card-body p-4'>
+            {row.getVisibleCells().map((cell) => (
+              <Fragment key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </Fragment>
+            ))}
+          </div>
+        </div>
       ))}
-    </ol>
+    </div>
   )
 }
 

@@ -14,6 +14,11 @@ import { useStore } from '@nanostores/react'
 import { $regions, type Regions } from './subregion/region.store'
 import { canUserAccessRegionSync } from '../../utils/access-control'
 import { useUserRegion } from '../../utils/hooks/useUserRegion'
+import IconBuilding from '~icons/lucide/building'
+import IconMapPin from '~icons/lucide/map-pin'
+import IconUsers from '~icons/lucide/users'
+import IconExternalLink from '~icons/lucide/external-link'
+import IconSearch from '~icons/lucide/search'
 
 const columnHelper = createColumnHelper<Regions['data'][number]>()
 
@@ -43,14 +48,17 @@ const RegionRC: FC = () => {
   return (
     <>
       {/* Search Input */}
-      <div className='mb-4'>
-        <input
-          type='text'
-          placeholder='Cari wilayah berdasarkan nama atau jenis...'
-          className='input input-bordered w-full max-w-md'
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
+      <div className='mb-6'>
+        <div className='relative max-w-md'>
+          <IconSearch className='text-base-content/40 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
+          <input
+            type='text'
+            placeholder='Cari wilayah berdasarkan nama atau jenis...'
+            className='input input-bordered border-primary/30 bg-base-100 focus:border-primary focus:ring-primary/20 w-full pl-10 transition-all duration-200 focus:ring-2'
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
       </div>
 
       <RegionTableRenderer
@@ -93,7 +101,12 @@ const RegionTableRenderer: FC<{
   const dColumnsWithAccess = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Nama Wilayah',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            <IconBuilding className='text-primary h-4 w-4' />
+            <span>Nama Wilayah</span>
+          </div>
+        ),
         enableSorting: true,
         cell: (cell) => {
           const region = cell.row.original
@@ -102,39 +115,120 @@ const RegionTableRenderer: FC<{
               ? canUserAccessRegionSync(currentUser, region, userRegion)
               : false
 
+          const getTypeIcon = () => {
+            switch (region.type) {
+              case 'KABUPATEN':
+                return IconBuilding
+              case 'KECAMATAN':
+                return IconMapPin
+              case 'DESA':
+                return IconUsers
+              default:
+                return IconMapPin
+            }
+          }
+
+          const getTypeColor = () => {
+            switch (region.type) {
+              case 'KABUPATEN':
+                return 'text-primary'
+              case 'KECAMATAN':
+                return 'text-info'
+              case 'DESA':
+                return 'text-success'
+              default:
+                return 'text-neutral'
+            }
+          }
+
+          const IconComponent = getTypeIcon()
+
           return (
-            <div className='flex flex-col'>
-              {canAccess ? (
-                <a className='link font-bold' href={`/region/${region.slug}`}>
-                  {cell.getValue()}
-                </a>
-              ) : (
-                <span
-                  className='font-bold text-gray-500'
-                  title='Anda tidak memiliki akses ke wilayah ini'
-                >
-                  {cell.getValue()}
+            <div className='flex items-center gap-3'>
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-lg ${getTypeColor()}`}
+              >
+                <IconComponent className='h-4 w-4' />
+              </div>
+              <div className='flex flex-col'>
+                {canAccess ? (
+                  <a
+                    className='text-primary hover:text-primary/80 font-bold transition-colors duration-200'
+                    href={`/region/${region.slug}`}
+                  >
+                    {cell.getValue()}
+                  </a>
+                ) : (
+                  <span
+                    className='text-base-content/50 font-bold'
+                    title='Anda tidak memiliki akses ke wilayah ini'
+                  >
+                    {cell.getValue()}
+                  </span>
+                )}
+                <span className={`text-xs font-medium ${getTypeColor()}`}>
+                  {region.type}
                 </span>
-              )}
-              <span className='text-sm text-gray-500 capitalize'>
-                {region.type.toLowerCase()}
-              </span>
+              </div>
             </div>
           )
         }
       }),
       columnHelper.accessor('type', {
-        header: 'Jenis',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            <IconMapPin className='text-info h-4 w-4' />
+            <span>Jenis</span>
+          </div>
+        ),
         enableSorting: true,
-        cell: (cell) => (
-          <span className='badge badge-soft badge-neutral badge-sm'>
-            {cell.getValue()}
-          </span>
-        )
+        cell: (cell) => {
+          const getTypeColor = () => {
+            switch (cell.getValue()) {
+              case 'KABUPATEN':
+                return 'badge-primary bg-primary/20 text-primary border-primary/30'
+              case 'KECAMATAN':
+                return 'badge-info bg-info/20 text-info border-info/30'
+              case 'DESA':
+                return 'badge-success bg-success/20 text-success border-success/30'
+              default:
+                return 'badge-neutral bg-neutral/20 text-neutral border-neutral/30'
+            }
+          }
+
+          const getTypeIcon = () => {
+            switch (cell.getValue()) {
+              case 'KABUPATEN':
+                return IconBuilding
+              case 'KECAMATAN':
+                return IconMapPin
+              case 'DESA':
+                return IconUsers
+              default:
+                return IconMapPin
+            }
+          }
+
+          const IconComponent = getTypeIcon()
+
+          return (
+            <span
+              className={`badge badge-sm rounded-full px-3 py-1 font-medium ${getTypeColor()}`}
+            >
+              <IconComponent className='mr-1 h-3 w-3' />
+              {cell.getValue()}
+            </span>
+          )
+        }
       }),
       columnHelper.display({
         id: 'actions',
-        header: 'Aksi',
+        header: () => (
+          <div className='flex items-center gap-2'>
+            <IconExternalLink className='text-neutral h-4 w-4' />
+            <span>Aksi</span>
+          </div>
+        ),
         enableSorting: false,
         cell: (cell) => {
           const region = cell.row.original
@@ -147,17 +241,20 @@ const RegionTableRenderer: FC<{
             <div className='flex gap-2'>
               {canAccess ? (
                 <a
-                  className='btn btn-soft btn-primary btn-xs'
+                  className='btn btn-primary btn-sm transition-all duration-200 hover:scale-105 hover:shadow-md'
                   href={`/region/${region.slug}`}
+                  title='Lihat detail wilayah'
                 >
+                  <IconExternalLink className='h-4 w-4' />
                   <span>Lihat</span>
                 </a>
               ) : (
                 <button
-                  className='btn btn-soft btn-neutral btn-xs'
+                  className='btn btn-neutral btn-sm opacity-50'
                   disabled
                   title='Anda tidak memiliki akses ke wilayah ini'
                 >
+                  <IconExternalLink className='h-4 w-4' />
                   <span>Lihat</span>
                 </button>
               )}

@@ -33,26 +33,28 @@ const Navigation: FC = () => {
   }
 
   return (
-    <div className='card-actions mt-8'>
-      <div className='join w-full'>
+    <div className='mt-8 flex justify-center'>
+      <div className='border-base-300 bg-base-100 inline-flex items-center overflow-hidden rounded-full border shadow-lg'>
         <button
-          className='btn'
+          className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
           aria-label='halaman sebelumnya'
           onClick={handlePrevPage}
           disabled={regions.pageProps.page <= 1}
         >
-          <PreviousIcon />
+          <PreviousIcon className='h-5 w-5' />
         </button>
-        <div className='btn max-md:flex-1'>
+
+        <div className='border-base-300 from-primary/5 to-primary/10 text-base-content flex h-12 items-center border-x bg-gradient-to-r px-6 font-medium'>
           {`Halaman ${regions.pageProps.page} dari ${regions.pageProps.total}`}
         </div>
+
         <button
-          className='btn'
+          className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
           aria-label='halaman selanjutnya'
           onClick={handleNextPage}
           disabled={regions.pageProps.page >= regions.pageProps.total}
         >
-          <NextIcon />
+          <NextIcon className='h-5 w-5' />
         </button>
       </div>
     </div>
