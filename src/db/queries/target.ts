@@ -1,6 +1,7 @@
 import { db } from '../db'
 import { target } from '../schemas/target'
 import { region } from '../schemas/region'
+import { targetDailyAssesment } from '../schemas/assesment'
 import { eq, sql } from 'drizzle-orm'
 import crypto from 'node:crypto'
 
@@ -183,6 +184,22 @@ export const getAllTargets = async (
  */
 export const deleteTarget = async (id: string): Promise<void> => {
   await db.delete(target).where(eq(target.id, id))
+}
+
+/**
+ * Get all images associated with a target from targetDailyAssesment.
+ * @param id Target id
+ * @returns Array of image filenames that need to be deleted from Cloudinary
+ */
+export const getTargetImages = async (id: string): Promise<string[]> => {
+  const imagesResult = await db
+    .select({ image: targetDailyAssesment.image })
+    .from(targetDailyAssesment)
+    .where(eq(targetDailyAssesment.targetId, id))
+
+  return imagesResult
+    .map((row) => row.image)
+    .filter((image): image is string => Boolean(image))
 }
 
 /**

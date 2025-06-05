@@ -121,6 +121,8 @@ const ProfileForm: FC = () => {
     formData.append('id', currentUser.id)
     formData.append('accessLevel', currentUser.accessLevel.toString())
     formData.append('username', currentUser.username)
+    // Add regionId to prevent region validation error
+    formData.append('regionId', currentUser.regionId || '')
 
     const result = await actions.user.upsert(formData)
 

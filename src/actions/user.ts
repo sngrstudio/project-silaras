@@ -159,18 +159,24 @@ const user = {
           // If it were mandatory, a check like !input.regionId would be needed here.
         }
       } else if (currentUser) {
-        // Logged-in user is creating or editing another user
-        if (currentUser.accessLevel < 3) {
-          // Must be PLKB Kecamatan (3) or Admin Dinas PPPAPPKB (4) or Super Administrator (5)
-          throw new ActionError({
-            code: 'FORBIDDEN',
-            message:
-              'Hanya PLKB Kecamatan dan administrator yang dapat mengelola pengguna.'
-          })
+        // Check if user is editing their own profile
+        const isEditingSelf = input.id && input.id === currentUser.id
+
+        // If not editing self, check for management permissions
+        if (!isEditingSelf) {
+          // Logged-in user is creating or editing another user
+          if (currentUser.accessLevel < 3) {
+            // Must be PLKB Kecamatan (3) or Admin Dinas PPPAPPKB (4) or Super Administrator (5)
+            throw new ActionError({
+              code: 'FORBIDDEN',
+              message:
+                'Hanya PLKB Kecamatan dan administrator yang dapat mengelola pengguna.'
+            })
+          }
         }
 
         // Additional restrictions for PLKB Kecamatan (level 3) when managing other users
-        if (currentUser.accessLevel === 3) {
+        if (currentUser.accessLevel === 3 && !isEditingSelf) {
           // PLKB Kecamatan cannot create/edit users with higher or equal access level (level 3, 4, or 5)
           if (input.accessLevel >= 3) {
             throw new ActionError({
@@ -222,9 +228,32 @@ const user = {
           }
         } // End of coordinator specific checks (currentUser.accessLevel === 3)
 
+        // Restrictions for users editing their own profile
+        if (isEditingSelf) {
+          // Users cannot change their own access level
+          if (input.accessLevel !== currentUser.accessLevel) {
+            throw new ActionError({
+              code: 'FORBIDDEN',
+              message: 'Anda tidak dapat mengubah level akses Anda sendiri.'
+            })
+          }
+
+          // Users cannot change their own region assignment
+          // Normalize null/empty string for comparison
+          const inputRegionId = input.regionId || null
+          const currentRegionId = currentUser.regionId || null
+          if (inputRegionId !== currentRegionId) {
+            throw new ActionError({
+              code: 'FORBIDDEN',
+              message:
+                'Anda tidak dapat mengubah penugasan wilayah Anda sendiri.'
+            })
+          }
+        }
+
         // Region assignment checks for privileged users (admin/coordinator creating/editing users)
         // This applies if a regionId is being set or changed for the target user.
-        if (input.regionId) {
+        if (input.regionId && !isEditingSelf) {
           const targetRegion = await getRegionById(input.regionId)
           if (!targetRegion) {
             throw new ActionError({

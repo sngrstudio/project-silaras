@@ -73,23 +73,47 @@ export const uploadToCloudinary = async (
 }
 
 /**
- * Delete an image from Cloudinary
+ * Delete a single image from Cloudinary
  * @param publicId - The Cloudinary public ID of the image to delete
  * @returns Promise<void>
  */
 export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
+  await deleteMultipleFromCloudinary([publicId])
+}
+
+/**
+ * Delete multiple images from Cloudinary using Admin API for efficiency
+ * @param publicIds - Array of Cloudinary public IDs to delete
+ * @returns Promise<void>
+ */
+export const deleteMultipleFromCloudinary = async (
+  publicIds: string[]
+): Promise<void> => {
+  if (publicIds.length === 0) {
+    return
+  }
+
   try {
     // Configure Cloudinary client
     const { cloudinary: cloudinaryClient } = configureCloudinary()
 
-    // Delete the image using the public_id
-    const result = await cloudinaryClient.uploader.destroy(publicId)
+    // Use Admin API to delete multiple resources in a single call
+    const result = await cloudinaryClient.api.delete_resources(publicIds, {
+      resource_type: 'image'
+    })
 
-    // Check if deletion was successful
-    if (result.result !== 'ok') {
-      throw new Error(`Cloudinary deletion failed: ${result.result}`)
+    // Check for any deletion failures
+    const deletedIds = Object.keys(result.deleted || {})
+    const failedIds = publicIds.filter((id) => !deletedIds.includes(id))
+
+    if (failedIds.length > 0) {
+      console.warn(
+        `Failed to delete some images from Cloudinary: ${failedIds.join(', ')}`
+      )
+      // Don't throw error to allow target deletion to continue
     }
   } catch (error: any) {
-    throw new Error(`Failed to delete from Cloudinary: ${error.message}`)
+    // Log the error but don't throw to allow target deletion to continue
+    console.error(`Failed to delete images from Cloudinary: ${error.message}`)
   }
 }

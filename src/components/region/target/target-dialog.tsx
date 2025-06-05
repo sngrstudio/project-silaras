@@ -34,6 +34,7 @@ import IconPhone from '~icons/lucide/phone'
 import IconSmartphone from '~icons/lucide/smartphone'
 import IconSave from '~icons/lucide/save'
 import IconX from '~icons/lucide/x'
+import IconTrash from '~icons/lucide/trash'
 import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconLoader from '~icons/lucide/loader'
 import IconActivity from '~icons/lucide/activity'
@@ -84,6 +85,7 @@ const TargetDialog: FC = () => {
   const [address, setAddress] = useState<string>('')
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<string>('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     document.addEventListener('astro:page-load', () => {
@@ -218,6 +220,41 @@ const TargetDialog: FC = () => {
         : 'Sasaran baru berhasil ditambahkan!'
     )
     return undefined
+  }
+
+  // Delete handler function
+  const handleDelete = async () => {
+    if (!currentTarget?.id) return
+
+    const confirmed = confirm(
+      `Apakah Anda yakin ingin menghapus sasaran "${currentTarget.name}"?\n\nTindakan ini akan menghapus:\n- Data sasaran\n- Semua penilaian harian dan bulanan\n- Semua gambar terkait\n\nTindakan ini tidak dapat dibatalkan.`
+    )
+
+    if (!confirmed) return
+
+    setIsDeleting(true)
+
+    try {
+      const { error } = await actions.target.delete({ id: currentTarget.id })
+
+      if (error) {
+        showErrorToast('Terjadi kesalahan saat menghapus data sasaran.')
+        return
+      }
+
+      // Refresh the targets list
+      const updatedTargets = await actions.target.getAll.orThrow({
+        regionSlug: currentRegion?.slug ?? ''
+      })
+      setTargets(updatedTargets)
+      setCurrentTarget(undefined)
+      showSuccessToast('Data sasaran berhasil dihapus!')
+    } catch (error) {
+      console.error('Delete error:', error)
+      showErrorToast('Terjadi kesalahan saat menghapus data sasaran.')
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -775,7 +812,7 @@ const TargetDialog: FC = () => {
               isPending ? 'loading' : 'hover:scale-105 hover:shadow-lg'
             }`}
             type='submit'
-            disabled={isPending}
+            disabled={isPending || isDeleting}
           >
             {isPending ? (
               <>
@@ -790,11 +827,35 @@ const TargetDialog: FC = () => {
             )}
           </button>
 
+          {/* Delete button - only show for existing targets */}
+          {currentTarget.id && (
+            <button
+              className={`btn btn-error min-h-12 flex-1 transition-all duration-200 md:flex-none md:px-6 ${
+                isDeleting ? 'loading' : 'hover:scale-105 hover:shadow-lg'
+              }`}
+              type='button'
+              onClick={handleDelete}
+              disabled={isPending || isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <IconLoader className='h-4 w-4 animate-spin' />
+                  Menghapus...
+                </>
+              ) : (
+                <>
+                  <IconTrash className='h-4 w-4' />
+                  Hapus
+                </>
+              )}
+            </button>
+          )}
+
           <button
             className='btn btn-ghost hover:bg-base-content/10 min-h-12 flex-1 transition-all duration-200 md:flex-none md:px-6'
             type='button'
             onClick={() => setCurrentTarget(undefined)}
-            disabled={isPending}
+            disabled={isPending || isDeleting}
           >
             <IconX className='h-4 w-4' />
             Batal

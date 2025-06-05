@@ -4,9 +4,11 @@ import {
   getTargetById,
   getAllTargets,
   deleteTarget,
-  getTargetBySlug
+  getTargetBySlug,
+  getTargetImages
 } from '../db/queries/target'
 import { getRegionById } from '../db/queries/region'
+import { deleteMultipleFromCloudinary } from '../utils/cloudinary'
 import { z } from 'astro:schema'
 
 /**
@@ -199,7 +201,7 @@ const target = {
 
   /**
    * Delete a target by id.
-   * Requires admin access.
+   * Requires editor level access (level 2+).
    * @param id Target id
    * @returns void
    */
@@ -208,14 +210,23 @@ const target = {
     handler: async ({ id }, ctx) => {
       const currentUser = ctx.locals.user
 
-      // Only admins can delete targets
-      if (!currentUser || currentUser.accessLevel < 4) {
+      // Only editors (level 2) and above can delete targets
+      if (!currentUser || currentUser.accessLevel < 2) {
         throw new ActionError({
           code: 'FORBIDDEN',
-          message: 'Hanya administrator yang dapat menghapus data sasaran.'
+          message: 'Anda tidak memiliki izin untuk menghapus data sasaran.'
         })
       }
 
+      // First, get all images that need to be deleted from Cloudinary
+      const imagesToDelete = await getTargetImages(id)
+
+      // Delete all images from Cloudinary in a single batch call for efficiency
+      if (imagesToDelete.length > 0) {
+        await deleteMultipleFromCloudinary(imagesToDelete)
+      }
+
+      // Delete the target record (CASCADE DELETE will handle related records)
       await deleteTarget(id)
     }
   })
