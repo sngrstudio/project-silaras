@@ -132,12 +132,6 @@ const site = {
       // Return updated settings
       return await getAllSiteProperties()
     }
-  }),
-
-  cloudName: defineAction({
-    handler: (_, ctx) => {
-      return ctx.locals.cloudName
-    }
   })
 }
 
