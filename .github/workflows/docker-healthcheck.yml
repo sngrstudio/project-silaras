@@ -7,6 +7,10 @@ on:
 jobs:
   docker-build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
 
     steps:
       - name: Checkout code
@@ -15,12 +19,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Test annotations
+        run: |
+          echo "Testing GitHub annotations..."
+          echo "::notice title=Workflow Started::Docker build and health check workflow has started"
+
+      - name: Test error annotation (will be skipped)
+        if: false
+        run: |
+          echo "::error title=Test Error::This is a test error annotation"
+          exit 1
+
       - name: Build Docker image
         run: |
           echo "Building Docker image..."
-          if ! docker build -t app:test . 2>&1 | tee build.log; then
+          docker build -t app:test . 2>&1 | tee build.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
             echo "::error title=Docker Build Failed::Failed to build Docker image. Check build logs for details."
+            echo "::group::Build Logs"
             cat build.log
+            echo "::endgroup::"
             exit 1
           fi
           echo "✅ Docker image built successfully"
@@ -28,8 +46,12 @@ jobs:
       - name: Start container
         run: |
           echo "Starting container..."
-          if ! docker run -d --name test-app -p 4321:4321 app:test; then
+          docker run -d --name test-app -p 4321:4321 app:test
+          if [ $? -ne 0 ]; then
             echo "::error title=Container Start Failed::Failed to start Docker container"
+            echo "::group::Docker Images"
+            docker images
+            echo "::endgroup::"
             exit 1
           fi
           echo "✅ Container started"
@@ -79,12 +101,12 @@ jobs:
             echo "- Status: 200 ✓"
             echo "- Body: 'OK' ✓"
           else
-            echo "::error title=Health Check Failed::Expected Status 200 with body 'OK', got Status $http_code with body '$body'"
+            echo "::error title=Health Check Failed::Expected Status 200 with body OK, got Status $http_code with body $body"
             echo "::group::Detailed Health Check Info"
             echo "HTTP Status Code: $http_code"
-            echo "Response Body: '$body'"
-            echo "Expected: Status 200 with body 'OK'"
-            echo "Actual: Status $http_code with body '$body'"
+            echo "Response Body: $body"
+            echo "Expected: Status 200 with body OK"
+            echo "Actual: Status $http_code with body $body"
             echo "::endgroup::"
             echo "::group::Container Status"
             docker ps -a
