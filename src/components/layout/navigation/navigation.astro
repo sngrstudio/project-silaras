@@ -1,4 +1,40 @@
 ---
+/**
+ * @fileoverview Navigation Header Wrapper Component
+ *
+ * Astro wrapper component for the main application navigation header.
+ * Handles server-side site configuration fetching and integrates the
+ * drawer toggle button with the navigation bar.
+ *
+ * Features:
+ * - Server-side site configuration loading
+ * - Integration with React navigation component
+ * - Drawer toggle button integration
+ * - Site branding and configuration display
+ * - Responsive navigation header
+ *
+ * Data Loading:
+ * - Fetches site configuration during SSR
+ * - Passes site data to React navigation component
+ * - Provides type safety with Site type export
+ * - Ensures consistent site branding
+ *
+ * Component Integration:
+ * - Combines NavigationRC and DrawerButtonRC
+ * - Client-side hydration for interactive elements
+ * - Maintains server-rendered structure
+ * - Proper component composition
+ *
+ * Site Configuration:
+ * - Site title, logo, and branding
+ * - Navigation links and structure
+ * - User authentication status
+ * - Regional context information
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import NavigationRC from './navigation'
 import DrawerButtonRC from '../drawer/button'
 import { actions } from 'astro:actions'

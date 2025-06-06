@@ -1,23 +1,78 @@
+/**
+ * @fileoverview Mobile List Template Component
+ *
+ * A reusable list component for rendering Tanstack Table data in mobile-optimized
+ * card layouts. Provides responsive design with enhanced visual effects, hover
+ * animations, and accessibility features optimized for touch interfaces.
+ *
+ * Features:
+ * - Card-based layout optimized for mobile screens
+ * - Gradient overlays and hover animations
+ * - Accent borders with smooth scaling effects
+ * - Touch-friendly spacing and sizing
+ * - Accessibility-compliant structure
+ * - Modern design with shadow effects
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import { Fragment, type FC, type OlHTMLAttributes } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { clsx } from 'clsx/lite'
 
+/**
+ * Props interface for the ListTemplate component
+ *
+ * @interface ListTemplateProps
+ */
 export interface ListTemplateProps extends OlHTMLAttributes<HTMLOListElement> {
+  /**
+   * The Tanstack Table instance to render.
+   * Contains all table data, columns, and state management for mobile display.
+   */
   table: Table<any>
 }
 
 /**
- * ListTemplate (Mobile)
+ * Mobile List Template Component
  *
- * A reusable list component for rendering Tanstack Table data as an ordered list (ol), suitable for mobile layouts.
+ * A reusable list component for rendering Tanstack Table data as an ordered list,
+ * specifically designed for mobile layouts. Each row is rendered as an interactive
+ * card with hover effects and modern styling.
  *
- * Props:
- * - table: Table<any> — The Tanstack Table instance to render.
- * - className: string (optional) — Additional class names for the list element.
- * - ...props: OlHTMLAttributes<HTMLOListElement> — Any other standard ol element props.
+ * Design Features:
+ * - Card-based layout with rounded corners and shadows
+ * - Gradient overlays that appear on hover
+ * - Colored accent borders with scaling animations
+ * - Optimized spacing for touch interaction
+ * - Responsive design that adapts to screen size
+ * - Smooth transitions and micro-interactions
  *
- * Usage:
- * `<ListTemplate table={tableInstance} className="my-list" />`
+ * @component
+ * @param props - Component properties
+ * @param props.table - Tanstack Table instance with data and configuration
+ * @param props.className - Additional CSS classes for styling customization
+ * @param props...props - Standard ordered list HTML attributes
+ *
+ * @example
+ * ```tsx
+ * // Basic usage with mobile table
+ * <ListTemplate
+ *   table={mobileTableInstance}
+ *   className="my-mobile-list"
+ * />
+ *
+ * // Common pattern with responsive tables
+ * return (
+ *   <>
+ *     <ListTemplate table={mTable} className="-mx-6 md:hidden" />
+ *     <TableTemplate table={dTable} className="max-md:hidden" />
+ *   </>
+ * )
+ * ```
+ *
+ * @see {@link Table} - Tanstack Table type
+ * @see {@link TableTemplate} - Desktop table counterpart
  */
 const ListTemplate: FC<ListTemplateProps> = ({ table, className }) => {
   return (

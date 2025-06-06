@@ -1,3 +1,35 @@
+/**
+ * @fileoverview Assessment Navigation Component
+ *
+ * A React component that provides month-based navigation for assessment data
+ * in the SILARAS application. This component allows users to navigate between
+ * different months to view daily and monthly assessments for a specific target.
+ *
+ * @features
+ * - Month-based navigation with previous/next controls
+ * - Automatic data fetching when month changes
+ * - Integration with assessment store for state management
+ * - Indonesian month names for localization
+ * - URL-based target identification
+ * - Responsive design with mobile-friendly controls
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <Navigation />
+ * ```
+ *
+ * @dependencies
+ * - Assessment store for month state management
+ * - Astro actions for data fetching
+ * - Lucide icons for navigation controls
+ * - Nanostores for reactive state
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { useEffect, type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import {

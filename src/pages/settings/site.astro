@@ -1,4 +1,49 @@
 ---
+/**
+ * @fileoverview Site Settings Management Page
+ *
+ * Administrative interface for managing core site configuration and global settings
+ * within the SILARAS system. Provides comprehensive control over system-wide
+ * parameters, branding, and operational configurations for authorized administrators.
+ *
+ * Features:
+ * - Global site configuration management
+ * - System branding and identity settings
+ * - Operational parameter configuration
+ * - Admin-only access control (level 4+)
+ * - Dashboard layout integration
+ * - Responsive configuration interface
+ *
+ * Configuration Areas:
+ * - Site identity and branding
+ * - System operational parameters
+ * - Regional configuration defaults
+ * - Notification settings
+ * - Security policy configuration
+ * - Integration settings
+ *
+ * Access Control:
+ * - Requires user authentication
+ * - Minimum access level 4 (admin privileges)
+ * - Redirects unauthorized users to homepage
+ * - Protected system configuration access
+ *
+ * Security Considerations:
+ * - Restricted to high-level administrators
+ * - System-wide impact configuration
+ * - Audit trail for configuration changes
+ * - Validation of critical system parameters
+ *
+ * Navigation:
+ * - Back to settings navigation
+ * - Breadcrumb-style navigation
+ * - Transition animations for smooth UX
+ * - Integrated dashboard controls
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import SiteComponent from '~/components/settings/site/site.astro'
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import BackIcon from '~icons/lucide/arrow-left'

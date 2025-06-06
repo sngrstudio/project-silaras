@@ -1,4 +1,26 @@
 ---
+/**
+ * Target Assessment Page - /target/[slug]
+ *
+ * This page displays detailed assessment information for a specific target (individual).
+ * It shows both daily nutritional assessments and monthly anthropometric data.
+ *
+ * Features:
+ * - Daily assessment tracking with 5 nutritional components
+ * - Monthly weight/height measurements and BMI calculations
+ * - Progress indicators and classification status
+ * - Photo documentation of meals
+ * - Assessment form for data entry/editing
+ *
+ * Access Control:
+ * - Admin (level 4): Can view all targets
+ * - Coordinator (level 3): Can view targets in their assigned kecamatan
+ * - Editor (level 2): Can view targets in their assigned village
+ * - Viewer (level 1): Currently restricted
+ *
+ * @param slug - The target slug from URL parameters
+ */
+
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import Assesment from '~/components/assesments/assesment.astro'
 import { actions } from 'astro:actions'
@@ -25,7 +47,6 @@ const region = await Astro.callAction(actions.region.getById.orThrow, {
   id: target.regionId
 })
 
-// Access control for target pages
 const hasAccess = await (async () => {
   // Admin (level 4) has access to everything
   if (user.accessLevel >= 4) {
@@ -92,10 +113,10 @@ const props = {
 <DLayout {...props}>
   <Assesment transition:name={target.slug} transition:animate='none' />
 
-  {
-    /* controls */
-    region && (
-      <Fragment slot='controls'>
+  {/* Navigation controls - back button to parent region */}
+  <Fragment slot='controls'>
+    {
+      region && (
         <a
           class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'
           href={`/region/${region.slug}`}
@@ -103,7 +124,7 @@ const props = {
           <BackIcon className='h-4 w-4 transition-transform duration-200 group-hover:scale-110' />
           <span>{region.name}</span>
         </a>
-      </Fragment>
-    )
-  }
+      )
+    }
+  </Fragment>
 </DLayout>

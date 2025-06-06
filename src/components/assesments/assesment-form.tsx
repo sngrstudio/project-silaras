@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Assessment Form Component
+ *
+ * Interactive form for daily assessment data entry with file upload capabilities,
+ * real-time validation, and automatic saving. Supports multiple assessment metrics
+ * including photos, nutritional components, and educational materials.
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import { useActionState, useRef, useState, useEffect, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'
@@ -23,11 +33,63 @@ import AppleIcon from '~icons/lucide/apple'
 import BookOpenIcon from '~icons/lucide/book-open'
 import clsx from 'clsx'
 
+/**
+ * Props interface for the AssessmentForm component
+ *
+ * @interface AssesmentFormProps
+ */
 interface AssesmentFormProps {
+  /**
+   * Table cell context containing assessment data for the current row.
+   * Provides access to assessment information, target data, and form state.
+   */
   cell: CellContext<DailyAssesments[number], unknown>
+
+  /**
+   * Whether the form should be disabled for interaction.
+   * When true, prevents form submission and input modifications.
+   *
+   * @default false
+   */
   isDisabled?: boolean
 }
 
+/**
+ * Assessment Form Component
+ *
+ * A comprehensive form for entering daily assessment data including:
+ * - Photo documentation with preview
+ * - Nutritional component checkboxes (carbs, protein, vegetables, fruits)
+ * - Educational material documentation
+ * - Real-time validation and error handling
+ * - Automatic form submission on blur events
+ *
+ * Features:
+ * - File upload with preview functionality
+ * - Cloudinary integration for image storage
+ * - Form state management with useActionState
+ * - Real-time error feedback
+ * - Automatic saving on field blur
+ * - Responsive design with mobile optimization
+ * - Toast notifications for success/error states
+ *
+ * @component
+ * @param props - Component properties
+ * @param props.cell - Table cell context with assessment data
+ * @param props.isDisabled - Whether form interactions should be disabled
+ *
+ * @example
+ * ```tsx
+ * // Used within assessment table cells
+ * <AssesmentForm
+ *   cell={cellContext}
+ *   isDisabled={!canEditAssessment}
+ * />
+ * ```
+ *
+ * @see {@link DailyAssesments} - Assessment data structure
+ * @see {@link actions.assesment.daily.set} - Form submission action
+ */
 const AssesmentForm: FC<AssesmentFormProps> = ({
   cell,
   isDisabled = false

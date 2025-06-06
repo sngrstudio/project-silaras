@@ -1,3 +1,42 @@
+/**
+ * @fileoverview Global Styles Configuration
+ * 
+ * This file defines the global styling configuration for the SILARAS application,
+ * including Tailwind CSS setup, custom theme configuration, typography, and
+ * design system variables. It establishes the visual foundation for the entire
+ * application.
+ * 
+ * @features
+ * - Tailwind CSS v4 integration with custom theme
+ * - DaisyUI component library configuration
+ * - Custom SILARAS design system with health-focused colors
+ * - Responsive typography with Plus Jakarta Sans font
+ * - Z-index hierarchy for proper layer management
+ * - Consistent spacing, radius, and sizing values
+ * 
+ * @designSystem
+ * - Primary: Health-focused blue for primary actions
+ * - Secondary: Soft purple for secondary elements
+ * - Accent: Warm orange for highlights and alerts
+ * - Success/Warning/Error: Standard semantic colors
+ * - Base colors: Clean whites and grays for backgrounds
+ * 
+ * @typography
+ * - Primary font: Plus Jakarta Sans Variable
+ * - Fallbacks: System fonts for optimal performance
+ * - Emoji support: Apple Color Emoji, Segoe UI Emoji
+ * 
+ * @theme SILARAS Custom Theme
+ * - Light color scheme optimized for health applications
+ * - High contrast ratios for accessibility
+ * - Consistent border radius and spacing values
+ * - Professional appearance suitable for medical contexts
+ * 
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 @import 'tailwindcss';
 
 @theme {

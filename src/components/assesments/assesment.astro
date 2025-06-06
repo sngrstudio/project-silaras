@@ -1,4 +1,32 @@
 ---
+/**
+ * @fileoverview Assessment Layout Component
+ *
+ * This Astro component provides the main layout structure for the assessment management page
+ * within the SILARAS platform. It orchestrates the assessment statistics and management
+ * components in a responsive layout design.
+ *
+ * Key Features:
+ * - Responsive layout with statistics and management sections
+ * - Integration of assessment statistics component
+ * - Assessment management table/list component
+ * - Card-based layout for clean presentation
+ * - Client-side hydration for interactive components
+ *
+ * Layout Structure:
+ * - Statistics section displayed prominently at top (mobile) or right (desktop)
+ * - Main assessment management section in card container
+ * - Responsive flex layout that adapts to screen size
+ *
+ * Component Integration:
+ * - AssesmentStatRC: Monthly statistics and progress tracking
+ * - AssesmentRC: Main assessment management interface
+ * - CardTemplateRC: Consistent card styling wrapper
+ *
+ * @module Components/Assessments
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
 import AssesmentRC from './assesment'
 import AssesmentStatRC from './assesment-stat'
 import CardTemplateRC from '~/components/common/card/card'

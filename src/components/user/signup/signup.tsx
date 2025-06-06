@@ -1,3 +1,38 @@
+/**
+ * @fileoverview User Signup Component
+ *
+ * This component provides a comprehensive user registration form for the SILARAS platform.
+ * It handles new user account creation with form validation, role assignment,
+ * and integration with the authentication system.
+ *
+ * Key Features:
+ * - Comprehensive user registration form with validation
+ * - Real-time form validation and error handling
+ * - Role-based registration (admin/user capabilities)
+ * - Phone number and identity card validation
+ * - Password strength requirements and confirmation
+ * - Integration with authentication actions
+ *
+ * Form Fields:
+ * - Full name with validation
+ * - Phone number with Indonesian format validation
+ * - Identity card number (NIK) validation
+ * - Username uniqueness validation
+ * - Password with strength requirements
+ * - Password confirmation matching
+ *
+ * Security Features:
+ * - Input sanitization and validation
+ * - Password strength enforcement
+ * - CSRF protection through Astro actions
+ * - Rate limiting and abuse prevention
+ *
+ * @module Components/User/Signup
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/user/signup/signup.tsx
+
 import { useActionState, useRef, useEffect, useState, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'

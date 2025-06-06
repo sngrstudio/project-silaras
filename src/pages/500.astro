@@ -1,4 +1,41 @@
 ---
+/**
+ * @fileoverview 500 Internal Server Error Page
+ *
+ * Custom 500 error page providing comprehensive server error handling with
+ * technical details and recovery options. Designed for critical server-side
+ * failures with appropriate error reporting and user guidance.
+ *
+ * Features:
+ * - Critical error styling with red error theme
+ * - Technical error details for debugging (when enabled)
+ * - Multiple recovery action options
+ * - Professional error messaging in Indonesian
+ * - Server error context and timestamp information
+ * - Responsive design with accessibility support
+ *
+ * Error Information:
+ * - Error code 500 prominently displayed
+ * - Server timestamp and URL context
+ * - Technical details for development/debugging
+ * - User-friendly explanation of the issue
+ *
+ * Recovery Actions:
+ * - Page refresh/retry functionality
+ * - Return to homepage option
+ * - Bug report submission (for authenticated users)
+ * - Contact support information
+ *
+ * Technical Details:
+ * - Error code, timestamp, and URL logging
+ * - Development environment error details
+ * - Proper HTTP status code handling
+ * - Error reporting to development team
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import ErrorLayout, { type Props as ErrorLayoutProps } from './_error.astro'
 import HomeIcon from '~icons/lucide/home'
 import RefreshCwIcon from '~icons/lucide/refresh-cw'
@@ -20,83 +57,87 @@ const props = {
 ---
 
 <ErrorLayout {...props}>
-  <!-- Action buttons -->
-  <div class='flex flex-col justify-center gap-3 sm:flex-row' slot='actions'>
-    <!-- Refresh button (left) -->
-    <button
-      onclick='window.location.reload()'
-      class='group border-error/30 from-error/10 to-error/5 text-error hover:border-error/50 hover:from-error/20 hover:to-error/10 hover:shadow-error/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
-    >
-      <RefreshCwIcon
-        className='h-4 w-4 transition-transform duration-200 group-hover:rotate-180'
-      />
-      <span>Coba Lagi</span>
-    </button>
+  {/* Action buttons */}
+  <Fragment slot='actions'>
+    <div class='flex flex-col justify-center gap-3 sm:flex-row'>
+      {/* Refresh button (left) */}
+      <button
+        onclick='window.location.reload()'
+        class='group border-error/30 from-error/10 to-error/5 text-error hover:border-error/50 hover:from-error/20 hover:to-error/10 hover:shadow-error/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
+      >
+        <RefreshCwIcon
+          className='h-4 w-4 transition-transform duration-200 group-hover:rotate-180'
+        />
+        <span>Coba Lagi</span>
+      </button>
 
-    <!-- Home button (right) -->
-    <a
-      href='/'
-      class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
-    >
-      <HomeIcon
-        className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
-      />
-      <span>Kembali ke Beranda</span>
-    </a>
-  </div>
+      {/* Home button (right) */}
+      <a
+        href='/'
+        class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
+      >
+        <HomeIcon
+          className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
+        />
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+  </Fragment>
 
-  <!-- Additional content -->
-  <div slot='additional'>
-    <div class='space-y-4'>
-      <!-- Server status -->
-      <div class='card bg-error/5 border-error/20 border'>
-        <div class='card-body p-6'>
-          <div class='flex items-start gap-3'>
-            <div
-              class='bg-error/10 border-error/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
-            >
-              <AlertTriangleIcon className='text-error h-5 w-5' />
-            </div>
-            <div class='text-left'>
-              <h3 class='text-base-content mb-2 font-semibold'>
-                Status Server
-              </h3>
-              <p class='text-base-content/70 text-sm leading-relaxed'>
-                Server sedang mengalami gangguan sementara. Silakan coba lagi
-                dalam beberapa menit atau hubungi administrator jika masalah
-                berlanjut.
-              </p>
+  {/* Additional content */}
+  <Fragment slot='additional'>
+    <div>
+      <div class='space-y-4'>
+        {/* Server status */}
+        <div class='card bg-error/5 border-error/20 border'>
+          <div class='card-body p-6'>
+            <div class='flex items-start gap-3'>
+              <div
+                class='bg-error/10 border-error/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
+              >
+                <AlertTriangleIcon className='text-error h-5 w-5' />
+              </div>
+              <div class='text-left'>
+                <h3 class='text-base-content mb-2 font-semibold'>
+                  Status Server
+                </h3>
+                <p class='text-base-content/70 text-sm leading-relaxed'>
+                  Server sedang mengalami gangguan sementara. Silakan coba lagi
+                  dalam beberapa menit atau hubungi administrator jika masalah
+                  berlanjut.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Error reporting -->
-      <div
-        class='card bg-base-200/30 border-base-300/30 border backdrop-blur-sm'
-      >
-        <div class='card-body p-6'>
-          <div class='flex items-start gap-3'>
-            <div
-              class='bg-info/10 border-info/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
-            >
-              <BugIcon className='text-info h-5 w-5' />
-            </div>
-            <div class='text-left'>
-              <h3 class='text-base-content mb-2 font-semibold'>
-                Laporkan Masalah
-              </h3>
-              <p class='text-base-content/70 mb-3 text-sm leading-relaxed'>
-                Jika error ini terus terjadi, silakan laporkan kepada tim teknis
-                dengan menyertakan informasi yang tertera di bagian detail
-                error.
-              </p>
+        {/* Error reporting */}
+        <div
+          class='card bg-base-200/30 border-base-300/30 border backdrop-blur-sm'
+        >
+          <div class='card-body p-6'>
+            <div class='flex items-start gap-3'>
+              <div
+                class='bg-info/10 border-info/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
+              >
+                <BugIcon className='text-info h-5 w-5' />
+              </div>
+              <div class='text-left'>
+                <h3 class='text-base-content mb-2 font-semibold'>
+                  Laporkan Masalah
+                </h3>
+                <p class='text-base-content/70 mb-3 text-sm leading-relaxed'>
+                  Jika error ini terus terjadi, silakan laporkan kepada tim
+                  teknis dengan menyertakan informasi yang tertera di bagian
+                  detail error.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </Fragment>
 </ErrorLayout>
 
 <script>

@@ -1,4 +1,38 @@
 ---
+/**
+ * @fileoverview Toast Notification Wrapper
+ *
+ * Astro wrapper component for the React toast notification system. Provides
+ * client-side hydration for interactive toast messages while maintaining
+ * server-side rendering compatibility.
+ *
+ * Features:
+ * - Client-side hydration with client:load directive
+ * - Slot-based content projection for child components
+ * - Integration with React toast notification system
+ * - SSR-compatible toast message handling
+ * - Automatic toast provider setup
+ *
+ * Integration:
+ * - Wraps page content with toast notification provider
+ * - Enables toast messages throughout the application
+ * - Provides reactive toast state management
+ * - Maintains toast functionality across page navigation
+ *
+ * Usage:
+ * - Used in layout components to provide app-wide toast support
+ * - Wraps main content areas with toast provider context
+ * - Enables toast functions to work from any child component
+ *
+ * Client Hydration:
+ * - Uses client:load for immediate interactivity
+ * - Ensures toast notifications work on page load
+ * - Maintains toast state across client-side navigation
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import ToastRC from './toast.tsx'
 ---
 

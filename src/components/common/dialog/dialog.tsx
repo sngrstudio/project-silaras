@@ -1,27 +1,128 @@
+/**
+ * @fileoverview Dialog Component with Radix UI Integration
+ *
+ * Modern modal dialog component built with Radix UI for enhanced accessibility,
+ * proper focus management, and responsive design. Provides z-index layering
+ * that allows toast notifications to appear above modals.
+ *
+ * Features:
+ * - Radix UI foundation for accessibility compliance
+ * - Responsive design with mobile bottom-sheet behavior
+ * - Smooth animations and transitions
+ * - Proper focus trap and keyboard navigation
+ * - Portal rendering for z-index management
+ * - Auto-close functionality
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import { Dialog } from 'radix-ui'
 import { clsx } from 'clsx/lite'
 import type { FC, PropsWithChildren } from 'react'
 import IconX from '~icons/lucide/x'
 
+/**
+ * Props interface for the main Dialog component
+ *
+ * @interface DialogProps
+ */
 export interface DialogProps {
+  /**
+   * Optional title for the dialog header.
+   * When provided, displays as a prominent heading.
+   */
   title?: string | undefined
+
+  /**
+   * Optional description text for the dialog.
+   * Provides additional context below the title.
+   */
   description?: string | undefined
+
+  /**
+   * Controls the open/closed state of the dialog.
+   * Must be managed by parent component.
+   */
   open: boolean
+
+  /**
+   * Callback fired when the dialog's open state changes.
+   * Used for controlled state management.
+   */
   onOpenChange?: (open: boolean) => void
+
+  /**
+   * Optional callback fired when dialog is closed.
+   * Useful for cleanup or state reset operations.
+   */
   closeAction?: () => void
+
+  /**
+   * Additional CSS classes for dialog content styling.
+   * Applied to the dialog content container.
+   */
   className?: string
+
+  /**
+   * Optional trigger element to open the dialog.
+   * When provided, renders as a clickable trigger.
+   */
   trigger?: React.ReactNode
 }
 
-// Legacy interface for backward compatibility
-export interface DialogTemplateProps {
-  children: React.ReactNode
-}
-
 /**
- * Radix UI Dialog component with proper z-index layering
- * This component allows toast notifications to appear above modals
- * and provides better accessibility than native dialog elements.
+ * Modern Dialog Component with Radix UI
+ *
+ * A comprehensive modal dialog component that provides excellent accessibility,
+ * responsive design, and smooth animations. Built on Radix UI primitives for
+ * robust focus management and keyboard navigation.
+ *
+ * Accessibility Features:
+ * - Automatic focus management and trapping
+ * - ARIA attributes for screen readers
+ * - Keyboard navigation support (ESC to close, tab cycling)
+ * - Portal rendering to prevent z-index conflicts
+ *
+ * Responsive Behavior:
+ * - Desktop: Centered modal with backdrop
+ * - Mobile: Bottom sheet with slide-up animation
+ * - Adaptive sizing and positioning
+ *
+ * @component
+ * @param props - Component properties
+ * @param props.children - Content to render inside the dialog
+ * @param props.title - Optional dialog title
+ * @param props.description - Optional dialog description
+ * @param props.open - Controls dialog visibility
+ * @param props.onOpenChange - Callback for state changes
+ * @param props.closeAction - Optional close callback
+ * @param props.className - Additional styling classes
+ * @param props.trigger - Optional trigger element
+ *
+ * @example
+ * ```tsx
+ * // Basic controlled dialog
+ * <DialogComponent
+ *   open={isOpen}
+ *   onOpenChange={setIsOpen}
+ *   title="Confirmation"
+ *   description="Are you sure you want to continue?"
+ * >
+ *   <div>Dialog content here</div>
+ * </DialogComponent>
+ *
+ * // With trigger and close action
+ * <DialogComponent
+ *   open={showModal}
+ *   onOpenChange={setShowModal}
+ *   closeAction={handleClose}
+ *   trigger={<button>Open Dialog</button>}
+ * >
+ *   <form onSubmit={handleSubmit}>...</form>
+ * </DialogComponent>
+ * ```
+ *
+ * @see {@link Dialog} - Radix UI Dialog primitives
  */
 export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
   children,
@@ -100,11 +201,6 @@ export const DialogComponent: FC<PropsWithChildren<DialogProps>> = ({
       </Dialog.Portal>
     </Dialog.Root>
   )
-}
-
-// Legacy DialogTemplate component for backward compatibility
-export const DialogTemplate: FC<DialogTemplateProps> = ({ children }) => {
-  return <div className='dialog-template'>{children}</div>
 }
 
 // Export the main component as default

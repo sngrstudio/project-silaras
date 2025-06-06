@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Mobile List Component for Daily Assessments
+ *
+ * Renders assessment data in a mobile-optimized card layout with interactive elements,
+ * date-based styling, and assessment forms. Handles future date detection and provides
+ * visual feedback for assessment completion status.
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import { type FC } from 'react'
 import AssesmentForm from './assesment-form'
 import { type CellContext } from '@tanstack/react-table'
@@ -12,6 +22,23 @@ import UserIcon from '~icons/lucide/user'
 import clsx from 'clsx'
 
 // Helper function to check if a date is in the future (after today)
+/**
+ * Helper function to check if a date is in the future (after today)
+ *
+ * @param date - The date to check, can be Date object, null, or undefined
+ * @returns True if the date is after today (start of day), false otherwise
+ *
+ * @example
+ * ```typescript
+ * const tomorrow = new Date()
+ * tomorrow.setDate(tomorrow.getDate() + 1)
+ * console.log(isDateInFuture(tomorrow)) // true
+ *
+ * const yesterday = new Date()
+ * yesterday.setDate(yesterday.getDate() - 1)
+ * console.log(isDateInFuture(yesterday)) // false
+ * ```
+ */
 const isDateInFuture = (date: Date | null | undefined): boolean => {
   if (!date) return false
   const today = new Date()
@@ -21,10 +48,53 @@ const isDateInFuture = (date: Date | null | undefined): boolean => {
   return compareDate > today
 }
 
+/**
+ * Props interface for the MobileList component
+ *
+ * @interface MobileListProps
+ */
 interface MobileListProps {
+  /**
+   * Table cell context containing assessment data and metadata.
+   * Provides access to the current row's assessment information including
+   * date, menus, completion status, and form data.
+   */
   cell: CellContext<DailyAssesments[number], unknown>
 }
 
+/**
+ * Mobile List Component for Daily Assessments
+ *
+ * Renders individual assessment entries in a mobile-optimized card format.
+ * Each card displays assessment date, menu information, completion status,
+ * and provides an embedded assessment form for data entry.
+ *
+ * Features:
+ * - Future date detection with visual indicators
+ * - Assessment completion status display
+ * - Interactive assessment forms
+ * - Menu information with color-coded badges
+ * - Responsive card design with hover effects
+ * - Date formatting with Indonesian locale
+ *
+ * @component
+ * @param props - Component properties
+ * @param props.cell - Table cell context with assessment data
+ *
+ * @example
+ * ```tsx
+ * // Used within a table renderer
+ * const mColumns = [
+ *   columnHelper.display({
+ *     id: 'mobile',
+ *     cell: (cell) => <MobileList cell={cell} />
+ *   })
+ * ]
+ * ```
+ *
+ * @see {@link AssesmentForm} - Embedded form component
+ * @see {@link DailyAssesments} - Assessment data type
+ */
 const MobileList: FC<MobileListProps> = ({ cell }) => {
   const assessment = cell.row.original
   const isFuture = isDateInFuture(assessment.date)

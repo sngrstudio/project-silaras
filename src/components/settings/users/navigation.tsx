@@ -1,3 +1,47 @@
+/**
+ * @fileoverview User Management Pagination Component
+ *
+ * React component providing pagination navigation for the user management
+ * interface. Handles page navigation with server-side data fetching and
+ * state management for large user datasets.
+ *
+ * Features:
+ * - Server-side pagination with configurable page size
+ * - Previous/next page navigation
+ * - Loading states during page transitions
+ * - Disabled states for boundary pages
+ * - Responsive button design
+ * - Integration with user management store
+ *
+ * Pagination Logic:
+ * - Default page size of 10 users per page
+ * - Automatic next page detection based on result count
+ * - Previous page availability based on current page
+ * - Server-side data fetching for each page
+ * - State synchronization with nanostore
+ *
+ * User Experience:
+ * - Clear navigation indicators
+ * - Disabled states for unavailable actions
+ * - Loading feedback during page changes
+ * - Accessible navigation buttons
+ * - Consistent styling with application theme
+ *
+ * State Management:
+ * - Integrates with users.store for data and page state
+ * - Updates current page number and user data
+ * - Handles server communication through Astro Actions
+ * - Maintains pagination state across component renders
+ *
+ * Error Handling:
+ * - Graceful handling of pagination failures
+ * - Fallback behavior for network issues
+ * - User feedback through loading states
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import { $users, $currentPage, setUsers, setCurrentPage } from './users.store'

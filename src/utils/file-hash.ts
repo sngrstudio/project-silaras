@@ -1,4 +1,28 @@
 /**
+ * @fileoverview File Hashing Utilities
+ *
+ * Provides secure file content hashing functionality for the SILARAS application.
+ * Used to generate unique, content-based identifiers for uploaded files to prevent
+ * duplicates and ensure file integrity.
+ *
+ * Features:
+ * - SHA-256 cryptographic hashing for security
+ * - Content-based unique filename generation
+ * - File integrity verification capabilities
+ * - Collision-resistant hash algorithm
+ * - Browser-compatible Web Crypto API usage
+ *
+ * Use Cases:
+ * - Generating unique filenames for uploads
+ * - Preventing duplicate file uploads
+ * - File integrity verification
+ * - Content-based deduplication
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+/**
  * Generate a SHA-256 hash for a file and return it as a hex string.
  * Useful for creating unique filenames based on file content.
  *

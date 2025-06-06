@@ -1,3 +1,49 @@
+/**
+ * @fileoverview Navigation Drawer Menu Component
+ *
+ * This component renders the main navigation menu within the drawer sidebar,
+ * providing access to all major sections of the SILARAS application. It includes
+ * role-based navigation with access control, user profile management, and
+ * hierarchical menu organization.
+ *
+ * @features
+ * - Role-based menu item visibility and access control
+ * - Hierarchical navigation (regions, districts, villages)
+ * - User profile section with logout functionality
+ * - Settings management for administrators
+ * - Dynamic menu item filtering based on user permissions
+ * - Responsive design with mobile-optimized interactions
+ * - Integration with user session management
+ *
+ * @navigation
+ * - Dashboard: Home and main overview
+ * - Regions: Geographic hierarchy navigation
+ * - Settings: Administrative configuration (admin only)
+ * - Profile: User account management
+ *
+ * @accessControl
+ * - Filters menu items based on user access level
+ * - Hides administrative functions from non-admin users
+ * - Restricts region access based on user assignments
+ * - Provides appropriate fallbacks for unauthorized access
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <DrawerMenuRC />
+ * ```
+ *
+ * @dependencies
+ * - Drawer store for user session state
+ * - Astro actions for navigation and logout
+ * - Lucide icons for visual indicators
+ * - Nanostores for reactive state management
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import type { FC } from 'react'
 import { useStore } from '@nanostores/react'
 import { $currentUser, setCurrentUser } from './drawer.store'

@@ -1,3 +1,43 @@
+/**
+ * @fileoverview Mobile List Component for User Management
+ *
+ * This component provides a mobile-optimized list view for displaying user data
+ * within the SILARAS platform. It renders user information in a card-based layout
+ * suitable for mobile devices with comprehensive user details and actions.
+ *
+ * Key Features:
+ * - Mobile-optimized card layout for user profiles
+ * - Role-based access control for user actions
+ * - Interactive user editing and management
+ * - User contact information with WhatsApp integration
+ * - Role and permission management interface
+ * - Real-time user data synchronization
+ *
+ * User Information Display:
+ * - User full name and username
+ * - Role badges with visual indicators
+ * - Contact information with click-to-call/WhatsApp
+ * - Region assignment and management
+ * - Identity card number (NIK) display
+ *
+ * Interactive Features:
+ * - Edit user functionality with permission checks
+ * - Delete user with confirmation dialogs
+ * - Role management and assignment
+ * - Region association management
+ * - Quick contact actions (phone, WhatsApp)
+ *
+ * Security Features:
+ * - Role-based action visibility
+ * - Permission checks for sensitive operations
+ * - Secure user data handling
+ *
+ * @module Components/Settings/Users
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/settings/users/mobile-list.tsx
+
 import { type FC } from 'react'
 import clsx from 'clsx'
 import type { CellContext } from '@tanstack/react-table'

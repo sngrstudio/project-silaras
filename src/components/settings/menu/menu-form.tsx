@@ -1,3 +1,41 @@
+/**
+ * @fileoverview Menu Form Component
+ *
+ * This component provides a comprehensive form interface for managing daily assessment menu
+ * settings within the SILARAS platform. It handles menu configuration, validation,
+ * and real-time updates with integration to the assessment system.
+ *
+ * Key Features:
+ * - Daily assessment menu configuration form
+ * - Real-time form validation and error handling
+ * - Integration with menu settings store for state management
+ * - Month-based menu planning and configuration
+ * - Form submission with loading states and feedback
+ * - Assessment settings synchronization
+ *
+ * Menu Management:
+ * - Daily menu planning and configuration
+ * - Assessment-based menu recommendations
+ * - Month-wise menu organization
+ * - Menu validation and requirement checks
+ *
+ * Form Features:
+ * - Interactive form fields for menu details
+ * - Real-time validation and error display
+ * - Auto-save functionality for user convenience
+ * - Form state management with nanostores
+ *
+ * Integration:
+ * - Astro actions for secure form processing
+ * - Toast notifications for user feedback
+ * - Store synchronization for real-time updates
+ *
+ * @module Components/Settings/Menu
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/settings/menu/menu-form.tsx
+
 import { useActionState, useRef, useState, type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { useStore } from '@nanostores/react'

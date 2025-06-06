@@ -1,4 +1,43 @@
 ---
+/**
+ * @fileoverview Main Layout Wrapper
+ *
+ * Provides the primary layout wrapper that combines base HTML structure with
+ * application-specific styling, fonts, and development tools. Serves as the
+ * foundation for all page layouts in the application.
+ *
+ * Features:
+ * - Base HTML document structure integration
+ * - Typography system with Plus Jakarta Sans font
+ * - Global CSS styling application
+ * - Client-side routing with Astro transitions
+ * - Development tools integration (dev environment only)
+ * - Flexible slot-based content insertion
+ * - TypeScript interface composition
+ *
+ * Layout Structure:
+ * - Full-height layout with overflow handling
+ * - Head section with SEO metadata
+ * - Body section with main content
+ * - Development tools overlay (dev only)
+ * - Named slots for extensibility
+ *
+ * Font Loading:
+ * - Plus Jakarta Sans variable font
+ * - Optimized font loading with @fontsource
+ * - Variable font weights support
+ * - Performance-optimized typography
+ *
+ * Development Features:
+ * - Client-side routing for SPA-like navigation
+ * - Development tools panel (debugging)
+ * - Environment-specific feature loading
+ * - Hot module replacement support
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import BaseLayout, { type Props as BaseLayoutProps } from './_base.astro'
 import Head, { type Props as HeadProps } from './_head.astro'
 import { ClientRouter } from 'astro:transitions'
@@ -6,15 +45,25 @@ import Devtools from '~/components/common/devtools/devtools.astro'
 import '@fontsource-variable/plus-jakarta-sans'
 import '~/styles/global.css'
 
-export interface Props extends HeadProps, BaseLayoutProps {}
+/**
+ * Props interface combining head metadata and base layout properties
+ * Extends both HeadProps and BaseLayoutProps for full layout control
+ */
+export interface Props extends HeadProps, BaseLayoutProps {
+  /** Page title for head metadata */
+  title?: string
+  /** Page description for SEO */
+  description?: string
+}
+
 const { title, description, class: className, ...props } = Astro.props
 ---
 
 <BaseLayout class:list={['h-screen overflow-hidden', className]} {...props}>
-  {/* <body /> */}
+  {/* Main content area */}
   <slot />
 
-  {/* <head /> */}
+  {/* Head section with metadata and client-side routing */}
   <Fragment slot='head'>
     <Head title={title} description={description} />
     <ClientRouter />

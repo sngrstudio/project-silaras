@@ -1,13 +1,42 @@
 ---
+/**
+ * @fileoverview User Profile Management Page
+ *
+ * Provides a comprehensive user profile management interface within the dashboard layout.
+ * Handles profile viewing, editing, and account settings for authenticated users.
+ * Features responsive design optimized for both desktop and mobile devices.
+ *
+ * Features:
+ * - Protected route requiring authentication
+ * - Profile component with transition animations
+ * - Navigation back to home with interactive controls
+ * - Dashboard layout integration
+ * - Responsive UI with accessible design patterns
+ *
+ * Security:
+ * - Authentication check with redirect to login if not authenticated
+ * - Server-side user validation through Astro.locals
+ * - Protected profile data access
+ *
+ * Navigation:
+ * - Back to home button with hover animations
+ * - Breadcrumb-style navigation integration
+ * - Transition animations for smooth UX
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import ProfileComponent from '~/components/user/profile/profile.astro'
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import BackIcon from '~icons/lucide/arrow-left'
 
+// Authentication guard - redirect to login if user not authenticated
 const { user } = Astro.locals
 if (!user) {
   return Astro.redirect('/user/login')
 }
 
+// Page metadata configuration for dashboard layout
 const props = {
   title: 'Profil Pengguna',
   description: `Kelola profil dan pengaturan akun Anda.`
@@ -17,6 +46,7 @@ const props = {
 <DLayout {...props}>
   <ProfileComponent transition:name='profile-page' transition:animate='none' />
 
+  {/* Controls for navigation back to home */}
   <Fragment slot='controls'>
     <a
       class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'

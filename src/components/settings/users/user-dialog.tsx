@@ -1,3 +1,51 @@
+/**
+ * @fileoverview User Dialog Component
+ *
+ * Modal dialog component for creating and editing user accounts in the SILARAS
+ * system. Provides comprehensive user management functionality with form
+ * validation, image upload, and role-based access control.
+ *
+ * Features:
+ * - User creation and editing in modal dialog
+ * - Profile image upload with Cloudinary integration
+ * - Password management (creation and reset)
+ * - Regional assignment with hierarchical selection
+ * - Access level management with role-based controls
+ * - Form validation with real-time feedback
+ * - Responsive design for all device sizes
+ *
+ * User Management:
+ * - Create new users with full profile setup
+ * - Edit existing user information and roles
+ * - Upload and manage profile images
+ * - Set and update user passwords
+ * - Assign users to specific regions
+ * - Configure access levels and permissions
+ *
+ * Form Validation:
+ * - Real-time input validation
+ * - Email format validation
+ * - Password strength requirements
+ * - Required field validation
+ * - Error message display
+ * - Form submission state management
+ *
+ * Access Control Integration:
+ * - Role-based field visibility
+ * - Permission validation for operations
+ * - Access level hierarchy enforcement
+ * - Regional jurisdiction respect
+ *
+ * State Management:
+ * - Astro Actions for server communication
+ * - Nanostore integration for reactive UI
+ * - Optimistic updates with error handling
+ * - Form state persistence during editing
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { useActionState, useEffect, useState, useRef, type FC } from 'react'
 import DialogComponent from '~/components/common/dialog/dialog'
 import { useStore } from '@nanostores/react'

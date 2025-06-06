@@ -1,4 +1,41 @@
 ---
+/**
+ * @fileoverview Menu Settings Management Page
+ *
+ * Administrative interface for managing daily menu configurations and meal planning
+ * within the SILARAS system. Restricted to admin users with elevated access levels
+ * for configuring institutional meal programs and nutritional guidelines.
+ *
+ * Features:
+ * - Daily menu configuration interface
+ * - Meal planning and scheduling tools
+ * - Nutritional content management
+ * - Admin-only access control (level 4+)
+ * - Dashboard layout integration
+ * - Responsive menu management UI
+ *
+ * Access Control:
+ * - Requires user authentication
+ * - Minimum access level 4 (admin privileges)
+ * - Redirects unauthorized users to homepage
+ * - Protected administrative functionality
+ *
+ * Menu Management:
+ * - Daily meal configuration
+ * - Nutritional content specification
+ * - Menu scheduling and planning
+ * - Institutional food program setup
+ *
+ * Navigation:
+ * - Back to settings navigation
+ * - Breadcrumb-style navigation
+ * - Transition animations for smooth UX
+ * - Integrated dashboard controls
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import MenuComponent from '~/components/settings/menu/menu.astro'
 import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
 import BackIcon from '~icons/lucide/arrow-left'

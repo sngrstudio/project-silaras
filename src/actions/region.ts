@@ -1,3 +1,47 @@
+/**
+ * @fileoverview Region Management Astro Actions
+ *
+ * This module defines Astro server actions for managing geographical regions
+ * in the SILARAS application. Regions form a hierarchical structure representing
+ * administrative divisions (KABUPATEN > KECAMATAN > DESA) used for organizing
+ * targets, users, and assessments throughout the system.
+ *
+ * @features
+ * - Hierarchical region management (three-tier structure)
+ * - CRUD operations for regions with validation
+ * - Slug-based URL-friendly identifiers
+ * - Parent-child relationship management
+ * - Target and user count aggregation
+ * - Region-based data filtering and organization
+ * - Bulk region operations
+ *
+ * @hierarchy
+ * - KABUPATEN: Top-level administrative region (district/regency)
+ * - KECAMATAN: Mid-level administrative region (sub-district)
+ * - DESA: Village-level administrative region (village)
+ *
+ * @actions
+ * - upsert: Create or update regions
+ * - getById: Retrieve region by ID
+ * - getBySlug: Retrieve region by URL slug
+ * - getAll: List regions with pagination
+ * - getAllWithCounts: List regions with target/user counts
+ * - getByType: Filter regions by administrative level
+ * - getByParent: Get child regions of a parent
+ * - getTargets: Get targets within a region
+ * - delete: Remove regions (with validation)
+ *
+ * @validation
+ * - Name uniqueness within parent region
+ * - Slug format and uniqueness validation
+ * - Hierarchical constraint enforcement
+ * - Data integrity checks before deletion
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { defineAction } from 'astro:actions'
 import {
   upsertRegion,
@@ -12,11 +56,6 @@ import {
   deleteRegion
 } from '../db/queries/region'
 import { z } from 'astro:schema'
-
-/**
- * Astro Actions for Region table
- * Each action corresponds to a query function for region data operations.
- */
 
 const region = {
   /**

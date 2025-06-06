@@ -1,3 +1,42 @@
+/**
+ * @fileoverview Site Settings Form Component
+ *
+ * This component provides a comprehensive site configuration form for the SILARAS platform.
+ * It handles site-wide settings including branding, metadata, and system configuration
+ * with form validation and real-time feedback.
+ *
+ * Key Features:
+ * - Comprehensive site configuration form with validation
+ * - Real-time form validation and error handling
+ * - Auto-save functionality and form state management
+ * - Site branding and metadata configuration
+ * - Integration with site settings store for data persistence
+ *
+ * Form Fields:
+ * - Site title and description editing
+ * - Site URL and domain configuration
+ * - Branding and appearance settings
+ * - Meta tags and SEO configuration
+ * - System-wide feature toggles
+ *
+ * Settings Management:
+ * - Real-time settings synchronization
+ * - Form validation with user feedback
+ * - Reset to default functionality
+ * - Auto-save for user convenience
+ *
+ * Integration:
+ * - Astro actions for secure form processing
+ * - Toast notifications for user feedback
+ * - Store synchronization for real-time updates
+ * - Site-wide settings propagation
+ *
+ * @module Components/Settings/Site
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/settings/site/site-form.tsx
+
 import { useActionState, useRef, useState, useEffect, type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import { $siteSettings, setSiteSettings } from './site.store'

@@ -1,3 +1,36 @@
+/**
+ * @fileoverview Mobile List Component for Targets
+ *
+ * This component provides a mobile-optimized list view for displaying target data
+ * within the SILARAS platform. It renders target information in a card-based layout
+ * suitable for mobile devices with comprehensive target details and actions.
+ *
+ * Key Features:
+ * - Mobile-optimized card layout for target profiles
+ * - Role-based access control for target actions
+ * - Interactive target editing and management
+ * - Target contact information with WhatsApp integration
+ * - Demographic information display (age, status, etc.)
+ * - Real-time target data synchronization
+ *
+ * Target Information Display:
+ * - Target name and mother's name
+ * - Age calculation and birth date information
+ * - Target status (Hamil, Menyusui, Anak-anak)
+ * - Contact information with click-to-call/WhatsApp
+ * - Address and location details
+ *
+ * Interactive Features:
+ * - Edit target functionality with permission checks
+ * - Toast notifications for user feedback
+ * - Quick contact actions (phone, WhatsApp)
+ *
+ * @module Components/Region/Target
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/region/target/mobile-list.tsx
+
 import { type FC } from 'react'
 import clsx from 'clsx'
 import { type CellContext } from '@tanstack/react-table'

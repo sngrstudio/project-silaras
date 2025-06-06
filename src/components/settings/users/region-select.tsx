@@ -1,3 +1,47 @@
+/**
+ * @fileoverview Region Selection Component
+ *
+ * React component providing hierarchical region selection for user assignment
+ * in the SILARAS system. Supports role-based region filtering and intelligent
+ * dropdown selection with search functionality.
+ *
+ * Features:
+ * - Hierarchical region selection (Kabupaten → Kecamatan → Desa)
+ * - Role-based access control for region visibility
+ * - Search and filter functionality
+ * - Responsive dropdown interface
+ * - Loading states and error handling
+ * - Accessibility support with keyboard navigation
+ *
+ * Access Level Mapping:
+ * - Level 4 (Admin): Can assign to KABUPATEN level
+ * - Level 3 (Coordinator): Can assign to KECAMATAN level
+ * - Level 2 (Officer): Can assign to DESA level
+ * - Level 1 (Observer): Cannot assign regions
+ *
+ * Regional Hierarchy:
+ * - Respects administrative hierarchy structure
+ * - Filters regions based on user's jurisdiction
+ * - Prevents unauthorized regional assignments
+ * - Maintains data integrity across assignments
+ *
+ * User Experience:
+ * - Searchable dropdown with real-time filtering
+ * - Clear region display with type indicators
+ * - Loading states during data fetching
+ * - Error handling with user feedback
+ * - Responsive design for all screen sizes
+ *
+ * State Management:
+ * - Local state for dropdown and search
+ * - Astro Actions for region data fetching
+ * - Error handling with toast notifications
+ * - Controlled component pattern with onChange
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { useState, useEffect, type FC } from 'react'
 import clsx from 'clsx'
 import { actions } from 'astro:actions'

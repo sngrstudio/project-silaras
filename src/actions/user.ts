@@ -1,3 +1,46 @@
+/**
+ * @fileoverview User Management Astro Actions
+ *
+ * This module defines comprehensive Astro server actions for user management,
+ * authentication, authorization, and profile operations in the SILARAS application.
+ * All actions include proper access control validation and error handling.
+ *
+ * @features
+ * - User authentication (login, logout, session management)
+ * - User registration and profile management
+ * - Access level and permission management
+ * - Profile photo upload and management via Cloudinary
+ * - Super administrator setup and detection
+ * - Region-based user organization and access control
+ * - Password security with hashing and validation
+ * - User search and pagination
+ * - Bulk user operations
+ *
+ * @security
+ * - All actions validate user permissions before execution
+ * - Password hashing using secure algorithms
+ * - Session token generation and management
+ * - File upload validation and sanitization
+ * - Access level enforcement
+ * - Region-based access restrictions
+ *
+ * @actions
+ * - Authentication: login, logout, getCurrentUser
+ * - User Management: create, update, delete, search users
+ * - Profile: updateProfile, uploadProfilePhoto
+ * - Administration: setupSuperAdmin, bulkOperations
+ *
+ * @dependencies
+ * - Database queries from src/db/queries/user
+ * - Authentication utilities from src/auth/
+ * - Access control from src/utils/access-control
+ * - File handling via Cloudinary integration
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { defineAction, ActionError } from 'astro:actions'
 import {
   upsertUser,
@@ -31,11 +74,6 @@ import {
   canUserDeleteUser,
   canUserAssignToRegion
 } from '../utils/access-control'
-
-/**
- * Astro Actions for User table
- * Each action corresponds to a query function for user data operations.
- */
 
 const user = {
   /**
@@ -765,7 +803,7 @@ const user = {
      * Login with username and password.
      * On success, creates a new session and sets the session token in a cookie.
      *
-     * @throws {ActionError} with "UNAUTHORIZED" code if login fails
+     * @throws ActionError with "UNAUTHORIZED" code if login fails
      */
     login: defineAction({
       accept: 'form',
@@ -856,8 +894,6 @@ const user = {
     /**
      * Logout the current user by invalidating all their sessions.
      * Also clears the session cookie.
-     *
-     * @returns {Promise<void>}
      */
     logout: defineAction({
       handler: async (_, ctx) => {

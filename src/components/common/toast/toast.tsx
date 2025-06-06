@@ -1,3 +1,46 @@
+/**
+ * @fileoverview Toast Notification Component
+ *
+ * React component implementing toast notifications using Radix UI primitives.
+ * Provides user feedback through temporary messages with success, error, and
+ * neutral states. Features automatic dismissal and manual close functionality.
+ *
+ * Features:
+ * - Radix UI Toast primitive integration
+ * - Bottom-center positioning with responsive design
+ * - Pill-shaped design following DaisyUI alert styling
+ * - Auto-dismiss after 5 seconds (configurable)
+ * - Manual dismissal with close button
+ * - Error and success state variants with icons
+ * - Smooth opacity and transform transitions
+ * - Nanostore integration for state management
+ *
+ * Toast States:
+ * - Success: Green styling with check-circle icon
+ * - Error: Red styling with alert-circle icon
+ * - Neutral: Default styling with no icon
+ * - Accessible with proper ARIA attributes
+ *
+ * Usage:
+ * ```tsx
+ * import { showToast, showErrorToast, showSuccessToast } from './toast.store'
+ *
+ * // Show different toast types
+ * showSuccessToast('Operation completed!')
+ * showErrorToast('Something went wrong!')
+ * showToast('Neutral message')
+ * ```
+ *
+ * Accessibility:
+ * - Proper ARIA live regions for screen readers
+ * - Keyboard navigation support
+ * - Focus management for close button
+ * - Semantic toast notification structure
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { type FC, type ReactNode } from 'react'
 import * as Toast from '@radix-ui/react-toast'
 import { useStore } from '@nanostores/react'

@@ -1,3 +1,34 @@
+/**
+ * @fileoverview Menu Navigation Component
+ *
+ * This component provides month-based navigation for menu settings within the SILARAS platform.
+ * It handles month selection, navigation controls, and real-time synchronization of menu data
+ * for different monthly periods in the assessment system.
+ *
+ * Key Features:
+ * - Monthly navigation controls (previous/next)
+ * - Indonesian month names display
+ * - Current month selection and indicator
+ * - Real-time month data synchronization using nanostores
+ * - Integration with daily assessment menu settings
+ *
+ * Navigation Features:
+ * - Smooth month transitions with navigation buttons
+ * - Current month highlighting and selection
+ * - Month boundary handling (January/December cycling)
+ * - Real-time menu data loading for selected months
+ *
+ * Data Integration:
+ * - Automatic menu settings loading for selected month
+ * - Integration with assessment system for month-specific data
+ * - Store synchronization for menu planning across months
+ *
+ * @module Components/Settings/Menu
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/settings/menu/navigation.tsx
+
 import { useEffect, type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import {

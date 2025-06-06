@@ -1,3 +1,29 @@
+/**
+ * @fileoverview Cloudinary Integration Utilities
+ *
+ * Provides secure file upload, management, and deletion functionality
+ * for the SILARAS application using Cloudinary's cloud storage service.
+ *
+ * Features:
+ * - Secure file uploads with automatic optimization
+ * - Configurable folder organization
+ * - Batch deletion for efficiency
+ * - Error handling and validation
+ * - Environment-based configuration
+ *
+ * Configuration:
+ * - CLOUDINARY_URL: Complete Cloudinary connection string (cloudinary://api_key:api_secret@cloud_name)
+ * - CLOUDINARY_FOLDER: Target folder for file organization
+ *
+ * Security:
+ * - Files are uploaded with generated public IDs to prevent conflicts
+ * - Automatic file type detection and validation
+ * - Secure API credentials handling
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { v2 as cloudinary } from 'cloudinary'
 
 /**

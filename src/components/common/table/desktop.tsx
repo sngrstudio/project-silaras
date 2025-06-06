@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Desktop Table Template Component
+ *
+ * A reusable table component for rendering Tanstack Table data in desktop/tablet layouts.
+ * Provides enhanced styling, sorting functionality, and responsive design with hover effects
+ * and gradient overlays for improved user experience.
+ *
+ * Features:
+ * - Interactive column sorting with visual indicators
+ * - Hover effects with gradient overlays
+ * - Responsive design optimized for larger screens
+ * - Accessibility-compliant table structure
+ * - Smooth transitions and animations
+ * - Shadow effects and border styling
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import { type FC, type TableHTMLAttributes } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { clsx } from 'clsx/lite'
@@ -5,23 +23,64 @@ import ChevronUpIcon from '~icons/lucide/chevron-up'
 import ChevronDownIcon from '~icons/lucide/chevron-down'
 import ChevronsUpDownIcon from '~icons/lucide/chevrons-up-down'
 
+/**
+ * Props interface for the TableTemplate component
+ *
+ * @interface TableTemplateProps
+ */
 export interface TableTemplateProps
   extends TableHTMLAttributes<HTMLTableElement> {
+  /**
+   * The Tanstack Table instance to render.
+   * Contains all table data, columns, and state management.
+   */
   table: Table<any>
 }
 
 /**
- * TableTemplate (Desktop)
+ * Desktop Table Template Component
  *
  * A reusable table component for rendering Tanstack Table data in a desktop/tablet layout.
+ * Features interactive sorting, hover effects, and modern styling consistent with the
+ * application's design system.
  *
- * Props:
- * - table: Table<any> — The Tanstack Table instance to render.
- * - className: string (optional) — Additional class names for the table element.
- * - ...props: TableHTMLAttributes<HTMLTableElement> — Any other standard table element props.
+ * Design Features:
+ * - Rounded container with subtle borders and shadows
+ * - Gradient overlay on hover for enhanced interactivity
+ * - Interactive column headers with sort indicators
+ * - Alternating row colors for improved readability
+ * - Smooth transitions and hover effects
+ * - Mobile-responsive with horizontal scrolling
  *
- * Usage:
- * `<TableTemplate table={tableInstance} className="my-table" />`
+ * @component
+ * @param props - Component properties
+ * @param props.table - Tanstack Table instance with data and configuration
+ * @param props.className - Additional CSS classes for styling customization
+ * @param props...props - Standard table HTML attributes
+ *
+ * @example
+ * ```tsx
+ * // Basic usage with table instance
+ * <TableTemplate
+ *   table={tableInstance}
+ *   className="my-custom-table"
+ * />
+ *
+ * // With sorting enabled
+ * const table = useReactTable({
+ *   data,
+ *   columns,
+ *   getCoreRowModel: getCoreRowModel(),
+ *   getSortedRowModel: getSortedRowModel(),
+ *   state: { sorting },
+ *   onSortingChange: setSorting
+ * })
+ *
+ * <TableTemplate table={table} />
+ * ```
+ *
+ * @see {@link Table} - Tanstack Table type
+ * @see {@link ListTemplate} - Mobile table counterpart
  */
 const TableTemplate: FC<TableTemplateProps> = ({
   table,

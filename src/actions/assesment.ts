@@ -1,3 +1,56 @@
+/**
+ * @fileoverview Assessment Management Astro Actions
+ *
+ * This module defines comprehensive Astro server actions for managing health and
+ * nutritional assessments in the SILARAS application. It handles both assessment
+ * definitions (templates) and individual target assessment results with a
+ * sophisticated two-tier system of monthly and daily assessments.
+ *
+ * @features
+ * - Monthly assessment definition management (JUNE-OCTOBER periods)
+ * - Daily assessment menu configuration and templates
+ * - Target daily assessment tracking with 5-component nutrition scoring
+ * - Target monthly anthropometric measurements (weight, height, BMI)
+ * - Progress tracking and completion percentage calculations
+ * - Metrics comparison between assessment periods
+ * - Image upload and management for assessment documentation
+ * - File hash validation for data integrity
+ * - Cloudinary integration for media storage
+ *
+ * @assessmentStructure
+ * - Monthly Assessments: Define assessment periods (e.g., JUNE, JULY)
+ * - Daily Assessments: Define daily menu templates within monthly periods
+ * - Target Daily Assessments: Individual daily nutrition assessments
+ * - Target Monthly Assessments: Individual monthly anthropometric data
+ *
+ * @scoringSystem
+ * - Contains Staple Food (0-1 points)
+ * - Contains Side Dish (0-1 points)
+ * - Contains Vegetables (0-1 points)
+ * - Contains Fruits (0-1 points)
+ * - Is Following Recipe (0-1 points)
+ * - Total Score: Sum of all components (0-5 points)
+ *
+ * @actions
+ * - monthly.get: Retrieve target monthly assessment summaries
+ * - monthly.set: Record target monthly measurements
+ * - daily.set: Record target daily nutrition assessments
+ * - daily.getAll: List target daily assessments with pagination
+ * - settings.setMonthly: Configure monthly assessment definitions
+ * - settings.setDaily: Configure daily assessment menu templates
+ *
+ * @validation
+ * - Access level verification (editor+ required)
+ * - Target existence validation
+ * - Assessment period validation
+ * - Nutrition scoring validation
+ * - File upload sanitization
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { defineAction, ActionError } from 'astro:actions'
 import {
   upsertMonthlyAssesment,
@@ -19,27 +72,15 @@ import { db } from '../db/db'
 import { targetDailyAssesment } from '../db/schemas/assesment'
 import { eq, and } from 'drizzle-orm'
 import { z } from 'astro:schema'
-
-/**
- * Astro Actions for Assessment Definitions and Target Results
- *
- * Structure:
- * - monthly.get: Get a target's monthly assessment summary (from view) by targetSlug and monthIndex (1-12)
- * - monthly.set: Upsert (insert or update) a target's monthly assessment result by targetId and monthlyAssesmentId
- * - daily.set: Upsert (insert or update) a target's daily assessment result by targetId and dailyAssesmentId
- * - daily.getAll: Get all daily assessment results for a target, paginated by monthIndex (1-12)
- * - settings.setMonthly: Upsert a monthly assessment definition by month name (enum)
- * - settings.setDaily: Upsert a daily assessment definition by monthlyAssesmentId, date, menu1, and menu2
- */
 const assesment = {
   monthly: {
     /**
      * Get a target's monthly assessment summary (from view).
      * Requires editor level access or above.
      *
-     * @param {string} targetSlug - The slug of the target.
-     * @param {number} monthIndex - The month index (1 = January, 12 = December).
-     * @returns {Promise<object|null>} The target's monthly assessment summary (from view) or null if not found.
+     * @param targetSlug - The slug of the target.
+     * @param monthIndex - The month index (1 = January, 12 = December).
+     * @returns The target's monthly assessment summary (from view) or null if not found.
      */
     get: defineAction({
       input: z.object({
@@ -66,11 +107,11 @@ const assesment = {
      * Upsert (insert or update) a target's monthly assessment result.
      * Requires editor level access or above.
      *
-     * @param {string} targetId - The ID of the target.
-     * @param {string} monthlyAssesmentId - The ID of the monthly assessment definition.
-     * @param {number} weight - The target's weight for the month.
-     * @param {number} height - The target's height for the month.
-     * @returns {Promise<object|null>} The upserted or updated row from the view, or null if not found.
+     * @param targetId - The ID of the target.
+     * @param monthlyAssesmentId - The ID of the monthly assessment definition.
+     * @param weight - The target's weight for the month.
+     * @param height - The target's height for the month.
+     * @returns The upserted or updated row from the view, or null if not found.
      */
     set: defineAction({
       accept: 'form',
@@ -99,9 +140,9 @@ const assesment = {
      * Get completion progress for a target in a specific month.
      * Requires editor level access or above.
      *
-     * @param {string} targetSlug - The slug of the target.
-     * @param {number} monthIndex - The month index (1 = January, 12 = December).
-     * @returns {Promise<Object>} Object containing progress percentage and counts.
+     * @param targetSlug - The slug of the target.
+     * @param monthIndex - The month index (1 = January, 12 = December).
+     * @returns Object containing progress percentage and counts.
      */
     getProgress: defineAction({
       input: z.object({
@@ -128,9 +169,9 @@ const assesment = {
      * Get metrics comparison for a target (current vs previous month).
      * Requires editor level access or above.
      *
-     * @param {string} targetSlug - The slug of the target.
-     * @param {number} monthIndex - The month index (1 = January, 12 = December).
-     * @returns {Promise<Object>} Object containing current, previous, and delta data.
+     * @param targetSlug - The slug of the target.
+     * @param monthIndex - The month index (1 = January, 12 = December).
+     * @returns Object containing current, previous, and delta data.
      */
     getMetricsComparison: defineAction({
       input: z.object({
@@ -161,14 +202,14 @@ const assesment = {
     /**
      * Upsert (insert or update) a target's daily assessment result.
      *
-     * @param {string} targetId - The ID of the target.
-     * @param {string} dailyAssesmentId - The ID of the daily assessment definition.
-     * @param {boolean} containsStapleFood - Whether the assessment contains staple food.
-     * @param {boolean} containsSideDish - Whether the assessment contains a side dish.
-     * @param {boolean} containsVegetables - Whether the assessment contains vegetables.
-     * @param {boolean} containsFruits - Whether the assessment contains fruits.
-     * @param {boolean} isFollowingRecipe - Whether the assessment follows the recipe.
-     * @returns {Promise<object|undefined>} The upserted or updated targetDailyAssesment row, or undefined if not found.
+     * @param targetId - The ID of the target.
+     * @param dailyAssesmentId - The ID of the daily assessment definition.
+     * @param containsStapleFood - Whether the assessment contains staple food.
+     * @param containsSideDish - Whether the assessment contains a side dish.
+     * @param containsVegetables - Whether the assessment contains vegetables.
+     * @param containsFruits - Whether the assessment contains fruits.
+     * @param isFollowingRecipe - Whether the assessment follows the recipe.
+     * @returns The upserted or updated targetDailyAssesment row, or undefined if not found.
      *
      * @example
      * await actions.assesment.daily.set({
@@ -184,14 +225,14 @@ const assesment = {
      * Upsert (insert or update) a target's daily assessment result.
      * Requires editor level access or above.
      *
-     * @param {string} targetId - The ID of the target.
-     * @param {string} dailyAssesmentId - The ID of the daily assessment definition.
-     * @param {boolean} containsStapleFood - Whether the assessment contains staple food.
-     * @param {boolean} containsSideDish - Whether the assessment contains a side dish.
-     * @param {boolean} containsVegetables - Whether the assessment contains vegetables.
-     * @param {boolean} containsFruits - Whether the assessment contains fruits.
-     * @param {boolean} isFollowingRecipe - Whether the assessment follows the recipe.
-     * @returns {Promise<object|undefined>} The upserted or updated targetDailyAssesment row, or undefined if not found.
+     * @param targetId - The ID of the target.
+     * @param dailyAssesmentId - The ID of the daily assessment definition.
+     * @param containsStapleFood - Whether the assessment contains staple food.
+     * @param containsSideDish - Whether the assessment contains a side dish.
+     * @param containsVegetables - Whether the assessment contains vegetables.
+     * @param containsFruits - Whether the assessment contains fruits.
+     * @param isFollowingRecipe - Whether the assessment follows the recipe.
+     * @returns The upserted or updated targetDailyAssesment row, or undefined if not found.
      *
      * @example
      * await actions.assesment.daily.set({
@@ -385,9 +426,9 @@ const assesment = {
      * Get all daily assessment results for a target, paginated by month.
      * Requires editor level access or above.
      *
-     * @param {string} targetSlug - The slug of the target.
-     * @param {number} monthIndex - The month index (1 = January, 12 = December).
-     * @returns {Promise<Array<object>>} Array of daily assessment results for the given month.
+     * @param targetSlug - The slug of the target.
+     * @param monthIndex - The month index (1 = January, 12 = December).
+     * @returns Array of daily assessment results for the given month.
      *
      * @example
      *   await actions.assesment.daily.getAll({ targetSlug: 'slug', monthIndex: 6 }) // June
@@ -423,8 +464,8 @@ const assesment = {
      * Upsert (insert or update) a monthly assessment definition.
      * Requires admin level access.
      *
-     * @param {string} month - Month name (enum: 'JANUARY', ...).
-     * @returns {Promise<object>} The upserted or found monthly assessment row.
+     * @param month - Month name (enum: 'JANUARY', ...).
+     * @returns The upserted or found monthly assessment row.
      */
     setMonthly: defineAction({
       input: z.object({ month: z.enum([...MONTHS]) }),
@@ -447,11 +488,11 @@ const assesment = {
      * Upsert (insert or update) a daily assessment definition.
      * Requires admin level access.
      *
-     * @param {string} monthlyAssesmentId - The ID of the monthly assessment.
-     * @param {string|Date} date - The date of the daily assessment.
-     * @param {string} menu1 - The first menu for the day.
-     * @param {string} menu2 - The second menu for the day.
-     * @returns {Promise<object>} The upserted or found daily assessment row.
+     * @param monthlyAssesmentId - The ID of the monthly assessment.
+     * @param date - The date of the daily assessment.
+     * @param menu1 - The first menu for the day.
+     * @param menu2 - The second menu for the day.
+     * @returns The upserted or found daily assessment row.
      */
     setDaily: defineAction({
       accept: 'form',
@@ -480,8 +521,8 @@ const assesment = {
      * Get daily assessment definitions for a given month.
      * Requires admin level access.
      *
-     * @param {number} monthIndex - The month index (1 = January, 12 = December).
-     * @returns {Promise<Array<object>>} Array of daily assessment definitions for the given month.
+     * @param monthIndex - The month index (1 = January, 12 = December).
+     * @returns Array of daily assessment definitions for the given month.
      *
      * @example
      *   await actions.assesment.settings.getAllDaily({ monthIndex: 6 }) // June

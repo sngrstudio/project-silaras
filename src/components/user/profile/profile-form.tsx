@@ -1,3 +1,44 @@
+/**
+ * @fileoverview User Profile Form Component
+ *
+ * This component provides a comprehensive user profile editing form for the SILARAS platform.
+ * It handles user profile updates including personal information, avatar uploads,
+ * and form validation with real-time feedback and image processing capabilities.
+ *
+ * Key Features:
+ * - Comprehensive profile editing form with validation
+ * - Avatar upload and image processing with Cloudinary integration
+ * - Real-time form validation and error handling
+ * - Auto-save functionality and form state management
+ * - Profile image cropping and optimization
+ * - Role-based field visibility and editing permissions
+ *
+ * Form Fields:
+ * - Full name editing with validation
+ * - Avatar image upload and management
+ * - Phone number with format validation
+ * - Identity card number (NIK) validation
+ * - User role display and management
+ *
+ * Image Management:
+ * - Drag-and-drop avatar upload
+ * - Image format validation and conversion
+ * - Automatic image optimization and resizing
+ * - Cloudinary integration for image storage
+ * - Profile picture preview and editing
+ *
+ * Security Features:
+ * - Input sanitization and validation
+ * - File type and size restrictions
+ * - CSRF protection through Astro actions
+ * - User session validation
+ *
+ * @module Components/User/Profile
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/user/profile/profile-form.tsx
+
 import { useActionState, useEffect, useRef, useState, type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import {

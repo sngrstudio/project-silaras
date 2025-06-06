@@ -1,3 +1,29 @@
+/**
+ * @fileoverview Mobile List Component for Subregions
+ *
+ * This component provides a mobile-optimized list view for displaying subregion data
+ * within the SILARAS platform. It renders region information in a card-based layout
+ * suitable for mobile devices with touch-friendly interactions.
+ *
+ * Key Features:
+ * - Mobile-optimized card layout for region data
+ * - Role-based access control for region actions
+ * - Interactive region navigation and details
+ * - Region statistics display (child regions, targets, users)
+ * - Region type indicators with appropriate icons
+ *
+ * Display Elements:
+ * - Region name and type with visual indicators
+ * - Child region and target count badges
+ * - User count and management information
+ * - External link navigation for detailed views
+ *
+ * @module Components/Region/Subregion
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/region/subregion/mobile-list.tsx
+
 import { type FC } from 'react'
 import { type CellContext } from '@tanstack/react-table'
 import { type Regions } from './region.store'

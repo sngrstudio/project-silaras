@@ -1,3 +1,43 @@
+/**
+ * @fileoverview User Login Component
+ *
+ * This component provides a secure user authentication form for the SILARAS platform.
+ * It handles user login with form validation, session management, and integration
+ * with the authentication system including error handling and user feedback.
+ *
+ * Key Features:
+ * - Secure user authentication form with validation
+ * - Real-time form validation and error handling
+ * - Password visibility toggle for user convenience
+ * - Remember username functionality
+ * - Integration with Astro authentication actions
+ * - Loading states and user feedback
+ *
+ * Form Fields:
+ * - Username with validation and auto-completion
+ * - Password with visibility toggle
+ * - Form submission with loading indicators
+ * - Error display and user guidance
+ *
+ * Authentication Flow:
+ * - Form validation before submission
+ * - Secure credential transmission
+ * - Session establishment on successful login
+ * - Automatic redirection to dashboard
+ * - Error handling for failed attempts
+ *
+ * Security Features:
+ * - Input sanitization and validation
+ * - CSRF protection through Astro actions
+ * - Secure password handling
+ * - Rate limiting and abuse prevention
+ *
+ * @module Components/User/Login
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/user/login/login.tsx
+
 import { useActionState, useRef, useEffect, type FC } from 'react'
 import { actions, isInputError } from 'astro:actions'
 import { navigate } from 'astro:transitions/client'

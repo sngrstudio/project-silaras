@@ -1,18 +1,42 @@
+/**
+ * @fileoverview Target Database Query Functions
+ *
+ * This module provides comprehensive database query functions for managing targets
+ * (beneficiaries) in the SILARAS health monitoring application. Targets represent
+ * individuals being monitored for health and nutrition assessments, including
+ * pregnant women, nursing mothers, and children.
+ *
+ * @features
+ * - Complete target CRUD operations with upsert functionality
+ * - Health status classification (HAMIL, MENYUSUI, ANAK-ANAK)
+ * - Geographic location tracking (latitude/longitude)
+ * - Initial health metrics recording (weight, height)
+ * - Region-based organization and access control
+ * - Mother-child relationship tracking
+ * - Assessment history integration
+ * - Pagination support for large datasets
+ *
+ * @healthData
+ * - Pregnancy monitoring (HAMIL status)
+ * - Nursing mother tracking (MENYUSUI status)
+ * - Child development monitoring (ANAK-ANAK status)
+ * - Initial baseline measurements
+ * - Geographic distribution analysis
+ *
+ * @database MySQL via Drizzle ORM
+ * @schema target table with region and assessment relationships
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { db } from '../db'
 import { target } from '../schemas/target'
 import { region } from '../schemas/region'
 import { targetDailyAssesment } from '../schemas/assesment'
 import { eq, sql } from 'drizzle-orm'
 import crypto from 'node:crypto'
-
-/**
- * Target table query functions.
- *
- * - upsertTarget(data): Insert or update a target (id auto-generated if not provided)
- * - getTargetById(id): Get a target by its id
- * - deleteTarget(id): Delete a target by id
- * - getAllTargets(page?, size?): Get paginated list of targets (default 10 per page)
- */
 
 /**
  * Insert or update a target (upsert). The id is auto-generated if not provided.

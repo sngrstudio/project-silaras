@@ -1,12 +1,39 @@
+/**
+ * @fileoverview User Database Query Functions
+ *
+ * This module provides comprehensive database query functions for managing users
+ * and user sessions in the SILARAS application. It handles user authentication,
+ * authorization, profile management, and session lifecycle operations.
+ *
+ * @features
+ * - Complete user CRUD operations with upsert functionality
+ * - Session management (create, validate, cleanup)
+ * - Access level and permission management
+ * - Super administrator detection and setup
+ * - Region-based user organization
+ * - Profile photo and contact information management
+ * - Secure password handling integration
+ * - User authentication and authorization
+ *
+ * @security
+ * - Password hashes are handled securely (never store plain text)
+ * - Session tokens use cryptographically secure random generation
+ * - Access levels enforce hierarchical permissions
+ * - Region-based access control integration
+ *
+ * @database MySQL via Drizzle ORM
+ * @schema user and session tables with region relationships
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { db } from '../db'
 import { user, session } from '../schemas/user'
 import { region } from '../schemas/region'
 import { eq, sql, getTableColumns, lt, gte } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
-
-/**
- * User table query functions.
- */
 
 /**
  * Check if any Super Administrators exist in the system.

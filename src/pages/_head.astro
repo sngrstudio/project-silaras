@@ -1,15 +1,57 @@
 ---
+/**
+ * @fileoverview HTML Head Component
+ *
+ * Provides centralized HTML head management for SEO optimization and metadata
+ * configuration across all pages. Handles title generation, meta descriptions,
+ * and consistent branding throughout the application.
+ *
+ * Features:
+ * - Dynamic title generation with site branding
+ * - SEO-optimized meta description handling
+ * - Consistent site identity and branding
+ * - Fallback content for missing metadata
+ * - TypeScript interface for prop validation
+ *
+ * SEO Optimization:
+ * - Structured title format: "Page Title | Site Title"
+ * - Meta description for search engine visibility
+ * - Consistent site branding across all pages
+ * - Proper fallback content for missing props
+ *
+ * Usage:
+ * - Import and use in layout components
+ * - Pass title and description props
+ * - Automatic site title appending
+ * - Fallback to default site description
+ *
+ * Site Configuration:
+ * - Site title: "SILARAS"
+ * - Site tagline: "Untuk Kotim yang Bebas Stunting"
+ * - Centralized site metadata management
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+/**
+ * Props interface for the Head component
+ * Defines optional title and description metadata
+ */
 export interface Props {
+  /** Page-specific title (will be prefixed with site title) */
   title?: string | undefined
+  /** Page-specific meta description for SEO */
   description?: string | undefined
 }
 
 const { title, description } = Astro.props
 
+// Site-wide configuration for consistent branding
 const site = {
   title: 'SILARAS',
   description: 'Untuk Kotim yang Bebas Stunting'
-} satisfies Props
+}
 ---
 
 <title>{title ? `${title} | ${site.title}` : site.title}</title>

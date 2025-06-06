@@ -1,14 +1,28 @@
-import argon2 from 'argon2'
-
 /**
- * Secure password hashing using Argon2id (recommended variant for general password hashing)
- * with secure defaults:
- * - memory: 64MB (65536 KiB)
- * - iterations: 3
- * - parallelism: 4
- * - hash length: 32 bytes
- * - salt length: 16 bytes
+ * @fileoverview Password Security Utilities
+ *
+ * Provides secure password hashing and verification functionality
+ * for the SILARAS application using Argon2id algorithm.
+ *
+ * Security Features:
+ * - Argon2id algorithm (recommended for password hashing)
+ * - Memory-hard function resistant to GPU/ASIC attacks
+ * - Configurable time/memory costs for future-proofing
+ * - Salt generation for unique hashes
+ * - Secure verification with timing attack protection
+ *
+ * Configuration:
+ * - Memory cost: 64MB (65536 KiB) - Recommended minimum for security
+ * - Time cost: 3 iterations - Balance between security and performance
+ * - Parallelism: 4 threads - Optimal for most server configurations
+ * - Hash length: 32 bytes - Strong output length
+ * - Salt length: 16 bytes (Argon2 default) - Sufficient entropy
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
  */
+
+import argon2 from 'argon2'
 
 /**
  * Hash a password using Argon2id

@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Target Dialog Component
+ *
+ * Modal dialog for creating and editing target/patient records with comprehensive
+ * form validation, map integration for location selection, and real-time address
+ * resolution. Provides a responsive interface for target management.
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import {
   useActionState,
   useEffect,
@@ -71,6 +81,96 @@ const markerIcon = new L.Icon({
 
 // Set the default icon for all markers
 L.Marker.prototype.options.icon = markerIcon
+
+/**
+ * Props for the LocationMarker component
+ *
+ * @interface LocationMarkerProps
+ */
+interface LocationMarkerProps {
+  /** Callback to set the selected coordinates */
+  setLatLng: Dispatch<SetStateAction<L.LatLng>>
+  /** Callback to set the resolved address */
+  setAddress: Dispatch<SetStateAction<string>>
+  /** Function to resolve address from coordinates */
+  getAddressFromCoords: (lat: number, lng: number) => Promise<string>
+  /** Current selected coordinates */
+  currentLatLng: L.LatLng
+  /** Initial coordinates for marker placement */
+  initialLatLng: L.LatLng | null
+}
+
+/**
+ * Interactive map marker component for location selection
+ *
+ * Provides click-to-place functionality for selecting target locations
+ * on the map with automatic address resolution.
+ *
+ * @component
+ * @param props - Component properties
+ */
+const LocationMarker: FC<LocationMarkerProps> = ({
+  initialLatLng = null,
+  currentLatLng,
+  setLatLng,
+  setAddress,
+  getAddressFromCoords
+}) => {
+  const [position, setPosition] = useState<L.LatLng | undefined>(
+    initialLatLng ?? undefined
+  )
+
+  const map = useMapEvents({
+    click: async (e) => {
+      setPosition(e.latlng)
+      setLatLng(e.latlng)
+
+      // Get address from coordinates when user clicks on map
+      try {
+        const addressFromCoords = await getAddressFromCoords(
+          e.latlng.lat,
+          e.latlng.lng
+        )
+        if (addressFromCoords) {
+          setAddress(addressFromCoords)
+        }
+        // Note: Error handling is already done in getAddressFromCoords function
+      } catch (error) {
+        console.error('Error getting address from map click:', error)
+        // Error toast is already shown in getAddressFromCoords
+      }
+    }
+  })
+
+  // Update position when currentLatLng changes (e.g., from location button)
+  useEffect(() => {
+    if (currentLatLng && (currentLatLng.lat !== 0 || currentLatLng.lng !== 0)) {
+      const newPosition = currentLatLng
+      setPosition(newPosition)
+
+      // Center the map on the new position
+      if (map) {
+        map.setView(newPosition, 15) // Set zoom level to 15 for better detail
+      }
+    }
+  }, [currentLatLng, map])
+
+  // Initialize position from initialLatLng on component mount
+  useEffect(() => {
+    if (initialLatLng && !position) {
+      setPosition(initialLatLng)
+      if (map) {
+        map.setView(initialLatLng, map.getZoom())
+      }
+    }
+  }, [initialLatLng, position, map])
+
+  if (!position) {
+    return <></>
+  }
+
+  return <Marker position={position} />
+}
 
 const TargetDialog: FC = () => {
   const currentRegion = useStore($currentRegion)
@@ -867,70 +967,3 @@ const TargetDialog: FC = () => {
 }
 
 export default TargetDialog
-
-export const LocationMarker: FC<{
-  initialLatLng?: L.LatLng | undefined
-  currentLatLng: L.LatLng
-  setLatLng: Dispatch<SetStateAction<L.LatLng>>
-  setAddress: Dispatch<SetStateAction<string>>
-  getAddressFromCoords: (lat: number, lng: number) => Promise<string>
-}> = ({
-  initialLatLng = undefined,
-  currentLatLng,
-  setLatLng,
-  setAddress,
-  getAddressFromCoords
-}) => {
-  const [position, setPosition] = useState<L.LatLng | undefined>(initialLatLng)
-
-  const map = useMapEvents({
-    click: async (e) => {
-      setPosition(e.latlng)
-      setLatLng(e.latlng)
-
-      // Get address from coordinates when user clicks on map
-      try {
-        const addressFromCoords = await getAddressFromCoords(
-          e.latlng.lat,
-          e.latlng.lng
-        )
-        if (addressFromCoords) {
-          setAddress(addressFromCoords)
-        }
-        // Note: Error handling is already done in getAddressFromCoords function
-      } catch (error) {
-        console.error('Error getting address from map click:', error)
-        // Error toast is already shown in getAddressFromCoords
-      }
-    }
-  })
-
-  // Update position when currentLatLng changes (e.g., from location button)
-  useEffect(() => {
-    if (currentLatLng && (currentLatLng.lat !== 0 || currentLatLng.lng !== 0)) {
-      const newPosition = currentLatLng
-      setPosition(newPosition)
-
-      // Center the map on the new position
-      if (map) {
-        map.setView(newPosition, 15) // Set zoom level to 15 for better detail
-      }
-    }
-  }, [currentLatLng, map])
-
-  // Initialize position from initialLatLng on component mount
-  useEffect(() => {
-    if (initialLatLng && !position) {
-      setPosition(initialLatLng)
-      if (map) {
-        map.setView(initialLatLng, map.getZoom())
-      }
-    }
-  }, [initialLatLng, position, map])
-
-  if (!position) {
-    return <></>
-  }
-
-  return <Marker position={position} />
-}

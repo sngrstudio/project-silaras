@@ -1,4 +1,38 @@
 ---
+/**
+ * @fileoverview Drawer Layout Wrapper Component
+ *
+ * Astro wrapper component for the React drawer navigation system. Handles
+ * server-side rendering (SSR) integration, user data passing, and client-side
+ * hydration for the responsive sidebar navigation.
+ *
+ * Features:
+ * - SSR integration with proper user data handling
+ * - Client-side hydration with user context
+ * - Automatic drawer state management on page navigation
+ * - Slot-based content projection
+ * - Responsive sidebar navigation
+ *
+ * SSR Integration:
+ * - Retrieves user data from Astro.locals during SSR
+ * - Prevents hydration mismatches by pre-populating user state
+ * - Ensures consistent rendering between server and client
+ *
+ * Navigation Behavior:
+ * - Automatically closes drawer on page navigation
+ * - Listens to astro:page-load events
+ * - Maintains proper state across route changes
+ * - Smooth transitions between pages
+ *
+ * Client Hydration:
+ * - Uses client:load directive for immediate interactivity
+ * - Passes SSR user data to React component
+ * - Manages drawer state with nanostore
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import DrawerRC from './drawer'
 
 // Get user data during SSR to prevent hydration mismatch

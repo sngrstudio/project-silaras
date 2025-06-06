@@ -1,3 +1,52 @@
+/**
+ * @fileoverview Target Management Astro Actions
+ *
+ * This module defines Astro server actions for managing targets (beneficiaries)
+ * in the SILARAS health monitoring application. Targets are individuals being
+ * monitored for nutritional and health assessments, including pregnant women,
+ * nursing mothers, and children.
+ *
+ * @features
+ * - Complete target lifecycle management (CRUD operations)
+ * - Health status classification and tracking
+ * - Geographic location recording and mapping
+ * - Initial health metrics baseline establishment
+ * - Region-based organization and filtering
+ * - Image management integration with Cloudinary
+ * - Slug-based URL generation for targets
+ * - Form-based data input with validation
+ *
+ * @healthStatus
+ * - HAMIL: Pregnant women requiring prenatal monitoring
+ * - MENYUSUI: Nursing mothers needing postpartum care
+ * - ANAK-ANAK: Children under nutritional monitoring
+ *
+ * @dataPoints
+ * - Personal Information: Name, mother's name, birth date
+ * - Health Status: Current monitoring category
+ * - Location: GPS coordinates for geographic analysis
+ * - Initial Metrics: Baseline weight and height measurements
+ * - Regional Assignment: Administrative region association
+ *
+ * @actions
+ * - upsert: Create or update target profiles
+ * - getById: Retrieve target by unique identifier
+ * - getBySlug: Retrieve target by URL-friendly slug
+ * - getAll: List targets with pagination and filtering
+ * - delete: Remove targets with cleanup
+ * - getImages: Retrieve associated target images
+ *
+ * @validation
+ * - Required health metrics validation
+ * - Geographic coordinate validation
+ * - Region assignment verification
+ * - File upload sanitization
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { defineAction, ActionError } from 'astro:actions'
 import {
   upsertTarget,
@@ -10,17 +59,6 @@ import {
 import { getRegionById } from '../db/queries/region'
 import { deleteMultipleFromCloudinary } from '../utils/cloudinary'
 import { z } from 'astro:schema'
-
-/**
- * Astro Actions for Target table
- * Each action corresponds to a query function for target data operations.
- *
- * - upsert: Insert or update a target (requires name, motherName, birthDate, status, latitude, longitude, regionId, initialWeight, initialHeight; id and slug optional)
- * - getById: Get a target by its id
- * - getBySlug: Get a target by its slug
- * - getAll: Get a paginated list of targets (optionally filtered by regionSlug)
- * - delete: Delete a target by id
- */
 
 const target = {
   /**

@@ -1,22 +1,70 @@
+/**
+ * @fileoverview Card Template Component
+ *
+ * A reusable card layout component providing consistent styling and interactive
+ * effects for wrapping content throughout the application. Features modern
+ * design with hover animations and gradient overlays.
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
 import type { FC, PropsWithChildren } from 'react'
 
+/**
+ * Props interface for the CardTemplate component
+ *
+ * @interface CardTemplateProps
+ */
 interface CardTemplateProps {
+  /**
+   * Optional title for the card header.
+   * When provided, displays as a prominent heading with decorative elements.
+   */
   title?: string | undefined
 }
 
 /**
- * CardTemplate component
+ * Card Template Component
  *
- * A reusable card layout for wrapping content in a styled card UI.
+ * A reusable card layout for wrapping content in a styled card UI with
+ * modern design elements and interactive hover effects. Provides consistent
+ * styling across the application with subtle animations and visual feedback.
  *
- * Props:
- * - title (optional): string | undefined — If provided, displays as the card's heading.
- * - children: ReactNode — The content to render inside the card body.
+ * Design Features:
+ * - Rounded borders with subtle shadows
+ * - Gradient overlays that appear on hover
+ * - Decorative title headers with animated elements
+ * - Smooth transitions and hover effects
+ * - Responsive design with proper spacing
+ * - Modern card styling following design system
  *
- * Usage:
- * `<CardTemplate title="My Card Title">Content here</CardTemplate>`
+ * @component
+ * @param props - Component properties
+ * @param props.children - Content to render inside the card body
+ * @param props.title - Optional card title for the header
+ *
+ * @example
+ * ```tsx
+ * // Basic card without title
+ * <CardTemplate>
+ *   <p>Card content here</p>
+ * </CardTemplate>
+ *
+ * // Card with title
+ * <CardTemplate title="Settings">
+ *   <form>...</form>
+ * </CardTemplate>
+ *
+ * // Complex content
+ * <CardTemplate title="User Statistics">
+ *   <div className="stats">
+ *     <div className="stat">...</div>
+ *   </div>
+ * </CardTemplate>
+ * ```
+ *
+ * @see {@link https://daisyui.com/components/card/} - DaisyUI Card Documentation
  */
-
 const CardTemplate: FC<PropsWithChildren<CardTemplateProps>> = ({
   children,
   title

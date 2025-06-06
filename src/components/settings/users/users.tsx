@@ -1,3 +1,51 @@
+/**
+ * @fileoverview User Management Component
+ *
+ * Comprehensive React component for managing users in the SILARAS system.
+ * Provides full CRUD operations with role-based access control, responsive
+ * design, and advanced table functionality for user administration.
+ *
+ * Features:
+ * - Responsive data table with sorting and filtering
+ * - Mobile-optimized list view for smaller screens
+ * - Role-based access control for user operations
+ * - Real-time user data management with nanostore
+ * - User profile editing with image upload
+ * - Password reset functionality
+ * - Regional assignment management
+ * - WhatsApp integration for contact
+ *
+ * User Operations:
+ * - Create new users with role assignment
+ * - Edit existing user profiles and permissions
+ * - Delete users (with proper authorization)
+ * - Reset user passwords
+ * - Assign users to regions
+ * - Update access levels and roles
+ *
+ * Access Control:
+ * - Validates user permissions for all operations
+ * - Respects regional jurisdiction boundaries
+ * - Enforces access level hierarchy
+ * - Prevents unauthorized user modifications
+ *
+ * Data Management:
+ * - TanStack Table for advanced table features
+ * - Nanostore integration for reactive state
+ * - Optimistic updates with error handling
+ * - Real-time data synchronization
+ *
+ * UI Components:
+ * - Desktop: Advanced data table with sorting
+ * - Mobile: Card-based list view
+ * - Search and filtering capabilities
+ * - Pagination for large datasets
+ * - Loading states and error handling
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import { type FC, useState, useMemo } from 'react'
 import clsx from 'clsx'
 import TableTemplate from '../../common/table/desktop'

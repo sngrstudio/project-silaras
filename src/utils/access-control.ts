@@ -1,3 +1,26 @@
+/**
+ * @fileoverview Access Control Utilities
+ *
+ * Comprehensive access control system for the SILARAS application.
+ * Implements role-based access control (RBAC) with territorial restrictions
+ * based on regional assignments and hierarchical permissions.
+ *
+ * Access Levels:
+ * - Level 1 (Pengamat): Read-only observers with restricted access
+ * - Level 2 (Kader DASHAT): Editors who manage data in their assigned desa
+ * - Level 3 (PLKB Kecamatan): Coordinators who oversee multiple desa in their kecamatan
+ * - Level 4 (Admin Dinas PPPAPPKB): Administrators with system-wide access
+ * - Level 5 (Super Administrator): Full system access (reserved for technical administration)
+ *
+ * Regional Hierarchy:
+ * - Kabupaten (District) → Kecamatan (Sub-district) → Desa (Village)
+ * - Users are assigned to specific regions and can access data within their territorial scope
+ * - Higher-level users can access data from lower-level regions under their jurisdiction
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
 import type { actions } from 'astro:actions'
 
 // Type for current user from the actions

@@ -1,3 +1,29 @@
+/**
+ * @fileoverview Subregion Navigation Component
+ *
+ * This component provides pagination navigation for subregion data within the SILARAS platform.
+ * It handles page navigation with previous/next controls and displays current page information
+ * with real-time data synchronization.
+ *
+ * Key Features:
+ * - Pagination navigation controls (previous/next)
+ * - Current page and total pages display
+ * - Real-time page data synchronization using nanostores
+ * - Dynamic parent region slug detection from URL
+ * - Responsive navigation button design
+ *
+ * Navigation Features:
+ * - Automatic page boundary handling
+ * - Disabled state management for edge pages
+ * - Page count information display
+ * - Smooth page transitions
+ *
+ * @module Components/Region/Subregion
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+// filepath: /workspaces/project-dashat/src/components/region/subregion/navigation.tsx
+
 import { type FC } from 'react'
 import { useStore } from '@nanostores/react'
 import { $regions, setRegions } from './region.store'

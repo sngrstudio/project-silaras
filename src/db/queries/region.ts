@@ -1,18 +1,33 @@
+/**
+ * @fileoverview Region Database Query Functions
+ *
+ * This module provides comprehensive database query functions for managing regions
+ * in the SILARAS application. Regions represent geographical or organizational
+ * hierarchies that can be nested (parent-child relationships) and are used
+ * throughout the system for data organization and access control.
+ *
+ * @features
+ * - CRUD operations for regions with hierarchical support
+ * - Upsert functionality for insert-or-update operations
+ * - Pagination support for large datasets
+ * - Parent-child relationship management
+ * - Region type classification (e.g., country, state, city)
+ * - Slug-based URL-friendly identifiers
+ * - Integration with targets and users
+ *
+ * @database MySQL via Drizzle ORM
+ * @schema region table with hierarchical structure
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { db } from '../db'
 import { region } from '../schemas/region'
 import { target } from '../schemas/target'
 import { user } from '../schemas/user'
 import { eq, count, sql } from 'drizzle-orm'
-
-/**
- * Region table query functions.
- *
- * - upsertRegion(data): Insert or update a region (id auto-generated if not provided)
- * - getRegionById(id): Get a region by its id
- * - getAllRegions(page?, size?): Get paginated list of regions (default 10 per page)
- * - updateRegion(id, data): Update region fields by id
- * - deleteRegion(id): Delete a region by id
- */
 
 /**
  * Insert or update a region (upsert). The id is auto-generated if not provided.

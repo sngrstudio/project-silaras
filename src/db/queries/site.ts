@@ -1,10 +1,34 @@
+/**
+ * @fileoverview Site Settings Database Query Functions
+ *
+ * This module provides database query functions for managing site-wide settings
+ * and configuration properties in the SILARAS application. Site settings are
+ * stored as key-value pairs and control various aspects of the application's
+ * behavior and appearance.
+ *
+ * @features
+ * - Site property retrieval (individual and bulk)
+ * - Configuration management (SITE_NAME, SITE_DESCRIPTION, etc.)
+ * - Key-value pair storage and retrieval
+ * - Application-wide settings control
+ * - Dynamic configuration updates
+ *
+ * @settings
+ * - SITE_NAME: Application display name
+ * - SITE_DESCRIPTION: Application description for metadata
+ * - Additional configurable properties as needed
+ *
+ * @database MySQL via Drizzle ORM
+ * @schema site table with property-value pairs
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
 import { db } from '../db'
 import { site } from '../schemas/site'
 import { eq } from 'drizzle-orm'
-
-/**
- * Site settings table query functions.
- */
 
 /**
  * Get a site property value.
