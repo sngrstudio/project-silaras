@@ -20,5 +20,5 @@ app.use(ssrHandler)
 
 const PORT = 4321
 app.listen(PORT, () => {
-  console.log(`Server is now run at: ${PORT}`)
+  console.log(`Server is now running on port ${PORT}`)
 })
