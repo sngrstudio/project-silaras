@@ -45,5 +45,4 @@ ENV NODE_ENV=production
 EXPOSE 4321
 
 # Distroless already runs as nonroot user, and Node.js handles signals properly in distroless
-# for checking actions behavior, I'll intentionally make this break
-CMD ["node", "server.mjs"]
+CMD ["server.mjs"]
