@@ -13,8 +13,7 @@ RUN npm ci
 
 FROM build-deps AS build
 # Copy configuration files first (these change less frequently)
-COPY astro.config.mjs drizzle.config.mjs tsconfig.json prettier.config.cjs .prettierignore ./
-COPY node.d.ts ./
+COPY astro.config.mjs drizzle.config.mjs tsconfig.json prettier.config.cjs .prettierignore node.d.ts ./
 
 # Copy source code
 COPY src/ ./src/
@@ -26,24 +25,25 @@ COPY public/ ./public/
 # - Source code in src/ or public/ changed
 RUN npm run build
 
-# Runner image
-FROM node:22.16.0-bookworm-slim AS runtime
+# Runner image - using distroless for security
+FROM gcr.io/distroless/nodejs22-debian12:nonroot AS runtime
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    dumb-init && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Set working directory (distroless already has /home/nonroot with correct permissions)
+WORKDIR /home/nonroot/app
 
-RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
-WORKDIR /home/node/app
-USER node
+# Copy application files
+COPY --from=prod-deps --chown=nonroot:nonroot /usr/src/app/node_modules ./node_modules
+COPY --from=build --chown=nonroot:nonroot /usr/src/app/dist ./dist
+COPY --chown=nonroot:nonroot server.mjs .
 
-COPY --from=prod-deps --chown=node:node /usr/src/app/node_modules ./node_modules
-COPY --from=build --chown=node:node /usr/src/app/dist ./dist
-COPY --chown=node:node server.mjs .
-
+# Environment variables
 ENV HOST=0.0.0.0
 ENV PORT=4321
+ENV NODE_ENV=production
+
+# Expose port
 EXPOSE 4321
-ENTRYPOINT [ "dumb-init", "--" ]
-CMD ["node", "./server.mjs"]
+
+# Distroless already runs as nonroot user, and Node.js handles signals properly in distroless
+# for checking actions behavior, I'll intentionally make this break
+CMD ["node", "server.mjs"]
