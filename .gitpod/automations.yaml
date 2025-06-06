@@ -10,14 +10,14 @@ services:
   server:
     name: Astro Dev Server
     commands:
-      start: bun run dev --host=0.0.0.0
+      start: npm run dev:astro -- --host=0.0.0.0
     triggeredBy:
       - postEnvironmentStart
 
   studio:
     name: Drizzle Studio
     commands:
-      start: bun db:studio
+      start: npm run db:studio
     triggeredBy:
       - manual
 
