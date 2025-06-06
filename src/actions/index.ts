@@ -34,8 +34,8 @@
 
 import region from './region'
 import target from './target'
-import assesment from './assesment'
+import assessment from './assessment'
 import user from './user'
 import site from './site'
 
-export const server = { region, target, assesment, user, site }
+export const server = { region, target, assessment, user, site }
