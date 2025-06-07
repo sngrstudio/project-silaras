@@ -10,7 +10,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  "runArgs": ["--env-file", ".devcontainer/.env"],
+  // "runArgs": ["--env-file", ".devcontainer/.env"],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [4321, 4322, 3306, 4983],
   "portsAttributes": {
