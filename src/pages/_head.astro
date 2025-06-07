@@ -59,3 +59,40 @@ const site = {
 
 <title>{title ? `${title} | ${site.title}` : site.title}</title>
 <meta name='description' content={description || site.description} />
+
+{/* Meta tags to prevent robots and crawlers from accessing the site */}
+<meta
+  name='robots'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='googlebot'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='bingbot'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='slurp'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='duckduckbot'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='yandexbot'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta
+  name='baiduspider'
+  content='noindex, nofollow, noarchive, nosnippet, noimageindex'
+/>
+<meta name='facebookexternalhit' content='noindex, nofollow' />
+<meta name='twitterbot' content='noindex, nofollow' />
+<meta name='linkedinbot' content='noindex, nofollow' />
+<meta name='whatsapp' content='noindex, nofollow' />
+<meta name='telegrambot' content='noindex, nofollow' />
+<meta name='discordbot' content='noindex, nofollow' />
+<meta name='applebot' content='noindex, nofollow' />
