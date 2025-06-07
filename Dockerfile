@@ -1,4 +1,4 @@
-FROM node:22.16.0-bookworm AS base-builder
+FROM node:22.16.0-bookworm@sha256:0b5b940c21ab03353de9042f9166c75bcfc53c4cd0508c7fd88576646adbf875 AS base-builder
 WORKDIR /usr/src/app
 
 # By copying only the package.json and package-lock.json here, we ensure that the following `-deps` steps are independent of the source code.
@@ -26,7 +26,7 @@ COPY public/ ./public/
 RUN npm run build
 
 # Runner image - using distroless for security
-FROM gcr.io/distroless/nodejs22-debian12:nonroot AS runtime
+FROM gcr.io/distroless/nodejs22-debian12:nonroot@sha256:581893ba58980f0b4c7444d7a16b89f4e966cd89a89f3e0c6f26c482e312f008 AS runtime
 
 # Set working directory (distroless already has /home/nonroot with correct permissions)
 WORKDIR /home/nonroot/app
