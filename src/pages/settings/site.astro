@@ -1,0 +1,81 @@
+---
+/**
+ * @fileoverview Site Settings Management Page
+ *
+ * Administrative interface for managing core site configuration and global settings
+ * within the SILARAS system. Provides comprehensive control over system-wide
+ * parameters, branding, and operational configurations for authorized administrators.
+ *
+ * Features:
+ * - Global site configuration management
+ * - System branding and identity settings
+ * - Operational parameter configuration
+ * - Admin-only access control (level 4+)
+ * - Dashboard layout integration
+ * - Responsive configuration interface
+ *
+ * Configuration Areas:
+ * - Site identity and branding
+ * - System operational parameters
+ * - Regional configuration defaults
+ * - Notification settings
+ * - Security policy configuration
+ * - Integration settings
+ *
+ * Access Control:
+ * - Requires user authentication
+ * - Minimum access level 4 (admin privileges)
+ * - Redirects unauthorized users to homepage
+ * - Protected system configuration access
+ *
+ * Security Considerations:
+ * - Restricted to high-level administrators
+ * - System-wide impact configuration
+ * - Audit trail for configuration changes
+ * - Validation of critical system parameters
+ *
+ * Navigation:
+ * - Back to settings navigation
+ * - Breadcrumb-style navigation
+ * - Transition animations for smooth UX
+ * - Integrated dashboard controls
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import SiteComponent from '~/components/settings/site/site.astro'
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import BackIcon from '~icons/lucide/arrow-left'
+
+const { user } = Astro.locals
+if (!user) {
+  return Astro.redirect('/user/login')
+}
+
+// Check if user has admin access (accessLevel >= 4)
+if (user.accessLevel < 4) {
+  return Astro.redirect('/')
+}
+
+const props = {
+  title: 'Setelan Situs',
+  description: `Setelan dasar situs.`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  <SiteComponent transition:name='settings-menu' transition:animate='none' />
+
+  <Fragment slot='controls'>
+    <a
+      class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'
+      href='/'
+    >
+      <BackIcon
+        className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
+      />
+      <span>Beranda</span>
+    </a>
+  </Fragment>
+</DLayout>

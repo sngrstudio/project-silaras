@@ -1,0 +1,96 @@
+/**
+ * @fileoverview Global Styles Configuration
+ * 
+ * This file defines the global styling configuration for the SILARAS application,
+ * including Tailwind CSS setup, custom theme configuration, typography, and
+ * design system variables. It establishes the visual foundation for the entire
+ * application.
+ * 
+ * @features
+ * - Tailwind CSS v4 integration with custom theme
+ * - DaisyUI component library configuration
+ * - Custom SILARAS design system with health-focused colors
+ * - Responsive typography with Plus Jakarta Sans font
+ * - Z-index hierarchy for proper layer management
+ * - Consistent spacing, radius, and sizing values
+ * 
+ * @designSystem
+ * - Primary: Health-focused blue for primary actions
+ * - Secondary: Soft purple for secondary elements
+ * - Accent: Warm orange for highlights and alerts
+ * - Success/Warning/Error: Standard semantic colors
+ * - Base colors: Clean whites and grays for backgrounds
+ * 
+ * @typography
+ * - Primary font: Plus Jakarta Sans Variable
+ * - Fallbacks: System fonts for optimal performance
+ * - Emoji support: Apple Color Emoji, Segoe UI Emoji
+ * 
+ * @theme SILARAS Custom Theme
+ * - Light color scheme optimized for health applications
+ * - High contrast ratios for accessibility
+ * - Consistent border radius and spacing values
+ * - Professional appearance suitable for medical contexts
+ * 
+ * @author SNGR Creative
+ * @version 1.0.0
+ * @since 2024
+ */
+
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans Variable',
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@plugin "daisyui" {
+  themes: false;
+}
+
+@plugin "daisyui/theme" {
+  name: 'silaras';
+  default: true;
+  prefersdark: false;
+  color-scheme: 'light';
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(0.5572 0.13007 241.0873);
+  --color-primary-content: oklch(0.9919 0.003956 286.3274);
+  --color-secondary: oklch(0.8942 0.054 248.43);
+  --color-secondary-content: oklch(0.4899 0.0555 244.58);
+  --color-accent: oklch(0.7831 0.1146 85.98);
+  --color-accent-content: oklch(0.4053 0.082974 85.8997);
+  --color-neutral: oklch(0.3108 0.0091 248.12);
+  --color-neutral-content: oklch(0.9576 0.0087 264.52);
+  --color-info: oklch(0.4712 0.110592 241.3877);
+  --color-info-content: oklch(1 0 0);
+  --color-success: oklch(0.5926 0.0771 186.24);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.7831 0.1146 85.98);
+  --color-warning-content: oklch(0.4053 0.082974 85.8997);
+  --color-error: oklch(0.506 0.1927 27.7);
+  --color-error-content: oklch(1 0 0);
+  --radius-selector: 1rem;
+  --radius-field: 1rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
+
+/*
+Z-INDEX HIERARCHY (highest to lowest):
+- z-[9999]: Toast notifications (highest priority)
+- z-[9998]: Dialog overlays and content
+- z-[9997]: Drawer side menu and overlay
+- z-[9996]: Dropdown menus and selects
+- z-[9995]: Dropdown overlays
+- z-50 and below: Regular components, buttons, etc.
+*/

@@ -1,0 +1,91 @@
+---
+/**
+ * @fileoverview Target Management Layout Component
+ *
+ * This Astro component provides the comprehensive layout for target management functionality
+ * within the SILARAS platform. It integrates the target table/list interface with the
+ * target creation/editing dialog and manages client-side data synchronization.
+ *
+ * Key Features:
+ * - Integrated target management interface with CRUD operations
+ * - Target dialog for creation and editing with form validation
+ * - Card-based layout wrapper for consistent styling
+ * - Client-side data synchronization using nanostores
+ * - Real-time target data updates and store management
+ *
+ * Component Integration:
+ * - TargetRC: Main target management table/list interface
+ * - TargetDialogRC: Modal dialog for target creation/editing
+ * - CardTemplateRC: Consistent card styling wrapper
+ *
+ * Data Management:
+ * - Client-side store initialization and synchronization
+ * - Real-time target data updates
+ * - Integration with server-side actions for data persistence
+ *
+ * Hydration Strategy:
+ * - Idle hydration for main component (performance optimization)
+ * - React-only hydration for dialog (modal functionality)
+ *
+ * @module Components/Region/Target
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import TargetRC from './target'
+import CardTemplateRC from '../../common/card/card'
+import TargetDialogRC from './target-dialog'
+---
+
+<CardTemplateRC>
+  <TargetRC client:idle />
+  <TargetDialogRC client:only='react' />
+</CardTemplateRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $targets,
+    setTargets,
+    $currentRegion,
+    setCurrentRegion
+  } from './target.store'
+  import { actions } from 'astro:actions'
+
+  const getRegionSlug = () => window.location.pathname.split('/').at(-1) ?? ''
+
+  onMount($currentRegion, () => {
+    task(async () => {
+      const state = await actions.region.getBySlug.orThrow({
+        slug: getRegionSlug()
+      })
+      setCurrentRegion(state!)
+    })
+    return () => {
+      setCurrentRegion(undefined)
+    }
+  })
+
+  onMount($targets, () => {
+    task(async () => {
+      const state = await actions.target.getAll.orThrow({
+        regionSlug: getRegionSlug()
+      })
+      setTargets(state)
+    })
+    return () => {
+      setTargets(undefined)
+    }
+  })
+
+  document.addEventListener('astro:page-load', async () => {
+    const currentRegionState = await actions.region.getBySlug.orThrow({
+      slug: getRegionSlug()
+    })
+    setCurrentRegion(currentRegionState!)
+
+    const targetsState = await actions.target.getAll.orThrow({
+      regionSlug: getRegionSlug()
+    })
+    setTargets(targetsState)
+  })
+</script>

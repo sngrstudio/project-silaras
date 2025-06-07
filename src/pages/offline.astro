@@ -1,0 +1,149 @@
+---
+/**
+ * @fileoverview Offline Error Page
+ *
+ * Custom offline page displayed when the application cannot connect to the internet
+ * or when users are experiencing network connectivity issues. Provides helpful
+ * guidance for restoring connection and accessing cached content.
+ *
+ * Features:
+ * - Network connectivity status indication
+ * - Informational styling (not critical error)
+ * - Connection troubleshooting guidance
+ * - Retry connection functionality
+ * - Offline mode explanation and limitations
+ * - Progressive Web App (PWA) support
+ *
+ * Offline Functionality:
+ * - Cached content availability information
+ * - Network connectivity detection
+ * - Retry connection attempts
+ * - Graceful degradation for offline users
+ *
+ * Recovery Actions:
+ * - Check connection button with network test
+ * - Refresh page to retry connection
+ * - Return to cached homepage
+ * - Connection troubleshooting tips
+ *
+ * User Guidance:
+ * - Clear explanation of connectivity requirements
+ * - Network troubleshooting suggestions
+ * - Information about offline limitations
+ * - Professional, non-alarming messaging
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import ErrorLayout, { type Props as ErrorLayoutProps } from './_error.astro'
+import HomeIcon from '~icons/lucide/home'
+import RefreshCwIcon from '~icons/lucide/refresh-cw'
+import WifiOffIcon from '~icons/lucide/wifi-off'
+import SignalIcon from '~icons/lucide/signal'
+
+const props = {
+  title: 'Tidak Ada Koneksi Internet',
+  description:
+    'Aplikasi tidak dapat terhubung ke internet. Periksa koneksi jaringan Anda.',
+  errorCode: 'OFFLINE',
+  errorTitle: 'Tidak Ada Koneksi',
+  errorMessage:
+    'Aplikasi memerlukan koneksi internet untuk berfungsi dengan baik. Pastikan perangkat Anda terhubung ke jaringan dan coba lagi.',
+  errorColor: 'info'
+} satisfies ErrorLayoutProps
+---
+
+<ErrorLayout {...props}>
+  {/* Action buttons */}
+  <Fragment slot='actions'>
+    <div class='flex flex-col justify-center gap-3 sm:flex-row'>
+      {/* Refresh button (left) */}
+      <button
+        onclick='window.location.reload()'
+        class='group border-info/30 from-info/10 to-info/5 text-info hover:border-info/50 hover:from-info/20 hover:to-info/10 hover:shadow-info/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
+      >
+        <RefreshCwIcon
+          className='h-4 w-4 transition-transform duration-200 group-hover:rotate-180'
+        />
+        <span>Coba Lagi</span>
+      </button>
+
+      {/* Home button (right) */}
+      <a
+        href='/'
+        class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center justify-center gap-2 rounded-xl border bg-gradient-to-r px-6 py-3 text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg'
+      >
+        <HomeIcon
+          className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
+        />
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+  </Fragment>
+
+  {/* Additional help */}
+  <Fragment slot='additional'>
+    <div>
+      <div class='space-y-4'>
+        {/* Connection troubleshooting */}
+        <div class='card bg-info/5 border-info/20 border'>
+          <div class='card-body p-6'>
+            <div class='flex items-start gap-3'>
+              <div
+                class='bg-info/10 border-info/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
+              >
+                <WifiOffIcon className='text-info h-5 w-5' />
+              </div>
+              <div class='text-left'>
+                <h3 class='text-base-content mb-2 font-semibold'>
+                  Periksa Koneksi Internet
+                </h3>
+                <ul
+                  class='text-base-content/70 space-y-1 text-sm leading-relaxed'
+                >
+                  <li>• Pastikan WiFi atau data seluler aktif</li>
+                  <li>• Periksa kabel jaringan jika menggunakan ethernet</li>
+                  <li>• Restart router atau modem jika diperlukan</li>
+                  <li>• Coba akses website lain untuk mengetes koneksi</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Network status */}
+        <div
+          class='card bg-base-200/30 border-base-300/30 border backdrop-blur-sm'
+        >
+          <div class='card-body p-6'>
+            <div class='flex items-start gap-3'>
+              <div
+                class='bg-warning/10 border-warning/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border'
+              >
+                <SignalIcon className='text-warning h-5 w-5' />
+              </div>
+              <div class='text-left'>
+                <h3 class='text-base-content mb-2 font-semibold'>
+                  Status Jaringan
+                </h3>
+                <p class='text-base-content/70 mb-3 text-sm leading-relaxed'>
+                  Beberapa fitur mungkin tidak tersedia saat offline. Koneksi
+                  akan dipulihkan secara otomatis ketika jaringan kembali
+                  tersedia.
+                </p>
+                <div class='flex items-center gap-2'>
+                  <div class='bg-warning h-2 w-2 animate-pulse rounded-full'>
+                  </div>
+                  <span class='text-base-content/60 text-xs'>
+                    Mencoba menghubungkan kembali...
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+</ErrorLayout>

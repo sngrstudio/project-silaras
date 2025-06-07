@@ -1,0 +1,56 @@
+---
+/**
+ * @fileoverview User Registration Page
+ *
+ * Provides secure user registration functionality with comprehensive form validation
+ * and account creation workflow. Features responsive design and accessibility compliance.
+ * Handles new user onboarding with proper security measures and data validation.
+ *
+ * Features:
+ * - Secure user registration form with validation
+ * - Email and password strength requirements
+ * - Account creation with proper error handling
+ * - Redirect to dashboard after successful registration
+ * - Authentication state management
+ * - First-time user onboarding support
+ * - Responsive design for all device sizes
+ *
+ * Security:
+ * - Input sanitization and validation
+ * - Password strength enforcement
+ * - CSRF protection through Astro's built-in security
+ * - Secure session establishment
+ * - SQL injection prevention
+ *
+ * Validation:
+ * - Email format validation
+ * - Password complexity requirements
+ * - Username availability checking
+ * - Form field validation feedback
+ * - Server-side validation enforcement
+ *
+ * Navigation:
+ * - Redirect to login page for existing users
+ * - Success redirect to dashboard
+ * - Error handling with user feedback
+ * - First-time user flow support via query parameter
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+import Layout from './_layout.astro'
+import SignupComponent from '~/components/user/signup/signup.astro'
+
+// Check if user is already authenticated and redirect to dashboard
+const { user } = Astro.locals
+if (user) {
+  return Astro.redirect('/')
+}
+
+// Check for first-time user parameter to customize onboarding experience
+const first = Astro.url.searchParams.get('first')
+---
+
+<Layout>
+  <SignupComponent first={!!first} />
+</Layout>

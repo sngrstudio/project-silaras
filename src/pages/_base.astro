@@ -1,0 +1,60 @@
+---
+/**
+ * @fileoverview Base HTML Document Template
+ *
+ * The foundational HTML document structure for the entire application.
+ * Provides the basic HTML5 document skeleton with proper meta tags,
+ * language settings, and slot-based content injection.
+ *
+ * Features:
+ * - HTML5 document structure
+ * - Indonesian language setting
+ * - Responsive viewport configuration
+ * - Astro transitions disabled for performance
+ * - Flexible head and body content slots
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import type { HTMLAttributes } from 'astro/types'
+
+/**
+ * Props interface for the base layout component
+ * Extends standard HTML body attributes while excluding title
+ *
+ * Usage Pattern:
+ * ```astro
+ * ---
+ * import BaseLayout from './_base.astro'
+ * ---
+ * <BaseLayout>
+ *   <Fragment slot="head">
+ *     <title>Page Title</title>
+ *     <meta name="description" content="Page description" />
+ *   </Fragment>
+ *
+ *   <main>Page content</main>
+ * </BaseLayout>
+ * ```
+ *
+ * @interface Props
+ */
+export interface Props extends Omit<HTMLAttributes<'body'>, 'title'> {}
+const props = Astro.props
+---
+
+<html lang='id' transition:animate='none'>
+  <head>
+    {/* Essential meta tags for responsive web design */}
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+
+    {/* Slot for page-specific head content (title, meta, styles, scripts) */}
+    <slot name='head' />
+  </head>
+  <body {...props}>
+    {/* Main content slot for page body */}
+    <slot />
+  </body>
+</html>

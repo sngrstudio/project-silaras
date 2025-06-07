@@ -1,0 +1,53 @@
+services:
+  db:
+    name: Database (MariaDB & PHPMyAdmin)
+    commands:
+      start: docker compose up phpmyadmin
+      stop: docker compose stop phpmyadmin
+    triggeredBy:
+      - postEnvironmentStart
+
+  server:
+    name: Astro Dev Server
+    commands:
+      start: npm run dev:astro -- --host=0.0.0.0
+    triggeredBy:
+      - postEnvironmentStart
+
+  studio:
+    name: Drizzle Studio
+    commands:
+      start: npm run db:studio
+    triggeredBy:
+      - manual
+
+tasks:
+  db-reset:
+    name: Reset DB
+    command: docker compose down phpmyadmin db --volumes
+    triggeredBy:
+      - manual
+
+  db-generate:
+    name: Generate DB migrations
+    command: bun db:generate
+    triggeredBy:
+      - manual
+
+  db-migrate:
+    name: Run DB migration
+    command: bun db:migrate
+    triggeredBy:
+      - manual
+
+  db-seed:
+    name: Run DB Seed
+    command: bun db:seed
+    triggeredBy:
+      - manual
+
+  format:
+    name: Run Formatter
+    command: bun format
+    triggeredBy:
+      - manual

@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "command": "npm run dev -- --host=0.0.0.0",
+      "name": "Development server",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "bun run db:studio",
+      "name": "Drizzle Studio",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ]
+}

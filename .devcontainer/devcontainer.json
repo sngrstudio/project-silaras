@@ -1,0 +1,81 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+  "name": "Project Silaras Devcontainer",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "runArgs": ["--env-file", ".devcontainer/.env"],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [4321, 4322, 3306, 4983],
+  "portsAttributes": {
+    "4321": {
+      "label": "Astro's Dev Server",
+      "onAutoForward": "notify"
+    },
+    "4322": {
+      "label": "phpMyAdmin",
+      "onAutoForward": "notify"
+    },
+    "3306": {
+      "label": "MySQL Database",
+      "onAutoForward": "silent"
+    },
+    "4983": {
+      "label": "Drizzle Studio",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "astro-build.astro-vscode",
+        "esbenp.prettier-vscode",
+        "GitHub.vscode-github-actions",
+        "bradlc.vscode-tailwindcss",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-mysql"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "files.associations": {
+          "*.css": "tailwindcss"
+        },
+        "editor.quickSuggestions": {
+          "strings": "on"
+        },
+        "tailwindCSS.experimental.classRegex": [
+          ["clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+        ],
+        "sqltools.connections": [
+          {
+            "mysqlOptions": {
+              "authProtocol": "default",
+              "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "MariaDB",
+            "name": "test",
+            "group": "test",
+            "connectString": "mysql://test:test@localhost:3306/test"
+          }
+        ]
+      }
+    }
+  },
+
+  // "containerEnv": {
+  //   "DATABASE_URL": "mysql://test:test@localhost:3306/test"
+  // },
+
+  "postCreateCommand": "npm ci && npx astro sync"
+}

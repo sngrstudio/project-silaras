@@ -1,0 +1,64 @@
+---
+/**
+ * @fileoverview Application Root Landing Page
+ *
+ * Main entry point for the SILARAS application that handles user routing based on
+ * authentication status and regional assignments. Implements intelligent redirection
+ * logic to guide users to their appropriate dashboard or login page.
+ *
+ * Features:
+ * - Authentication-based routing logic
+ * - Regional assignment detection
+ * - Automatic dashboard redirection
+ * - Fallback routing for admin users
+ * - Seamless user experience flow
+ *
+ * Routing Logic:
+ * 1. Check user authentication status
+ * 2. Redirect unauthenticated users to login page
+ * 3. For authenticated users, check regional assignment
+ * 4. Redirect to user's assigned region dashboard
+ * 5. Fallback to default region for admins without assignment
+ *
+ * Authentication Flow:
+ * - Unauthenticated: → /user/login
+ * - Authenticated with region: → /region/{user-region-slug}
+ * - Authenticated without region: → /region/kotawaringin-timur-6202 (default)
+ *
+ * Regional Access Control:
+ * - Users automatically routed to their assigned region
+ * - Regional health officers see their district data
+ * - Admins default to main regional overview
+ * - Proper access control enforcement
+ *
+ * Performance:
+ * - Server-side redirection (no client-side loading)
+ * - Single database query for region lookup
+ * - Efficient routing with minimal overhead
+ * - Fast user experience with direct navigation
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import { actions } from 'astro:actions'
+
+const { user } = Astro.locals
+if (!user) {
+  return Astro.redirect('/user/login')
+}
+
+// Redirect user to their assigned region if they have one
+if (user.regionId) {
+  const userRegion = await Astro.callAction(actions.region.getById.orThrow, {
+    id: user.regionId
+  })
+
+  if (userRegion) {
+    return Astro.redirect(`/region/${userRegion.slug}`)
+  }
+}
+
+// Default redirect for admins without region assignment
+return Astro.redirect('/region/kotawaringin-timur-6202')
+---

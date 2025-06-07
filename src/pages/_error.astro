@@ -1,0 +1,156 @@
+---
+/**
+ * @fileoverview Error Layout Template
+ *
+ * Provides a comprehensive error page layout with consistent styling and navigation
+ * for displaying various error states throughout the application. Features responsive
+ * design with proper error handling and user-friendly messaging.
+ *
+ * Features:
+ * - Configurable error codes and messages
+ * - Consistent error styling with color-coded severity
+ * - Navigation integration for error recovery
+ * - Responsive design for all device sizes
+ * - Accessibility-compliant error presentation
+ * - Toast notification support for error details
+ * - Drawer navigation for site-wide navigation
+ *
+ * Error Types Supported:
+ * - 404 Not Found errors
+ * - 500 Server errors
+ * - Authentication errors
+ * - Permission denied errors
+ * - Custom application errors
+ *
+ * Layout Components:
+ * - Navigation header with site branding
+ * - Main error content area
+ * - Drawer navigation for mobile
+ * - Toast notifications for additional feedback
+ * - Footer with support links
+ *
+ * Styling:
+ * - Error color coding (error, warning, info)
+ * - Responsive typography and spacing
+ * - Consistent with application design system
+ * - Proper contrast ratios for accessibility
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+import Layout, { type Props as LayoutProps } from './_layout.astro'
+import Navigation from '~/components/layout/navigation/navigation.astro'
+import Drawer from '~/components/layout/drawer/drawer.astro'
+import Toast from '~/components/common/toast/toast.astro'
+
+/**
+ * Props interface for the Error Layout component
+ * Extends base layout props with error-specific properties
+ */
+export interface Props extends LayoutProps {
+  /** HTTP error code or custom error identifier */
+  errorCode: string
+  /** User-friendly error title */
+  errorTitle: string
+  /** Detailed error message for user */
+  errorMessage: string
+  /** Color theme for error display */
+  errorColor?: 'error' | 'warning' | 'info'
+  /** Whether to show technical error details */
+  showErrorDetails?: boolean
+  /** Additional contextual information */
+  additionalInfo?: string
+}
+
+const {
+  class: className,
+  errorCode,
+  errorTitle,
+  errorMessage,
+  errorColor = 'error',
+  showErrorDetails = false,
+  additionalInfo,
+  ...props
+} = Astro.props
+---
+
+<Layout class:list={['', className]} {...props}>
+  <Toast>
+    {/* <body /> */}
+    <Navigation />
+    <Drawer>
+      {/* Error Content */}
+      <div class='flex min-h-[60vh] items-center justify-center'>
+        <div class='mx-auto max-w-md text-center'>
+          {/* Error Card */}
+          <div
+            class='card bg-base-100 border-base-300/50 group relative overflow-hidden border shadow-xl transition-all duration-300 hover:shadow-2xl'
+          >
+            {/* Gradient overlay */}
+            <div
+              class={`from-${errorColor}/5 to-${errorColor}/10 pointer-events-none absolute inset-0 bg-gradient-to-br via-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-100`}
+            >
+            </div>
+
+            {/* Error number - larger and cleaner */}
+            <div class='relative z-10 p-8 pb-4'>
+              <div class='relative mx-auto mb-8'>
+                {/* Error code - much larger without background circles */}
+                <span
+                  class={`block text-9xl font-black text-${errorColor} leading-none`}
+                >
+                  {errorCode}
+                </span>
+              </div>
+
+              {/* Error message */}
+              <h2 class='text-base-content mb-3 text-2xl font-bold'>
+                {errorTitle}
+              </h2>
+              <p class='text-base-content/70 mb-6 text-sm leading-relaxed'>
+                {errorMessage}
+              </p>
+            </div>
+
+            {/* Action buttons slot */}
+            <div class='border-base-300/50 relative z-10 border-t p-6'>
+              <slot name='actions' />
+            </div>
+          </div>
+
+          {/* Additional content slot */}
+          <div class='mt-8'>
+            <slot name='additional' />
+          </div>
+
+          {/* Error details for development/debugging */}
+          {
+            showErrorDetails && additionalInfo && (
+              <div class='mt-4'>
+                <div class='card bg-base-200/30 border-base-300/30 border backdrop-blur-sm'>
+                  <div class='card-body p-6'>
+                    <div class='text-left'>
+                      <h3 class='text-base-content mb-2 font-semibold'>
+                        Error Details
+                      </h3>
+                      <div class='bg-base-100/50 rounded-lg p-3'>
+                        <code class='text-base-content/80 text-xs whitespace-pre-wrap'>
+                          {additionalInfo}
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </Drawer>
+  </Toast>
+
+  {/* Head slot for page-specific head content */}
+  <Fragment slot='head'>
+    <slot name='head' />
+  </Fragment>
+</Layout>

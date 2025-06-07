@@ -1,0 +1,130 @@
+---
+/**
+ * Target Assessment Page - /target/[slug]
+ *
+ * This page displays detailed assessment information for a specific target (individual).
+ * It shows both daily nutritional assessments and monthly anthropometric data.
+ *
+ * Features:
+ * - Daily assessment tracking with 5 nutritional components
+ * - Monthly weight/height measurements and BMI calculations
+ * - Progress indicators and classification status
+ * - Photo documentation of meals
+ * - Assessment form for data entry/editing
+ *
+ * Access Control:
+ * - Admin (level 4): Can view all targets
+ * - Coordinator (level 3): Can view targets in their assigned kecamatan
+ * - Editor (level 2): Can view targets in their assigned village
+ * - Viewer (level 1): Currently restricted
+ *
+ * @param slug - The target slug from URL parameters
+ */
+
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import Assesment from '~/components/assesments/assesment.astro'
+import { actions } from 'astro:actions'
+import BackIcon from '~icons/lucide/arrow-left'
+
+const { user } = Astro.locals
+if (!user) {
+  return Astro.redirect('/user/login')
+}
+
+const { slug } = Astro.params
+if (!slug) {
+  return Astro.redirect('/')
+}
+
+const target = await Astro.callAction(actions.target.getBySlug.orThrow, {
+  slug
+})
+if (!target) {
+  return Astro.redirect('/404')
+}
+
+const region = await Astro.callAction(actions.region.getById.orThrow, {
+  id: target.regionId
+})
+
+const hasAccess = await (async () => {
+  // Admin (level 4) has access to everything
+  if (user.accessLevel >= 4) {
+    return true
+  }
+
+  // Viewers (level 1) are restricted for now
+  if (user.accessLevel === 1) {
+    return false
+  }
+
+  // If user has no region assignment, deny access
+  if (!user.regionId) {
+    return false
+  }
+
+  // Get user's assigned region
+  const userRegion = await Astro.callAction(actions.region.getById.orThrow, {
+    id: user.regionId
+  })
+
+  if (!userRegion) {
+    return false
+  }
+
+  if (!region) {
+    return false
+  }
+
+  // Coordinators (level 3) can access targets in desa under their kecamatan
+  if (user.accessLevel === 3) {
+    // Check if the target's desa is under the user's kecamatan
+    if (region.parentId === userRegion.id) {
+      return true
+    }
+
+    return false
+  }
+
+  // Editors (level 2) can only access targets in their assigned desa
+  if (user.accessLevel === 2) {
+    // User can only access targets in their own desa
+    if (region.id === userRegion.id && region.type === 'DESA') {
+      return true
+    }
+
+    return false
+  }
+
+  return false
+})()
+
+// Redirect if user doesn't have access
+if (!hasAccess) {
+  return Astro.redirect('/')
+}
+
+const props = {
+  title: target.name,
+  description: `Halaman sasaran untuk ${target.name}`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  <Assesment transition:name={target.slug} transition:animate='none' />
+
+  {/* Navigation controls - back button to parent region */}
+  <Fragment slot='controls'>
+    {
+      region && (
+        <a
+          class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'
+          href={`/region/${region.slug}`}
+        >
+          <BackIcon className='h-4 w-4 transition-transform duration-200 group-hover:scale-110' />
+          <span>{region.name}</span>
+        </a>
+      )
+    }
+  </Fragment>
+</DLayout>

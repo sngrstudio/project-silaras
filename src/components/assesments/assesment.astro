@@ -1,0 +1,112 @@
+---
+/**
+ * @fileoverview Assessment Layout Component
+ *
+ * This Astro component provides the main layout structure for the assessment management page
+ * within the SILARAS platform. It orchestrates the assessment statistics and management
+ * components in a responsive layout design.
+ *
+ * Key Features:
+ * - Responsive layout with statistics and management sections
+ * - Integration of assessment statistics component
+ * - Assessment management table/list component
+ * - Card-based layout for clean presentation
+ * - Client-side hydration for interactive components
+ *
+ * Layout Structure:
+ * - Statistics section displayed prominently at top (mobile) or right (desktop)
+ * - Main assessment management section in card container
+ * - Responsive flex layout that adapts to screen size
+ *
+ * Component Integration:
+ * - AssesmentStatRC: Monthly statistics and progress tracking
+ * - AssesmentRC: Main assessment management interface
+ * - CardTemplateRC: Consistent card styling wrapper
+ *
+ * @module Components/Assessments
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import AssesmentRC from './assesment'
+import AssesmentStatRC from './assesment-stat'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<section class='mb-4 flex md:flex-row-reverse'>
+  <AssesmentStatRC client:load />
+</section>
+<section>
+  <CardTemplateRC>
+    <AssesmentRC client:load />
+  </CardTemplateRC>
+</section>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $dailyAssesments,
+    setDailyAssesments,
+    $monthlyAssesments,
+    setMonthlyAssesment,
+    $currentMonthIndex,
+    setCurrentMonthIndex
+  } from './assesment.store'
+  import { actions } from 'astro:actions'
+
+  const getTargetSlug = () => window.location.pathname.split('/').at(-1) || ''
+
+  onMount($currentMonthIndex, () => {
+    const state = Math.min(10, Math.max(6, new Date().getMonth() + 1))
+    setCurrentMonthIndex(state)
+
+    return () => {
+      setCurrentMonthIndex(0)
+    }
+  })
+
+  onMount($dailyAssesments, () => {
+    task(async () => {
+      const state = await actions.assesment.daily.getAll.orThrow({
+        targetSlug: getTargetSlug(),
+        monthIndex: $currentMonthIndex.get()
+      })
+      setDailyAssesments(state)
+    })
+
+    return () => {
+      setDailyAssesments([])
+    }
+  })
+
+  onMount($monthlyAssesments, () => {
+    task(async () => {
+      const state = await actions.assesment.monthly.get.orThrow({
+        targetSlug: getTargetSlug(),
+        monthIndex: $currentMonthIndex.get()
+      })
+      setMonthlyAssesment(state)
+    })
+
+    return () => {
+      setMonthlyAssesment(undefined)
+    }
+  })
+
+  // Refetch on page navigation
+  document.addEventListener('astro:page-load', async () => {
+    const newDailyAssesmentState = await actions.assesment.daily.getAll.orThrow(
+      {
+        targetSlug: getTargetSlug(),
+        monthIndex: $currentMonthIndex.get()
+      }
+    )
+    setDailyAssesments(newDailyAssesmentState)
+
+    const newMonthlyAssesmentState =
+      await actions.assesment.monthly.get.orThrow({
+        targetSlug: getTargetSlug(),
+        monthIndex: $currentMonthIndex.get()
+      })
+    setMonthlyAssesment(newMonthlyAssesmentState)
+  })
+</script>

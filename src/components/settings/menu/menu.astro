@@ -1,0 +1,80 @@
+---
+/**
+ * @fileoverview Menu Settings Layout Component
+ *
+ * This Astro component provides the layout structure for menu settings management
+ * within the SILARAS platform. It integrates the menu management interface with
+ * client-side data synchronization and state management for assessment menu configuration.
+ *
+ * Key Features:
+ * - Menu settings management interface
+ * - Client-side data synchronization using nanostores
+ * - Month-based menu configuration and navigation
+ * - Real-time settings updates and store management
+ * - Integration with daily assessment menu system
+ *
+ * Component Integration:
+ * - MenuRC: Main menu management and configuration interface
+ *
+ * Data Management:
+ * - Client-side store initialization for menu settings
+ * - Month index tracking for menu navigation
+ * - Daily assessment settings synchronization
+ * - Real-time updates with server-side menu configuration
+ *
+ * Store Management:
+ * - Current month index for menu planning context
+ * - Daily assessment settings for menu configuration
+ * - Integration with assessment system for menu requirements
+ *
+ * @module Components/Settings/Menu
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import MenuRC from './menu'
+---
+
+<section>
+  <MenuRC client:load />
+</section>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $currentMonthIndex,
+    setCurrentMonthIndex,
+    $dailyAssesmentsSettings,
+    setDailyAssesmentsSettings
+  } from './menu.store'
+  import { actions } from 'astro:actions'
+
+  onMount($currentMonthIndex, () => {
+    const state = Math.min(10, Math.max(6, new Date().getMonth() + 1))
+    setCurrentMonthIndex(state)
+
+    return () => {
+      setCurrentMonthIndex(0)
+    }
+  })
+
+  onMount($dailyAssesmentsSettings, () => {
+    task(async () => {
+      const state = await actions.assesment.settings.getAllDaily.orThrow({
+        monthIndex: $currentMonthIndex.get()
+      })
+      setDailyAssesmentsSettings(state)
+    })
+
+    return () => {
+      setDailyAssesmentsSettings([])
+    }
+  })
+
+  // Refetch on page navigation
+  document.addEventListener('astro:page-load', async () => {
+    const newState = await actions.assesment.settings.getAllDaily.orThrow({
+      monthIndex: $currentMonthIndex.get()
+    })
+    setDailyAssesmentsSettings(newState)
+  })
+</script>

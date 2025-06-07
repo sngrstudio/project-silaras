@@ -1,0 +1,64 @@
+---
+/**
+ * @fileoverview User Layout for Authentication Pages
+ *
+ * Specialized layout component for user authentication pages (login, signup, profile).
+ * Provides a centered card layout with hero styling optimized for authentication forms
+ * and user-focused interactions.
+ *
+ * Features:
+ * - Hero-style full-screen layout
+ * - Centered card design for form content
+ * - Responsive flex layout (mobile vertical, desktop horizontal)
+ * - Toast notification integration
+ * - Consistent authentication page styling
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import MainLayout, { type Props as MainLayoutProps } from '../_layout.astro'
+import Toast from '~/components/common/toast/toast.astro'
+
+/**
+ * Props interface extending main layout properties
+ *
+ * @interface Props
+ *
+ * Usage Examples:
+ * Login page:
+ * <Layout title="Login">
+ *   <LoginForm />
+ * </Layout>
+ *
+ * Signup page:
+ * <Layout title="Create Account">
+ *   <SignupForm />
+ * </Layout>
+ */
+export interface Props extends MainLayoutProps {}
+const { class: className, ...props } = Astro.props
+---
+
+<MainLayout class:list={['', className]} {...props}>
+  {/* Toast notification system for user feedback */}
+  <Toast>
+    {/* Main content area with hero styling */}
+    <main class='hero bg-base-200 min-h-screen'>
+      <div class='hero-content flex-col lg:flex-row-reverse'>
+        {/* Card container for authentication forms */}
+        <div class='card bg-base-100 w-full max-w-sm shrink-0 shadow'>
+          <div class='card-body'>
+            {/* Slot for authentication form content */}
+            <slot />
+          </div>
+        </div>
+      </div>
+    </main>
+  </Toast>
+
+  {/* Head slot for page-specific meta tags and styles */}
+  <Fragment slot='head'>
+    <slot name='head' />
+  </Fragment>
+</MainLayout>

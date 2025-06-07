@@ -1,0 +1,60 @@
+---
+/**
+ * @fileoverview Subregion Layout Component
+ *
+ * This Astro component provides the layout wrapper for the subregion management interface
+ * within the SILARAS platform. It serves as a bridge between server-side region data
+ * and the client-side React component for interactive subregion management.
+ *
+ * Key Features:
+ * - Server-side region data integration
+ * - Card-based layout wrapper for consistent styling
+ * - Client-side hydration with idle strategy for performance
+ * - Type-safe props interface for region data
+ * - Clean separation between layout and functionality
+ *
+ * Data Flow:
+ * - Receives region data from parent Astro pages
+ * - Passes data to React component for interactive features
+ * - Uses idle hydration for optimal performance
+ *
+ * Props:
+ * - regionsData: Optional regions data for initialization
+ *
+ * @module Components/Region/Subregion
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import RegionRC from './region'
+import CardTemplateRC from '~/components/common/card/card'
+import type { Regions } from './region.store'
+
+interface Props {
+  regionsData?: Regions
+}
+
+const { regionsData } = Astro.props
+---
+
+<CardTemplateRC>
+  <RegionRC client:idle regionsData={regionsData} />
+</CardTemplateRC>
+
+<script>
+  import { setRegions } from './region.store'
+  import { actions } from 'astro:actions'
+
+  // Handle view transitions - reload data when navigating between regions
+  document.addEventListener('astro:page-load', async () => {
+    const newParentSlug = window.location.pathname.split('/').at(-1) ?? ''
+    try {
+      const state = await actions.region.getAllWithCounts.orThrow({
+        parentSlug: newParentSlug
+      })
+      setRegions(state)
+    } catch (error) {
+      console.error('Failed to load regions data on page transition:', error)
+      setRegions(undefined)
+    }
+  })
+</script>

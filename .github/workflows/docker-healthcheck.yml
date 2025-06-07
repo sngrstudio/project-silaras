@@ -1,0 +1,132 @@
+name: Docker Build and Health Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker-build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build -t app:test . 2>&1 | tee build.log
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "::error title=Docker Build Failed::Failed to build Docker image. Check build logs for details."
+            echo "::group::Build Logs"
+            cat build.log
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "✅ Docker image built successfully"
+
+      - name: Start container
+        run: |
+          echo "Starting container..."
+          docker run -d --name test-app -p 4321:4321 app:test
+          if [ $? -ne 0 ]; then
+            echo "::error title=Container Start Failed::Failed to start Docker container"
+            echo "::group::Docker Images"
+            docker images
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "✅ Container started"
+
+      - name: Wait for container to be ready
+        run: |
+          echo "Waiting for container to be ready..."
+          # Wait up to 60 seconds for the container to be ready
+          timeout=60
+          counter=0
+          while [ $counter -lt $timeout ]; do
+            if docker ps | grep -q test-app; then
+              echo "Container is running, checking health..."
+              if curl -f http://localhost:4321/healthcheck > /dev/null 2>&1; then
+                echo "✅ Health check passed!"
+                break
+              fi
+            fi
+            echo "Waiting... ($counter/$timeout seconds)"
+            sleep 2
+            counter=$((counter + 2))
+          done
+
+          if [ $counter -ge $timeout ]; then
+            echo "::error title=Container Health Check Timeout::Container failed to become ready within $timeout seconds"
+            echo "::group::Container Logs"
+            docker logs test-app || echo "Failed to get container logs"
+            echo "::endgroup::"
+            echo "::group::Container Status"
+            docker ps -a
+            echo "::endgroup::"
+            exit 1
+          fi
+
+      - name: Run health check
+        run: |
+          echo "Running detailed health check..."
+          response=$(curl -s -w "%{http_code}" http://localhost:4321/healthcheck)
+          http_code=$(echo "$response" | tail -c 4)
+          body=$(echo "$response" | head -c -4)
+
+          echo "HTTP Status Code: $http_code"
+          echo "Response Body: '$body'"
+
+          if [ "$http_code" = "200" ] && [ "$body" = "OK" ]; then
+            echo "✅ Health check passed successfully!"
+            echo "- Status: 200 ✓"
+            echo "- Body: 'OK' ✓"
+          else
+            echo "::error title=Health Check Failed::Expected Status 200 with body OK, got Status $http_code with body $body"
+            echo "::group::Detailed Health Check Info"
+            echo "HTTP Status Code: $http_code"
+            echo "Response Body: $body"
+            echo "Expected: Status 200 with body OK"
+            echo "Actual: Status $http_code with body $body"
+            echo "::endgroup::"
+            echo "::group::Container Status"
+            docker ps -a
+            echo "::endgroup::"
+            echo "::group::Container Logs"
+            docker logs test-app
+            echo "::endgroup::"
+            exit 1
+          fi
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          echo "::group::Container Logs"
+          docker logs test-app || echo "Failed to get container logs"
+          echo "::endgroup::"
+          echo "::group::Container Status"
+          docker ps -a
+          echo "::endgroup::"
+          echo "::group::Docker Images"
+          docker images
+          echo "::endgroup::"
+          echo "::group::System Info"
+          docker system df
+          echo "::endgroup::"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "Cleaning up..."
+          docker stop test-app || true
+          docker rm test-app || true
+          docker rmi app:test || true
+          echo "✅ Cleanup completed"

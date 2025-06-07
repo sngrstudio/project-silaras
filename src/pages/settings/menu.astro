@@ -1,0 +1,73 @@
+---
+/**
+ * @fileoverview Menu Settings Management Page
+ *
+ * Administrative interface for managing daily menu configurations and meal planning
+ * within the SILARAS system. Restricted to admin users with elevated access levels
+ * for configuring institutional meal programs and nutritional guidelines.
+ *
+ * Features:
+ * - Daily menu configuration interface
+ * - Meal planning and scheduling tools
+ * - Nutritional content management
+ * - Admin-only access control (level 4+)
+ * - Dashboard layout integration
+ * - Responsive menu management UI
+ *
+ * Access Control:
+ * - Requires user authentication
+ * - Minimum access level 4 (admin privileges)
+ * - Redirects unauthorized users to homepage
+ * - Protected administrative functionality
+ *
+ * Menu Management:
+ * - Daily meal configuration
+ * - Nutritional content specification
+ * - Menu scheduling and planning
+ * - Institutional food program setup
+ *
+ * Navigation:
+ * - Back to settings navigation
+ * - Breadcrumb-style navigation
+ * - Transition animations for smooth UX
+ * - Integrated dashboard controls
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import MenuComponent from '~/components/settings/menu/menu.astro'
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import BackIcon from '~icons/lucide/arrow-left'
+
+const { user } = Astro.locals
+if (!user) {
+  return Astro.redirect('/user/login')
+}
+
+// Check if user has admin access (accessLevel >= 4)
+if (user.accessLevel < 4) {
+  return Astro.redirect('/')
+}
+
+const props = {
+  title: 'Menu',
+  description: `Setelan menu harian.`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  <MenuComponent transition:name='settings-menu' transition:animate='none' />
+
+  <Fragment slot='controls'>
+    <a
+      class='group border-primary/30 from-primary/10 to-primary/5 text-primary hover:border-primary/50 hover:from-primary/20 hover:to-primary/10 hover:shadow-primary/20 inline-flex items-center gap-2 rounded-xl border bg-gradient-to-r px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md md:px-3 md:py-1.5 md:text-xs'
+      href='/'
+    >
+      <BackIcon
+        className='h-4 w-4 transition-transform duration-200 group-hover:scale-110'
+      />
+      <span>Beranda</span>
+    </a>
+  </Fragment>
+</DLayout>

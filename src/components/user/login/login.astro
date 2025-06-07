@@ -1,0 +1,37 @@
+---
+/**
+ * @fileoverview User Login Layout Component
+ *
+ * This Astro component provides a clean layout wrapper for the user authentication functionality
+ * within the SILARAS platform. It serves as a bridge between server-side routing and the
+ * client-side React login form component.
+ *
+ * Key Features:
+ * - Server-side props handling for login context
+ * - Client-side hydration for interactive form functionality
+ * - Support for pre-filled username from URL parameters or previous sessions
+ * - Clean separation between layout and form logic
+ *
+ * Props:
+ * - userName: Optional string for pre-filling the username field
+ *   (useful for password reset flows or remember me functionality)
+ *
+ * Integration:
+ * - Passes props to React component for form behavior
+ * - Uses client:load hydration for immediate interactivity
+ * - Integrates with authentication system and session management
+ *
+ * @module Components/User/Login
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import LoginFormRC from './login'
+
+interface Props {
+  userName?: string | undefined
+}
+
+const { userName } = Astro.props
+---
+
+<LoginFormRC userName={userName} client:load />

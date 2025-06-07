@@ -1,0 +1,169 @@
+---
+/**
+ * Dynamic Region Page - /region/[slug]
+ *
+ * This page handles the display of regional data in a hierarchical structure:
+ * - KABUPATEN level: Shows all KECAMATAN (districts) within the regency
+ * - KECAMATAN level: Shows all DESA (villages) within the district
+ * - DESA level: Shows all targets (individuals) within the village
+ *
+ * Features:
+ * - Role-based access control with regional restrictions
+ * - Admin (level 4): Full access to all regions
+ * - Coordinator (level 3): Access to assigned kecamatan and its villages
+ * - Editor (level 2): Access only to assigned village
+ * - Viewer (level 1): Currently restricted
+ *
+ * Navigation:
+ * - Displays appropriate child regions or targets based on region type
+ * - Provides back navigation to parent region when accessible
+ * - Uses view transitions for smooth navigation
+ *
+ * @param slug - The region slug from URL parameters
+ */
+
+import DLayout, { type Props as DLayoutProps } from '../_dashboard.astro'
+import Region from '~/components/region/subregion/region.astro'
+import Target from '~/components/region/target/target.astro'
+import { actions } from 'astro:actions'
+import BackIcon from '~icons/lucide/arrow-left'
+import { canUserAccessRegionSync } from '~/utils/access-control'
+
+const { user } = Astro.locals
+if (!user) {
+  return Astro.redirect('/user/login')
+}
+
+const { slug } = Astro.params
+if (!slug) {
+  return Astro.redirect('/')
+}
+
+const page = await Astro.callAction(actions.region.getBySlug.orThrow, { slug })
+if (!page) {
+  return Astro.redirect('/404')
+}
+
+// Get regions data during SSR to prevent hydration mismatch
+const regionsData = await Astro.callAction(
+  actions.region.getAllWithCounts.orThrow,
+  {
+    parentSlug: slug
+  }
+)
+
+// Access control based on user access level and region assignment
+const hasAccess = await (async () => {
+  // Admin (level 4) has access to everything
+  if (user.accessLevel >= 4) {
+    return true
+  }
+
+  // Viewers (level 1) are restricted for now
+  if (user.accessLevel === 1) {
+    return false
+  }
+
+  // If user has no region assignment, deny access
+  if (!user.regionId) {
+    return false
+  }
+
+  // Get user's assigned region
+  const userRegion = await Astro.callAction(actions.region.getById.orThrow, {
+    id: user.regionId
+  })
+
+  if (!userRegion) {
+    return false
+  }
+
+  // Coordinators (level 3) can access their assigned kecamatan and everything under it
+  if (user.accessLevel === 3) {
+    // Check if the requested page is the user's kecamatan
+    if (page.id === userRegion.id) {
+      return true
+    }
+
+    // Check if the requested page is under the user's kecamatan
+    // This includes desa under their kecamatan
+    if (page.parentId === userRegion.id) {
+      return true
+    }
+
+    return false
+  }
+
+  // Editors (level 2) can only access their assigned desa and targets under it
+  if (user.accessLevel === 2) {
+    // User can only access their own desa
+    if (page.id === userRegion.id && page.type === 'DESA') {
+      return true
+    }
+
+    return false
+  }
+
+  return false
+})()
+
+// Redirect if user doesn't have access
+if (!hasAccess) {
+  return Astro.redirect('/')
+}
+
+const parentRegion = await Astro.callAction(actions.region.getById.orThrow, {
+  id: page.parentId || ''
+})
+
+// Get user's assigned region for access control checks
+const userRegion = user.regionId
+  ? await Astro.callAction(actions.region.getById.orThrow, {
+      id: user.regionId
+    })
+  : null
+
+// Check if user can access the parent region (for back button visibility)
+const canAccessParent =
+  parentRegion && userRegion
+    ? canUserAccessRegionSync(user, parentRegion, userRegion)
+    : false
+
+const props = {
+  title: page.name,
+  description: `Selayang Pandang untuk ${page.type.toLowerCase()} ${page.name}`
+} satisfies DLayoutProps
+---
+
+<DLayout {...props}>
+  {
+    /* Display Region component for non-DESA types (KABUPATEN, KECAMATAN) */
+    page.type !== 'DESA' && (
+      <Region
+        regionsData={regionsData}
+        transition:name={page.slug}
+        transition:animate='none'
+      />
+    )
+  }
+  {
+    /* Display Target component for DESA type regions */
+    page.type === 'DESA' && (
+      <Target transition:name={page.slug} transition:animate='none' />
+    )
+  }
+  {/* Navigation controls - back button to parent region */}
+  <Fragment slot='controls'>
+    {
+      parentRegion && canAccessParent && (
+        <a
+          class='btn btn-ghost md:btn-sm'
+          href={`/region/${parentRegion.slug}`}
+        >
+          <BackIcon />
+          <span>{parentRegion.name}</span>
+        </a>
+      )
+    }
+  </Fragment>
+</DLayout>

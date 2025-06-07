@@ -1,0 +1,44 @@
+---
+/**
+ * @fileoverview Development Tools Integration
+ *
+ * Astro component that integrates React Scan development tools for performance
+ * monitoring and debugging React components during development. Only enabled
+ * in development environment to avoid impacting production performance.
+ *
+ * Features:
+ * - React component performance scanning
+ * - Development-only activation
+ * - Performance monitoring and optimization insights
+ * - Component render analysis
+ * - Development workflow enhancement
+ *
+ * Development Tools:
+ * - React Scan for component performance analysis
+ * - Render tracking and optimization suggestions
+ * - Development environment detection
+ * - Zero impact on production builds
+ *
+ * Usage:
+ * - Automatically imported in layout files during development
+ * - Provides visual feedback on component performance
+ * - Helps identify rendering bottlenecks
+ * - Assists in React optimization efforts
+ *
+ * Configuration:
+ * - Enabled only when import.meta.env.DEV is true
+ * - No configuration needed for basic usage
+ * - Automatic detection of development mode
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+---
+
+<script>
+  import { scan } from 'react-scan'
+
+  scan({
+    enabled: import.meta.env.DEV
+  })
+</script>

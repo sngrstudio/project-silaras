@@ -1,0 +1,48 @@
+---
+/**
+ * User Login Page - /user/login
+ *
+ * Handles user authentication for the SILARAS system.
+ *
+ * Features:
+ * - Username/password authentication
+ * - Automatic redirect for already authenticated users
+ * - First-time setup detection (redirects to signup if no admins exist)
+ * - Pre-filled username support via URL parameter
+ *
+ * Security:
+ * - Session-based authentication using Oslo crypto
+ * - Secure password verification with Argon2
+ * - Automatic redirect to appropriate dashboard based on user role
+ *
+ * Flow:
+ * 1. Check if user is already authenticated -> redirect to dashboard
+ * 2. Check if any admin users exist -> redirect to signup if none
+ * 3. Display login form with optional pre-filled username
+ *
+ * @param user URL parameter - Optional username to pre-fill the form
+ */
+
+import Layout from './_layout.astro'
+import LoginComponent from '~/components/user/login/login.astro'
+import { actions } from 'astro:actions'
+
+const { user } = Astro.locals
+if (user) {
+  return Astro.redirect('/')
+}
+
+const isNoAdmins = await Astro.callAction(
+  actions.user.checks.isNoAdmin.orThrow,
+  {}
+)
+if (isNoAdmins) {
+  return Astro.redirect('/user/signup/?first=true')
+}
+
+const userName = Astro.url.searchParams.get('user') ?? undefined
+---
+
+<Layout>
+  <LoginComponent userName={userName} />
+</Layout>

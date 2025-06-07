@@ -1,0 +1,37 @@
+---
+/**
+ * @fileoverview User Signup Layout Component
+ *
+ * This Astro component provides a clean layout wrapper for the user registration functionality
+ * within the SILARAS platform. It serves as a bridge between server-side routing and the
+ * client-side React signup form component.
+ *
+ * Key Features:
+ * - Server-side props handling for signup context
+ * - Client-side hydration for interactive form functionality
+ * - Support for first-time user registration flow
+ * - Clean separation between layout and form logic
+ *
+ * Props:
+ * - first: Optional boolean indicating if this is the first user registration
+ *   (useful for admin account creation during system setup)
+ *
+ * Integration:
+ * - Passes props to React component for form behavior
+ * - Uses client:load hydration for immediate interactivity
+ * - Integrates with authentication system and user management
+ *
+ * @module Components/User/Signup
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import SignupFormRC from './signup'
+
+interface Props {
+  first?: boolean | undefined
+}
+
+const { first } = Astro.props
+---
+
+<SignupFormRC first={first} client:load />

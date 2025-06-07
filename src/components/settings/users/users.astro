@@ -1,0 +1,72 @@
+---
+/**
+ * @fileoverview User Management Layout Component
+ *
+ * This Astro component provides the comprehensive layout for user management functionality
+ * within the SILARAS platform. It integrates the user management table/list interface with
+ * the user creation/editing dialog and manages client-side data synchronization.
+ *
+ * Key Features:
+ * - Integrated user management interface with CRUD operations
+ * - User dialog for creation and editing with form validation
+ * - Card-based layout wrapper for consistent styling
+ * - Client-side data synchronization using nanostores
+ * - Real-time user data updates and store management
+ *
+ * Component Integration:
+ * - UsersRC: Main user management table/list interface
+ * - UserDialogRC: Modal dialog for user creation/editing
+ * - CardTemplateRC: Consistent card styling wrapper
+ *
+ * Data Management:
+ * - Client-side store initialization and synchronization
+ * - Real-time user data updates
+ * - Integration with server-side actions for data persistence
+ *
+ * Hydration Strategy:
+ * - Idle hydration for main component (performance optimization)
+ * - React-only hydration for dialog (modal functionality)
+ *
+ * @module Components/Settings/Users
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import UsersRC from './users'
+import UserDialogRC from './user-dialog'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<CardTemplateRC>
+  <UsersRC client:idle />
+  <UserDialogRC client:only='react' />
+</CardTemplateRC>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import { $users, setUsers, setCurrentPage } from './users.store'
+  import { actions } from 'astro:actions'
+
+  onMount($users, () => {
+    task(async () => {
+      const state = await actions.user.getAll.orThrow({
+        page: 1,
+        size: 10
+      })
+      setUsers(state)
+      setCurrentPage(1)
+    })
+    return () => {
+      setUsers(undefined)
+      setCurrentPage(1)
+    }
+  })
+
+  document.addEventListener('astro:page-load', async () => {
+    const state = await actions.user.getAll.orThrow({
+      page: 1,
+      size: 10
+    })
+    setUsers(state)
+    setCurrentPage(1)
+  })
+</script>

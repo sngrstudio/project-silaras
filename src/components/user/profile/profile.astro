@@ -1,0 +1,60 @@
+---
+/**
+ * @fileoverview User Profile Layout Component
+ *
+ * This Astro component provides the layout structure for user profile management
+ * within the SILARAS platform. It integrates the profile form component with
+ * client-side data synchronization and state management.
+ *
+ * Key Features:
+ * - Card-based layout wrapper for consistent styling
+ * - Client-side user data synchronization using nanostores
+ * - Integration with profile form for user information editing
+ * - Real-time user data updates and store management
+ *
+ * Component Integration:
+ * - ProfileRC: Main profile form and management interface
+ * - CardTemplateRC: Consistent card styling wrapper
+ *
+ * Data Management:
+ * - Client-side store initialization for current user data
+ * - Real-time synchronization with server-side user information
+ * - Integration with authentication system for user context
+ *
+ * Hydration:
+ * - Client-side loading for interactive profile editing
+ * - Store-based state management for user data consistency
+ *
+ * @module Components/User/Profile
+ * @author SNGR Creative
+ * @since 1.0.0
+ */
+import ProfileRC from './profile'
+import CardTemplateRC from '~/components/common/card/card'
+---
+
+<section>
+  <CardTemplateRC>
+    <ProfileRC client:load />
+  </CardTemplateRC>
+</section>
+
+<script>
+  import { onMount, task } from 'nanostores'
+  import {
+    $currentUser,
+    setCurrentUser
+  } from '~/components/layout/drawer/drawer.store'
+  import { actions } from 'astro:actions'
+
+  onMount($currentUser, () => {
+    task(async () => {
+      const user = await actions.user.getCurrent.orThrow()
+      setCurrentUser(user)
+    })
+
+    return () => {
+      // Don't clear current user on unmount as it's used globally
+    }
+  })
+</script>

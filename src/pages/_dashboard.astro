@@ -1,0 +1,94 @@
+---
+/**
+ * @fileoverview Dashboard Layout Template
+ *
+ * Main layout template for authenticated dashboard pages providing navigation,
+ * drawer system, and content organization. Includes header sections, control
+ * areas, and toast notifications for a complete dashboard experience.
+ *
+ * Features:
+ * - Complete navigation and drawer integration
+ * - Optional page header with title and description
+ * - Control area for page-specific actions
+ * - Toast notification system
+ * - Responsive layout with proper spacing
+ * - Consistent dashboard styling
+ *
+ * @author SNGR Creative
+ * @version 1.0.0
+ */
+
+import Layout, { type Props as LayoutProps } from './_layout.astro'
+import Navigation from '~/components/layout/navigation/navigation.astro'
+import Drawer from '~/components/layout/drawer/drawer.astro'
+import Toast from '~/components/common/toast/toast.astro'
+
+/**
+ * Props interface extending base layout properties
+ *
+ * @interface Props
+ *
+ * Usage Examples:
+ * Basic dashboard page:
+ * <Layout title="Dashboard">
+ *   [Main content goes here]
+ * </Layout>
+ *
+ * With page controls:
+ * <Layout title="Users" description="Manage system users">
+ *   <div slot="controls">
+ *     <button class="btn btn-primary">Add User</button>
+ *   </div>
+ *   [User table component goes here]
+ * </Layout>
+ */
+export interface Props extends LayoutProps {
+  /** Page title for header section */
+  title?: string
+  /** Page description for header section */
+  description?: string
+}
+const { class: className, ...props } = Astro.props
+---
+
+<Layout class:list={['', className]} {...props}>
+  {/* Toast notification system */}
+  <Toast>
+    {/* Top navigation bar */}
+    <Navigation />
+
+    {/* Main layout with drawer sidebar */}
+    <Drawer>
+      {/* Optional controls area for page-specific actions */}
+      {
+        Astro.slots.has('controls') && (
+          <div class='mb-4 flex w-auto pr-4'>
+            <slot name='controls' />
+          </div>
+        )
+      }
+
+      {/* Page header section */}
+      {
+        props.title && (
+          <header class='mb-8'>
+            <h1 class='text-2xl font-black md:text-4xl'>{props.title}</h1>
+            {props.description && (
+              <p class='mt-1 text-sm md:mt-2 md:text-base'>
+                {props.description}
+              </p>
+            )}
+          </header>
+        )
+      }
+
+      {/* Main page content */}
+      <slot />
+    </Drawer>
+  </Toast>
+
+  {/* Head slot for page-specific meta tags */}
+  <Fragment slot='head'>
+    <slot name='head' />
+  </Fragment>
+</Layout>
