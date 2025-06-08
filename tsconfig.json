@@ -3,7 +3,16 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "types": ["node", "express", "morgan", "unplugin-icons/types/react"],
+    "types": [
+      "node",
+      "express",
+      "morgan",
+      "unplugin-icons/types/react",
+      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/pwa-assets",
+      "vite/client"
+    ],
+    "lib": ["webworker", "es2022"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]

@@ -35,6 +35,7 @@
  */
 
 import { actions } from 'astro:actions'
+import { pwaAssetsHead } from 'virtual:pwa-assets/head'
 
 /**
  * Props interface for the Head component
@@ -96,3 +97,14 @@ const site = {
 <meta name='telegrambot' content='noindex, nofollow' />
 <meta name='discordbot' content='noindex, nofollow' />
 <meta name='applebot' content='noindex, nofollow' />
+
+{/* Meta tags of assets */}
+{
+  pwaAssetsHead.themeColor && (
+    <meta name='theme-color' content={pwaAssetsHead.themeColor.content} />
+  )
+}
+{pwaAssetsHead.links.map((link) => <link {...link} />)}
+
+{/* PWA Manifest */}
+<link rel='manifest' href='/manifest.json' />

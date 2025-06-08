@@ -109,11 +109,5 @@ Disallow: /
 # No sitemap provided as we don't want any indexing
 `
 
-  return new Response(robotsTxt, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=31536000, immutable' // Cache for 1 year (longest available)
-    }
-  })
+  return new Response(robotsTxt)
 }

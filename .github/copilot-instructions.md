@@ -7,3 +7,5 @@ When writing actions, always import query functions from `src/db/queries` instea
 Our query functions in `src/db/queries` should focus only on database operations without importing utility functions, since utilities are meant to be used in the actions layer. The only exception is Redis which tied tightly with the database function.
 
 Don't suggest running build, dev, or type check commands when helping with code.
+
+Every import must be static, do not import dynamically.
