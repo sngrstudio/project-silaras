@@ -20,6 +20,8 @@
 
 import type { APIRoute } from 'astro'
 
+export const prerender = true
+
 /**
  * Convert OKLCH color values to hex format for PWA manifest compatibility
  * @param oklch OKLCH color string (e.g., "oklch(0.5572 0.13007 241.0873)")
