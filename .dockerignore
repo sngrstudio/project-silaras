@@ -37,7 +37,6 @@ pnpm-debug.log*
 
 # docker-related
 .dockerignore
-Dockerfile
 docker-compose.yml
 
 # other

@@ -13,7 +13,7 @@ RUN npm ci
 
 FROM build-deps AS build
 # Copy configuration files first (these change less frequently)
-COPY astro.config.mjs drizzle.config.mjs tsconfig.json prettier.config.cjs .prettierignore node.d.ts ./
+COPY astro.config.mjs drizzle.config.mjs pwa-assets.config.ts tsconfig.json prettier.config.cjs .prettierignore node.d.ts ./
 
 # Copy source code
 COPY src/ ./src/
