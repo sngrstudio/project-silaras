@@ -20,8 +20,8 @@
   "dependencies": {
     "@astrojs/node": "9.2.2",
     "@astrojs/react": "4.3.0",
-    "@aws-sdk/client-s3": "3.821.0",
-    "@aws-sdk/s3-request-presigner": "3.821.0",
+    "@aws-sdk/client-s3": "3.826.0",
+    "@aws-sdk/s3-request-presigner": "3.826.0",
     "@cloudinary/url-gen": "1.21.0",
     "@fontsource-variable/plus-jakarta-sans": "5.2.6",
     "@nanostores/persistent": "1.0.0",
