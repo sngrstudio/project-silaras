@@ -14,7 +14,7 @@ services:
 
   db:
     container_name: db
-    image: mariadb:10.11.10@sha256:41d89394db8e777d96058d4cf5cf4daf1ed87f76192154f3d89572676f1e2327
+    image: mariadb:10.11.13@sha256:34adebbac117c8ce649040e009f520fb79e577c68cc4e57debdf91befa53907f
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
