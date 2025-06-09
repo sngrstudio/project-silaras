@@ -54,7 +54,7 @@
     "@svgr/plugin-jsx": "8.1.0",
     "@types/express": "5.0.1",
     "@types/leaflet": "1.9.18",
-    "@types/morgan": "1.9.9",
+    "@types/morgan": "1.9.10",
     "@types/node": "20.10.5",
     "@types/react": "19.1.4",
     "@types/react-dom": "19.1.4",
