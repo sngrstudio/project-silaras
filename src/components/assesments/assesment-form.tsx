@@ -287,11 +287,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
             {/* First Row */}
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsStapleFood' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsStapleFood'
                   id='containsStapleFood'
+                  value='true'
                   disabled={isPending || isDisabled}
                   defaultChecked={!!cell.row.original.containsStapleFood}
                 />
@@ -309,11 +311,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsSideDish' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsSideDish'
                   id='containsSideDish'
+                  value='true'
                   disabled={isPending || isDisabled}
                   defaultChecked={!!cell.row.original.containsSideDish}
                 />
@@ -332,11 +336,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
             {/* Second Row */}
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsVegetables' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsVegetables'
                   id='containsVegetables'
+                  value='true'
                   disabled={isPending || isDisabled}
                   defaultChecked={!!cell.row.original.containsVegetables}
                 />
@@ -354,11 +360,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsFruits' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsFruits'
                   id='containsFruits'
+                  value='true'
                   disabled={isPending || isDisabled}
                   defaultChecked={!!cell.row.original.containsFruits}
                 />
@@ -378,11 +386,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
           {/* Recipe Following - Full Width */}
           <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
             <div className='card-body flex-row items-center gap-3'>
+              <input type='hidden' name='isFollowingRecipe' value='false' />
               <input
                 className='checkbox checkbox-primary'
                 type='checkbox'
                 name='isFollowingRecipe'
                 id='isFollowingRecipe'
+                value='true'
                 disabled={isPending || isDisabled}
                 defaultChecked={!!cell.row.original.isFollowingRecipe}
               />
