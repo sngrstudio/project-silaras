@@ -59,7 +59,7 @@
     "@types/react": "19.1.4",
     "@types/react-dom": "19.1.4",
     "concurrently": "9.1.2",
-    "daisyui": "5.0.35",
+    "daisyui": "5.0.43",
     "drizzle-kit": "0.31.1",
     "prettier": "3.5.3",
     "prettier-config-standard": "7.0.0",
