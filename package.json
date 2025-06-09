@@ -41,7 +41,7 @@
     "morgan": "1.10.0",
     "mysql2": "3.14.1",
     "nanostores": "1.0.1",
-    "radix-ui": "1.4.1",
+    "radix-ui": "1.4.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "5.0.0",
