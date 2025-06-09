@@ -28,7 +28,7 @@
     "@nanostores/react": "1.0.0",
     "@oslojs/crypto": "1.0.1",
     "@oslojs/encoding": "1.1.0",
-    "@tailwindcss/vite": "4.1.6",
+    "@tailwindcss/vite": "4.1.8",
     "@tanstack/react-table": "8.21.3",
     "argon2": "0.43.0",
     "astro": "5.9.0",
@@ -45,7 +45,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-leaflet": "5.0.0",
-    "tailwindcss": "4.1.6"
+    "tailwindcss": "4.1.8"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.4",
