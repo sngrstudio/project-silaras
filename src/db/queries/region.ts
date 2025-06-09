@@ -281,7 +281,14 @@ export const getAllRegionsWithCounts = async (
     .where(eq(region.parentId, parentIdSubquery))
     .limit(size)
     .offset(offset)
-    .orderBy(region.name)
+    .orderBy(
+      sql`CASE WHEN (
+        SELECT COUNT(*) 
+        FROM user u 
+        WHERE u.region_id = region.id
+      ) > 0 THEN 0 ELSE 1 END`,
+      region.name
+    )
 
   const data = results.map(({ totalCount, ...rest }) => rest)
   const total = results[0]?.totalCount ?? 0

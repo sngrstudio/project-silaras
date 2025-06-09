@@ -250,13 +250,13 @@ const assesment = {
       input: z.object({
         targetId: z.string(),
         dailyAssesmentId: z.string(),
-        containsStapleFood: z.boolean(),
-        containsSideDish: z.boolean(),
-        containsVegetables: z.boolean(),
-        containsFruits: z.boolean(),
-        isFollowingRecipe: z.boolean(),
+        containsStapleFood: z.coerce.boolean(),
+        containsSideDish: z.coerce.boolean(),
+        containsVegetables: z.coerce.boolean(),
+        containsFruits: z.coerce.boolean(),
+        isFollowingRecipe: z.coerce.boolean(),
         imageFile: z.instanceof(File).optional(),
-        removeImage: z.boolean().optional()
+        removeImage: z.coerce.boolean().optional()
       }),
       handler: async (input, ctx) => {
         const currentUser = ctx.locals.user

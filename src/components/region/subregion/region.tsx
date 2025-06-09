@@ -67,24 +67,26 @@ const RegionRC: FC<RegionRCProps> = ({ regionsData }) => {
           region.childRegionCount.toString().includes(search) ||
           region.userCount.toString().includes(search)
       )
+
+      // Sort filtered data by user assignment first (regions with users assigned first), then alphabetically
+      // This is needed because search filtering changes the original database order
+      filteredData = [...filteredData].sort((a, b) => {
+        // Primary sort: regions with users assigned come first
+        const aHasUsers = a.userCount > 0
+        const bHasUsers = b.userCount > 0
+
+        if (aHasUsers && !bHasUsers) return -1
+        if (!aHasUsers && bHasUsers) return 1
+
+        // Secondary sort: alphabetical by name
+        return a.name.localeCompare(b.name)
+      })
     }
-
-    // Sort by user assignment first (regions with users assigned first), then alphabetically
-    const sortedData = [...filteredData].sort((a, b) => {
-      // Primary sort: regions with users assigned come first
-      const aHasUsers = a.userCount > 0
-      const bHasUsers = b.userCount > 0
-
-      if (aHasUsers && !bHasUsers) return -1
-      if (!aHasUsers && bHasUsers) return 1
-
-      // Secondary sort: alphabetical by name
-      return a.name.localeCompare(b.name)
-    })
+    // If no search filter, data is already sorted correctly by the database query
 
     return {
       ...regions,
-      data: sortedData
+      data: filteredData
     }
   }, [regions, searchInput])
 
