@@ -101,6 +101,26 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
+  // State for controlled checkboxes
+  const [checkboxState, setCheckboxState] = useState({
+    containsStapleFood: !!cell.row.original.containsStapleFood,
+    containsSideDish: !!cell.row.original.containsSideDish,
+    containsVegetables: !!cell.row.original.containsVegetables,
+    containsFruits: !!cell.row.original.containsFruits,
+    isFollowingRecipe: !!cell.row.original.isFollowingRecipe
+  })
+
+  // Update checkbox state when cell data changes
+  useEffect(() => {
+    setCheckboxState({
+      containsStapleFood: !!cell.row.original.containsStapleFood,
+      containsSideDish: !!cell.row.original.containsSideDish,
+      containsVegetables: !!cell.row.original.containsVegetables,
+      containsFruits: !!cell.row.original.containsFruits,
+      isFollowingRecipe: !!cell.row.original.isFollowingRecipe
+    })
+  }, [cell.row.original])
+
   const handleForm = async (_prev: unknown, data: FormData) => {
     const { error } = await actions.assesment.daily.set(data)
     if (error) {
@@ -221,7 +241,10 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
     // Only handle changes for assessment checkboxes, not file inputs
     const target = event.target as unknown as HTMLInputElement
     if (target.type === 'checkbox' && target.name !== 'removeImage') {
-      handleSave()
+      // Use a timeout to ensure state is updated before checking for changes
+      setTimeout(() => {
+        handleSave()
+      }, 0)
     }
   }
 
@@ -239,13 +262,13 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
     // Only submit if assessment checkboxes changed (not file input changes)
     const assessmentChanged =
-      form.containsStapleFood.checked !==
+      checkboxState.containsStapleFood !==
         !!cell.row.original.containsStapleFood ||
-      form.containsSideDish.checked !== !!cell.row.original.containsSideDish ||
-      form.containsVegetables.checked !==
+      checkboxState.containsSideDish !== !!cell.row.original.containsSideDish ||
+      checkboxState.containsVegetables !==
         !!cell.row.original.containsVegetables ||
-      form.containsFruits.checked !== !!cell.row.original.containsFruits ||
-      form.isFollowingRecipe.checked !== !!cell.row.original.isFollowingRecipe
+      checkboxState.containsFruits !== !!cell.row.original.containsFruits ||
+      checkboxState.isFollowingRecipe !== !!cell.row.original.isFollowingRecipe
 
     // Only submit if assessment checkboxes changed, not for file input changes
     if (!assessmentChanged) return
@@ -287,13 +310,21 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
             {/* First Row */}
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsStapleFood' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsStapleFood'
                   id='containsStapleFood'
+                  value='true'
                   disabled={isPending || isDisabled}
-                  defaultChecked={!!cell.row.original.containsStapleFood}
+                  checked={checkboxState.containsStapleFood}
+                  onChange={(e) => {
+                    setCheckboxState((prev) => ({
+                      ...prev,
+                      containsStapleFood: e.target.checked
+                    }))
+                  }}
                 />
                 <WheatIcon className='h-5 w-5 flex-shrink-0 text-amber-600' />
                 <div className='flex-1'>
@@ -309,13 +340,21 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsSideDish' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsSideDish'
                   id='containsSideDish'
+                  value='true'
                   disabled={isPending || isDisabled}
-                  defaultChecked={!!cell.row.original.containsSideDish}
+                  checked={checkboxState.containsSideDish}
+                  onChange={(e) => {
+                    setCheckboxState((prev) => ({
+                      ...prev,
+                      containsSideDish: e.target.checked
+                    }))
+                  }}
                 />
                 <DrumstickIcon className='h-5 w-5 flex-shrink-0 text-red-600' />
                 <div className='flex-1'>
@@ -332,13 +371,21 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
             {/* Second Row */}
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsVegetables' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsVegetables'
                   id='containsVegetables'
+                  value='true'
                   disabled={isPending || isDisabled}
-                  defaultChecked={!!cell.row.original.containsVegetables}
+                  checked={checkboxState.containsVegetables}
+                  onChange={(e) => {
+                    setCheckboxState((prev) => ({
+                      ...prev,
+                      containsVegetables: e.target.checked
+                    }))
+                  }}
                 />
                 <LeafIcon className='h-5 w-5 flex-shrink-0 text-green-600' />
                 <div className='flex-1'>
@@ -354,13 +401,21 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
 
             <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
               <div className='card-body flex-row items-center gap-3'>
+                <input type='hidden' name='containsFruits' value='false' />
                 <input
                   className='checkbox checkbox-primary'
                   type='checkbox'
                   name='containsFruits'
                   id='containsFruits'
+                  value='true'
                   disabled={isPending || isDisabled}
-                  defaultChecked={!!cell.row.original.containsFruits}
+                  checked={checkboxState.containsFruits}
+                  onChange={(e) => {
+                    setCheckboxState((prev) => ({
+                      ...prev,
+                      containsFruits: e.target.checked
+                    }))
+                  }}
                 />
                 <AppleIcon className='h-5 w-5 flex-shrink-0 text-orange-500' />
                 <div className='flex-1'>
@@ -378,13 +433,21 @@ const AssesmentForm: FC<AssesmentFormProps> = ({
           {/* Recipe Following - Full Width */}
           <label className='card card-compact border-base-200 bg-base-50 hover:border-primary/50 hover:bg-primary/5 has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer border-2 transition-all duration-200 hover:shadow-md has-[:checked]:shadow-lg'>
             <div className='card-body flex-row items-center gap-3'>
+              <input type='hidden' name='isFollowingRecipe' value='false' />
               <input
                 className='checkbox checkbox-primary'
                 type='checkbox'
                 name='isFollowingRecipe'
                 id='isFollowingRecipe'
+                value='true'
                 disabled={isPending || isDisabled}
-                defaultChecked={!!cell.row.original.isFollowingRecipe}
+                checked={checkboxState.isFollowingRecipe}
+                onChange={(e) => {
+                  setCheckboxState((prev) => ({
+                    ...prev,
+                    isFollowingRecipe: e.target.checked
+                  }))
+                }}
               />
               <BookOpenIcon className='h-5 w-5 flex-shrink-0 text-blue-600' />
               <div className='flex-1'>
