@@ -73,9 +73,5 @@
     }
   },
 
-  // "containerEnv": {
-  //   "DATABASE_URL": "mysql://test:test@localhost:3306/test"
-  // },
-
   "postCreateCommand": "npm ci && npx astro sync"
 }
