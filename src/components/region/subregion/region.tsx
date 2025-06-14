@@ -181,7 +181,7 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
   // Generate different styles based on disabled state
   const cardClasses = isDisabled
     ? 'block overflow-hidden rounded-2xl border border-base-300/50 bg-gradient-to-br from-base-100/50 to-base-200/25 shadow-sm opacity-60 cursor-not-allowed'
-    : 'group block transform overflow-hidden rounded-2xl border border-base-300 bg-gradient-to-br from-base-100 to-base-200/50 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10'
+    : 'group block transform overflow-hidden rounded-2xl border border-base-300 bg-gradient-to-br from-base-100 to-base-200/50 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 cursor-pointer'
 
   const iconClasses = isDisabled
     ? `flex h-12 w-12 items-center justify-center rounded-xl border ${getTypeColor()}`
@@ -203,11 +203,30 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
     ? `inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold ${getTypeColor()}`
     : `inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold transition-all duration-300 group-hover:scale-105 ${getTypeColor()}`
 
-  const CardWrapper = isDisabled ? 'div' : 'a'
-  const cardProps = isDisabled ? {} : { href: `/region/${region.slug}` }
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only navigate if not disabled and target is not a link
+    if (!isDisabled && !(e.target as HTMLElement).closest('a')) {
+      window.location.href = `/region/${region.slug}`
+    }
+  }
 
   return (
-    <CardWrapper {...cardProps} className={cardClasses}>
+    <div
+      className={cardClasses}
+      onClick={handleCardClick}
+      role={isDisabled ? undefined : 'button'}
+      tabIndex={isDisabled ? undefined : 0}
+      onKeyDown={
+        isDisabled
+          ? undefined
+          : (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                window.location.href = `/region/${region.slug}`
+              }
+            }
+      }
+    >
       {/* Header with gradient and icon */}
       <div className='from-primary/5 via-primary/10 to-primary/5 bg-gradient-to-r p-4 pb-0'>
         <div className='mb-3 flex items-center justify-between'>
@@ -314,6 +333,6 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
           </div>
         </div>
       </div>
-    </CardWrapper>
+    </div>
   )
 }
