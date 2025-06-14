@@ -35,7 +35,6 @@ import IconMapPin from '~icons/lucide/map-pin'
 import IconUsers from '~icons/lucide/users'
 import IconExternalLink from '~icons/lucide/external-link'
 import IconSearch from '~icons/lucide/search'
-import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 
 interface RegionRCProps {
   regionsData?: Regions | undefined
@@ -234,35 +233,32 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
             </div>
             <div className='flex items-center gap-2'>
               {hasUsers ? (
-                <div className='flex items-center gap-2'>
-                  <div className='text-right'>
-                    {managedByUsers.map((user: any, index: number) => (
-                      <div
-                        key={index}
-                        className='text-primary text-xs font-medium'
-                      >
-                        {user.fullName}
-                      </div>
-                    ))}
-                  </div>
-                  {managedByUsers.length > 0 &&
-                    managedByUsers[0]?.phoneNumber && (
-                      <a
-                        href={`https://wa.me/${managedByUsers[0].phoneNumber.replace(/\D/g, '')}`}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className={`flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white transition-all duration-300 ${
-                          isDisabled
-                            ? 'cursor-not-allowed opacity-60'
-                            : 'hover:scale-110 hover:bg-green-600'
-                        }`}
-                        onClick={
-                          isDisabled ? (e) => e.preventDefault() : undefined
-                        }
-                      >
-                        <WhatsAppIcon className='h-3 w-3' />
-                      </a>
-                    )}
+                <div className='text-right'>
+                  {managedByUsers.map((user: any, index: number) => (
+                    <div key={index}>
+                      {user.phoneNumber ? (
+                        <a
+                          href={`https://wa.me/${user.phoneNumber.replace(/\D/g, '')}`}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className={`text-primary text-xs font-medium transition-colors duration-300 ${
+                            isDisabled
+                              ? 'cursor-not-allowed opacity-60'
+                              : 'hover:text-green-600 hover:underline'
+                          }`}
+                          onClick={
+                            isDisabled ? (e) => e.preventDefault() : undefined
+                          }
+                        >
+                          {user.fullName}
+                        </a>
+                      ) : (
+                        <div className='text-primary text-xs font-medium'>
+                          {user.fullName}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <span className='text-base-content/40 text-xs font-medium'>
