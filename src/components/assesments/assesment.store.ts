@@ -68,17 +68,44 @@ export const setMonthlyAssesment = (state: MonthlyAssesment | undefined) =>
   $monthlyAssesments.set(state)
 
 /**
+ * Function to get the default month index based on current date
+ * If current month is earlier than July (index 7), return July
+ * If current month is later than November (index 11), return November
+ * Otherwise, return the current month index
+ *
+ * Note: Uses 1-based indexing (1=January, 12=December) to match API expectations
+ */
+const getDefaultMonthIndex = (): number => {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() + 1 // Convert to 1-based: 1=January, 12=December
+
+  // Assessment period: July (7) to November (11)
+  const FIRST_MONTH = 7 // July
+  const LAST_MONTH = 11 // November
+
+  if (currentMonth < FIRST_MONTH) {
+    return FIRST_MONTH // Return July if current month is before July
+  } else if (currentMonth > LAST_MONTH) {
+    return LAST_MONTH // Return November if current month is after November
+  } else {
+    return currentMonth // Return current month if it's within the assessment period
+  }
+}
+
+/**
  * Nanostore for current month index
- * Represents the selected month for assessment viewing (0-11)
+ * Represents the selected month for assessment viewing (1-12)
  *
  * Month mapping:
- * - 0: January, 1: February, 2: March, 3: April
- * - 4: May, 5: June, 6: July (default), 7: August
- * - 8: September, 9: October, 10: November, 11: December
+ * - 1: January, 2: February, 3: March, 4: April
+ * - 5: May, 6: June, 7: July, 8: August
+ * - 9: September, 10: October, 11: November, 12: December
  *
- * @default 6 - July (mid-year default for assessment period)
+ * Assessment period: July (7) to November (11)
+ *
+ * @default getDefaultMonthIndex() - Current month with fallback to July/November
  */
-export const $currentMonthIndex = atom<number>(6)
+export const $currentMonthIndex = atom<number>(getDefaultMonthIndex())
 
 /**
  * Setter function for current month index
