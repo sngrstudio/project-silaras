@@ -36,13 +36,14 @@
  */
 
 import NavigationRC from './navigation'
-import DrawerButtonRC from '../drawer/button'
+import { Image } from 'astro:assets'
+import logo from '~/assets/logo.png'
 import { actions } from 'astro:actions'
 
 const site = await Astro.callAction(actions.site.getAll.orThrow, {})
 export type Site = typeof site
 ---
 
-<NavigationRC site={site}>
-  <DrawerButtonRC client:load />
+<NavigationRC site={site} client:load>
+  <Image src={logo} width={120} loading='eager' fetchpriority='high' alt='' />
 </NavigationRC>

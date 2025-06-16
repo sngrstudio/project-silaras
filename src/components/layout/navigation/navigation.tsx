@@ -10,6 +10,7 @@
  */
 import type { FC, PropsWithChildren } from 'react'
 import type { Site } from './navigation.astro'
+import DrawerButtonRC from '../drawer/button'
 
 /**
  * Props interface for the NavigationRC component
@@ -64,10 +65,12 @@ interface NavigationRCProps extends PropsWithChildren {
 const NavigationRC: FC<NavigationRCProps> = ({ children, site }) => {
   return (
     <nav className='navbar border-base-300 border-b'>
-      <div className='xl:hidden'>{children}</div>
+      <div className='xl:hidden'>
+        <DrawerButtonRC />
+      </div>
       <div className='flex-1'>
-        <a className='btn btn-ghost text-lg' href='/'>
-          <span>{site.SITE_NAME}</span>
+        <a className='btn btn-ghost text-lg' href='/' title={site.SITE_NAME}>
+          {children}
         </a>
       </div>
     </nav>

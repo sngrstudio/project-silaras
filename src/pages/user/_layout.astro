@@ -19,6 +19,8 @@
 
 import MainLayout, { type Props as MainLayoutProps } from '../_layout.astro'
 import Toast from '~/components/common/toast/toast.astro'
+import { Image } from 'astro:assets'
+import logo from '~/assets/logo.png'
 
 /**
  * Props interface extending main layout properties
@@ -48,7 +50,15 @@ const { class: className, ...props } = Astro.props
       <div class='hero-content flex-col lg:flex-row-reverse'>
         {/* Card container for authentication forms */}
         <div class='card bg-base-100 w-full max-w-sm shrink-0 shadow'>
-          <div class='card-body'>
+          <div class='card-body items-center'>
+            <Image
+              class='mb-4'
+              src={logo}
+              width={180}
+              loading='eager'
+              fetchpriority='high'
+              alt=''
+            />
             {/* Slot for authentication form content */}
             <slot />
           </div>
