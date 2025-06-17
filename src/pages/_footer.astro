@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets'
+import kotim from '~/assets/kotim.png'
+import designedBy from '~/assets/designed-by.svg'
+---
+
+<footer
+  class='mt-16 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-y-4'
+>
+  <div class='text-base-content/50 flex items-center gap-1 text-xs'>
+    <Image src={kotim} width={48} alt='' />
+    <div>
+      <div>Dinas Pemberdayaan Perempuan, Perlindungan Anak,</div>
+      <div>Pengendalian Penduduk dan Keluarga Berencana (PPPAPPKB)</div>
+      <div>Kabupaten Kotawaringin Timur</div>
+    </div>
+  </div>
+  <div class='text-base-content/35 flex items-center gap-1 text-xs'>
+    <a href='/designedby' title='Designed By SNGR Creative' target='_blank'>
+      <Image src={designedBy} width={144} alt='' />
+    </a>
+  </div>
+</footer>

@@ -22,6 +22,7 @@ import Layout, { type Props as LayoutProps } from './_layout.astro'
 import Navigation from '~/components/layout/navigation/navigation.astro'
 import Drawer from '~/components/layout/drawer/drawer.astro'
 import Toast from '~/components/common/toast/toast.astro'
+import Footer from './_footer.astro'
 
 /**
  * Props interface extending base layout properties
@@ -84,6 +85,7 @@ const { class: className, ...props } = Astro.props
 
       {/* Main page content */}
       <slot />
+      <Footer />
     </Drawer>
   </Toast>
 
