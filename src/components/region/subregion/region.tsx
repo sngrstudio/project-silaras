@@ -35,7 +35,6 @@ import IconMapPin from '~icons/lucide/map-pin'
 import IconUsers from '~icons/lucide/users'
 import IconExternalLink from '~icons/lucide/external-link'
 import IconSearch from '~icons/lucide/search'
-import WhatsAppIcon from '~icons/simple-icons/whatsapp'
 
 interface RegionRCProps {
   regionsData?: Regions | undefined
@@ -182,7 +181,7 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
   // Generate different styles based on disabled state
   const cardClasses = isDisabled
     ? 'block overflow-hidden rounded-2xl border border-base-300/50 bg-gradient-to-br from-base-100/50 to-base-200/25 shadow-sm opacity-60 cursor-not-allowed'
-    : 'group block transform overflow-hidden rounded-2xl border border-base-300 bg-gradient-to-br from-base-100 to-base-200/50 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10'
+    : 'group block transform overflow-hidden rounded-2xl border border-base-300 bg-gradient-to-br from-base-100 to-base-200/50 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 cursor-pointer'
 
   const iconClasses = isDisabled
     ? `flex h-12 w-12 items-center justify-center rounded-xl border ${getTypeColor()}`
@@ -204,11 +203,30 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
     ? `inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold ${getTypeColor()}`
     : `inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold transition-all duration-300 group-hover:scale-105 ${getTypeColor()}`
 
-  const CardWrapper = isDisabled ? 'div' : 'a'
-  const cardProps = isDisabled ? {} : { href: `/region/${region.slug}` }
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only navigate if not disabled and target is not a link
+    if (!isDisabled && !(e.target as HTMLElement).closest('a')) {
+      window.location.href = `/region/${region.slug}`
+    }
+  }
 
   return (
-    <CardWrapper {...cardProps} className={cardClasses}>
+    <div
+      className={cardClasses}
+      onClick={handleCardClick}
+      role={isDisabled ? undefined : 'button'}
+      tabIndex={isDisabled ? undefined : 0}
+      onKeyDown={
+        isDisabled
+          ? undefined
+          : (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                window.location.href = `/region/${region.slug}`
+              }
+            }
+      }
+    >
       {/* Header with gradient and icon */}
       <div className='from-primary/5 via-primary/10 to-primary/5 bg-gradient-to-r p-4 pb-0'>
         <div className='mb-3 flex items-center justify-between'>
@@ -234,35 +252,32 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
             </div>
             <div className='flex items-center gap-2'>
               {hasUsers ? (
-                <div className='flex items-center gap-2'>
-                  <div className='text-right'>
-                    {managedByUsers.map((user: any, index: number) => (
-                      <div
-                        key={index}
-                        className='text-primary text-xs font-medium'
-                      >
-                        {user.fullName}
-                      </div>
-                    ))}
-                  </div>
-                  {managedByUsers.length > 0 &&
-                    managedByUsers[0]?.phoneNumber && (
-                      <a
-                        href={`https://wa.me/${managedByUsers[0].phoneNumber.replace(/\D/g, '')}`}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className={`flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white transition-all duration-300 ${
-                          isDisabled
-                            ? 'cursor-not-allowed opacity-60'
-                            : 'hover:scale-110 hover:bg-green-600'
-                        }`}
-                        onClick={
-                          isDisabled ? (e) => e.preventDefault() : undefined
-                        }
-                      >
-                        <WhatsAppIcon className='h-3 w-3' />
-                      </a>
-                    )}
+                <div className='text-right'>
+                  {managedByUsers.map((user: any, index: number) => (
+                    <div key={index}>
+                      {user.phoneNumber ? (
+                        <a
+                          href={`https://wa.me/${user.phoneNumber.replace(/\D/g, '')}`}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className={`text-primary text-xs font-medium transition-colors duration-300 ${
+                            isDisabled
+                              ? 'cursor-not-allowed opacity-60'
+                              : 'hover:text-green-600 hover:underline'
+                          }`}
+                          onClick={
+                            isDisabled ? (e) => e.preventDefault() : undefined
+                          }
+                        >
+                          {user.fullName}
+                        </a>
+                      ) : (
+                        <div className='text-primary text-xs font-medium'>
+                          {user.fullName}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <span className='text-base-content/40 text-xs font-medium'>
@@ -318,6 +333,6 @@ const RegionCard: FC<{ region: Regions['data'][number] }> = ({ region }) => {
           </div>
         </div>
       </div>
-    </CardWrapper>
+    </div>
   )
 }

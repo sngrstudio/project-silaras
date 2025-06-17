@@ -58,6 +58,7 @@ interface TargetData {
   id: string
   name: string
   age: number | null // age in months
+  birthDate: Date // birth date as Date object
 }
 
 // BMI classification according to WHO standards
@@ -112,6 +113,20 @@ const formatAge = (ageInMonths: number | null) => {
   }
 
   return `${years}.${remainingMonths}`
+}
+
+// Calculate age in months as of a specific assessment month
+const calculateAgeAtMonth = (birthDate: Date, monthIndex: number): number => {
+  // Create a date for the assessment month in 2025
+  // monthIndex is 1-based (1=January, 12=December)
+  const assessmentDate = new Date(2025, monthIndex - 1, 1) // Use first day of the assessment month
+
+  // Calculate months difference
+  const monthsDiff =
+    (assessmentDate.getFullYear() - birthDate.getFullYear()) * 12 +
+    (assessmentDate.getMonth() - birthDate.getMonth())
+
+  return Math.max(0, monthsDiff) // Ensure non-negative age
 }
 
 const AssesmentStatRC: FC = () => {
@@ -373,20 +388,30 @@ const AssesmentStatRC: FC = () => {
           </div>
           <div className='flex flex-1 items-center justify-center'>
             <div className='text-base-content text-3xl font-bold'>
-              {targetData ? formatAge(targetData.age) : '-'}
+              {targetData && targetData.birthDate
+                ? formatAge(
+                    calculateAgeAtMonth(targetData.birthDate, currentMonthIndex)
+                  )
+                : '-'}
             </div>
           </div>
           <div className='text-base-content/50 w-full truncate text-xs'>
-            {targetData && targetData.age
-              ? targetData.age < 24
-                ? 'bulan'
-                : (() => {
-                    const remainingMonths = targetData.age % 12
-                    return remainingMonths === 0
-                      ? 'tahun'
-                      : `${Math.floor(targetData.age / 12)} thn ${remainingMonths} bln`
-                  })()
-              : 'Usia saat ini'}
+            {targetData && targetData.birthDate
+              ? (() => {
+                  const ageAtMonth = calculateAgeAtMonth(
+                    targetData.birthDate,
+                    currentMonthIndex
+                  )
+                  return ageAtMonth < 24
+                    ? 'bulan'
+                    : (() => {
+                        const remainingMonths = ageAtMonth % 12
+                        return remainingMonths === 0
+                          ? 'tahun'
+                          : `${Math.floor(ageAtMonth / 12)} thn ${remainingMonths} bln`
+                      })()
+                })()
+              : 'Usia pada bulan tersebut'}
           </div>
         </div>
       </div>

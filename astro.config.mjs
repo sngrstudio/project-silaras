@@ -16,6 +16,9 @@ export default defineConfig({
     mode: 'middleware'
   }),
   output: 'server',
+  redirects: {
+    '/designedby': 'https://www.sngrcreative.xyz'
+  },
   vite: {
     plugins: [tailwindcss(), icons({ compiler: 'jsx', jsx: 'react' })]
   },

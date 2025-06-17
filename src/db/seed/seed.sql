@@ -299,15 +299,15 @@ INSERT INTO region (id, name, slug, type, parent_id) VALUES
 -- =====================================================
 -- MONTHLY ASSESSMENT TEMPLATES SEEDING
 -- =====================================================
--- Create monthly assessment templates for June-October 2025
--- Matches TypeScript seed: months JUNE through OCTOBER
+-- Create monthly assessment templates for July-November 2025
+-- Matches TypeScript seed: months JULY through NOVEMBER
 
 INSERT INTO monthly_assesment (id, month) VALUES 
-(UUID(), 'JUNE'),
 (UUID(), 'JULY'),
 (UUID(), 'AUGUST'),
 (UUID(), 'SEPTEMBER'),
-(UUID(), 'OCTOBER');
+(UUID(), 'OCTOBER'),
+(UUID(), 'NOVEMBER');
 
 -- =====================================================
 -- DAILY ASSESSMENT TEMPLATES SEEDING
@@ -316,28 +316,11 @@ INSERT INTO monthly_assesment (id, month) VALUES
 -- Each day gets placeholder menu entries: '<<menu>>'
 
 -- Set monthly assessment variables
-SET @june_id = (SELECT id FROM monthly_assesment WHERE month = 'JUNE');
 SET @july_id = (SELECT id FROM monthly_assesment WHERE month = 'JULY');
 SET @august_id = (SELECT id FROM monthly_assesment WHERE month = 'AUGUST');
 SET @september_id = (SELECT id FROM monthly_assesment WHERE month = 'SEPTEMBER');
 SET @october_id = (SELECT id FROM monthly_assesment WHERE month = 'OCTOBER');
-
--- JUNE 2025 (30 days)
-INSERT INTO daily_assesment (id, monthly_assesment_id, date, menu_1, menu_2)
-SELECT 
-  UUID(),
-  @june_id,
-  DATE('2025-06-01') + INTERVAL (n-1) DAY,
-  '<<menu>>',
-  '<<menu>>'
-FROM (
-  SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION
-  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION
-  SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION
-  SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION
-  SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION
-  SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30
-) days;
+SET @november_id = (SELECT id FROM monthly_assesment WHERE month = 'NOVEMBER');
 
 -- JULY 2025 (30 days - skip day 31)
 INSERT INTO daily_assesment (id, monthly_assesment_id, date, menu_1, menu_2)
@@ -407,6 +390,23 @@ FROM (
   SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30
 ) days;
 
+-- NOVEMBER 2025 (30 days)
+INSERT INTO daily_assesment (id, monthly_assesment_id, date, menu_1, menu_2)
+SELECT 
+  UUID(),
+  @november_id,
+  DATE('2025-11-01') + INTERVAL (n-1) DAY,
+  '<<menu>>',
+  '<<menu>>'
+FROM (
+  SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION
+  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION
+  SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION
+  SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION
+  SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION
+  SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30
+) days;
+
 -- =====================================================
 -- SITE PROPERTIES SEEDING
 -- =====================================================
@@ -448,11 +448,11 @@ FROM monthly_assesment
 GROUP BY month 
 ORDER BY 
   CASE month
-    WHEN 'JUNE' THEN 1
-    WHEN 'JULY' THEN 2  
-    WHEN 'AUGUST' THEN 3
-    WHEN 'SEPTEMBER' THEN 4
-    WHEN 'OCTOBER' THEN 5
+    WHEN 'JULY' THEN 1
+    WHEN 'AUGUST' THEN 2  
+    WHEN 'SEPTEMBER' THEN 3
+    WHEN 'OCTOBER' THEN 4
+    WHEN 'NOVEMBER' THEN 5
   END;
 
 -- Daily assessment summary by month
@@ -465,11 +465,11 @@ LEFT JOIN daily_assesment da ON ma.id = da.monthly_assesment_id
 GROUP BY ma.month
 ORDER BY 
   CASE ma.month
-    WHEN 'JUNE' THEN 1
-    WHEN 'JULY' THEN 2  
-    WHEN 'AUGUST' THEN 3
-    WHEN 'SEPTEMBER' THEN 4
-    WHEN 'OCTOBER' THEN 5
+    WHEN 'JULY' THEN 1
+    WHEN 'AUGUST' THEN 2  
+    WHEN 'SEPTEMBER' THEN 3
+    WHEN 'OCTOBER' THEN 4
+    WHEN 'NOVEMBER' THEN 5
   END;
 
 -- Site properties summary
@@ -511,7 +511,7 @@ FROM site;
 SELECT 
   '✅ SILARAS SEED COMPLETED SUCCESSFULLY!' as status,
   '203 regions seeded (1 KABUPATEN + 17 KECAMATAN + 185 DESA)' as regional_data,
-  '5 months of assessment templates (June-October 2025)' as assessment_data,
-  '150 daily assessment entries with menu placeholders (30 days each month, skipping day 31)' as daily_entries,
+  '5 months of assessment templates (July-November 2025)' as assessment_data,
+  '150 daily assessment entries with menu placeholders (30 days each month)' as daily_entries,
   '3 site properties configured' as site_config,
   NOW() as completion_time;

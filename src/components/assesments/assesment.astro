@@ -48,21 +48,11 @@ import CardTemplateRC from '~/components/common/card/card'
     setDailyAssesments,
     $monthlyAssesments,
     setMonthlyAssesment,
-    $currentMonthIndex,
-    setCurrentMonthIndex
+    $currentMonthIndex
   } from './assesment.store'
   import { actions } from 'astro:actions'
 
   const getTargetSlug = () => window.location.pathname.split('/').at(-1) || ''
-
-  onMount($currentMonthIndex, () => {
-    const state = Math.min(10, Math.max(6, new Date().getMonth() + 1))
-    setCurrentMonthIndex(state)
-
-    return () => {
-      setCurrentMonthIndex(0)
-    }
-  })
 
   onMount($dailyAssesments, () => {
     task(async () => {
