@@ -48,6 +48,7 @@ import clsx from 'clsx'
 
 // Helper function to check if a date is in the future (after today)
 // TEMPORARILY DISABLED FOR TESTING - ALL ENTRIES ENABLED
+// @ts-ignore
 const isDateInFuture = (date: Date | null | undefined): boolean => {
   // Temporarily return false to enable all entries for testing
   return false
