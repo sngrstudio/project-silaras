@@ -39,13 +39,12 @@ import clsx from 'clsx'
  * console.log(isDateInFuture(yesterday)) // false
  * ```
  */
+// Helper function to check if a date is in the future (after today)
+// TEMPORARILY DISABLED FOR TESTING - ALL ENTRIES ENABLED
+// @ts-ignore
 const isDateInFuture = (date: Date | null | undefined): boolean => {
-  if (!date) return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0) // Reset time to start of day for accurate comparison
-  const compareDate = new Date(date)
-  compareDate.setHours(0, 0, 0, 0)
-  return compareDate > today
+  // Temporarily return false to enable all entries for testing
+  return false
 }
 
 /**
