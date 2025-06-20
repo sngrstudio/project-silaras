@@ -48,6 +48,11 @@ import clsx from 'clsx'
 
 // Helper function to check if a date is in the future (after today)
 const isDateInFuture = (date: Date | null | undefined): boolean => {
+  // If ENABLE_FUTURE environment variable is set to true, allow all entries
+  if (import.meta.env.ENABLE_FUTURE === 'true') {
+    return false
+  }
+
   if (!date) return false
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Reset time to start of day for accurate comparison
