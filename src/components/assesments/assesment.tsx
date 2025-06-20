@@ -49,7 +49,7 @@ import clsx from 'clsx'
 // Helper function to check if a date is in the future (after today)
 const isDateInFuture = (date: Date | null | undefined): boolean => {
   // If ENABLE_FUTURE environment variable is set to true, allow all entries
-  if (process.env.ENABLE_FUTURE === 'true') {
+  if (process.env.ENABLE_FUTURE) {
     return false
   }
 
