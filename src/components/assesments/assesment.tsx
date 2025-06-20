@@ -47,18 +47,10 @@ import TrophyIcon from '~icons/lucide/trophy'
 import clsx from 'clsx'
 
 // Helper function to check if a date is in the future (after today)
+// TEMPORARILY DISABLED FOR TESTING - ALL ENTRIES ENABLED
 const isDateInFuture = (date: Date | null | undefined): boolean => {
-  // If ENABLE_FUTURE environment variable is set to true, allow all entries
-  if (process.env.ENABLE_FUTURE) {
-    return false
-  }
-
-  if (!date) return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0) // Reset time to start of day for accurate comparison
-  const compareDate = new Date(date)
-  compareDate.setHours(0, 0, 0, 0)
-  return compareDate > today
+  // Temporarily return false to enable all entries for testing
+  return false
 }
 
 const columnHelper = createColumnHelper<DailyAssesments[number]>()
