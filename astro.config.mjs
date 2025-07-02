@@ -7,7 +7,7 @@ import icons from 'unplugin-icons/vite'
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://staging.silaraskotim.com',
+  site: 'https://www.silaraskotim.com',
   integrations: [react()],
   image: {
     domains: []
@@ -21,8 +21,5 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss(), icons({ compiler: 'jsx', jsx: 'react' })]
-  },
-  experimental: {
-    responsiveImages: true
   }
 })
