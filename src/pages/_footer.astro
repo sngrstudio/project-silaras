@@ -2,22 +2,50 @@
 import { Image } from 'astro:assets'
 import kotim from '~/assets/kotim.png'
 import designedBy from '~/assets/designed-by.svg'
+
+const info = {
+  address: '📍 Jl. Jendral Sudirman KM.7, 74326',
+  email: '✉️ bppkb.kotim@gmail.com',
+  time: '🕰️ 08.00-15.30',
+  web: '🌐 www.dp3ap2kb.kotimkab.go.id'
+} as const
 ---
 
-<footer
-  class='mt-16 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-y-4'
->
-  <div class='text-base-content/50 flex items-center gap-1 text-xs'>
-    <Image src={kotim} width={48} alt='' />
-    <div>
-      <div>Dinas Pemberdayaan Perempuan, Perlindungan Anak,</div>
-      <div>Pengendalian Penduduk dan Keluarga Berencana (PPPAPPKB)</div>
-      <div>Kabupaten Kotawaringin Timur</div>
+<footer class='mt-16 flex flex-col gap-y-4'>
+  <div class='text-base-content flex flex-col gap-2'>
+    <div class='flex gap-1'>
+      <Image src={kotim} width={32} alt='' />
+      <div class='text-xl font-bold'>DPPAPPKB</div>
     </div>
+    <ul class='flex flex-col gap-1 text-sm'>
+      <li>{info.address}</li>
+      <li>
+        <a
+          href='mailto:bppkb.kotim@gmail.com'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {info.email}
+        </a>
+      </li>
+      <li>{info.time}</li>
+      <li>
+        <a
+          class='link'
+          href='https://www.dp3ap2kb.kotimkab.go.id'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          {info.web}
+        </a>
+      </li>
+    </ul>
   </div>
-  <div class='text-base-content/35 flex items-center gap-1 text-xs'>
+  <div
+    class='text-base-content/35 flex items-center gap-1 text-xs md:flex-row-reverse'
+  >
     <a href='/designedby' title='Designed By SNGR Creative' target='_blank'>
-      <Image src={designedBy} width={144} alt='' />
+      <Image src={designedBy} width={72} alt='' />
     </a>
   </div>
 </footer>
