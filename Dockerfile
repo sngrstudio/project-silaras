@@ -26,7 +26,7 @@ COPY public/ ./public/
 RUN npm run build
 
 # Runner image - using distroless for security
-FROM gcr.io/distroless/nodejs22-debian12:nonroot@sha256:581893ba58980f0b4c7444d7a16b89f4e966cd89a89f3e0c6f26c482e312f008 AS runtime
+FROM gcr.io/distroless/nodejs22-debian12:nonroot@sha256:8d8b9363b0c9d1153f845824f9b754fdb050ada4fa190583eca2da13fdd3138c AS runtime
 
 # Set working directory (distroless already has /home/nonroot with correct permissions)
 WORKDIR /home/nonroot/app
