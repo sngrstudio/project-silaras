@@ -83,7 +83,7 @@ const SETTINGS_MENU = [
 
 const DrawerMenuRC: FC = () => {
   return (
-    <ul className='menu bg-base-200/95 max-xl:border-primary/70 pointer-coarse:menu-lg relative z-[9997] h-full w-64 p-4 backdrop-blur-sm max-xl:border-r-2 max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
+    <ul className='menu bg-base-200/95 max-xl:border-primary/70 pointer-coarse:menu-lg relative z-[9997] min-h-full w-64 overflow-y-auto p-4 backdrop-blur-sm max-xl:border-r-2 max-xl:pt-[4rem] max-md:pointer-coarse:w-[80vw]'>
       <MainMenu />
       <RegionsMenu />
       <SettingsMenu />
