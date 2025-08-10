@@ -31,7 +31,7 @@
     "@tailwindcss/vite": "4.1.11",
     "@tanstack/react-table": "8.21.3",
     "argon2": "0.43.0",
-    "astro": "5.11.0",
+    "astro": "5.12.8",
     "cloudinary": "2.7.0",
     "clsx": "2.1.1",
     "drizzle-orm": "0.44.2",
