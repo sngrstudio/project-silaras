@@ -18,7 +18,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/node": "9.3.0",
+    "@astrojs/node": "9.4.1",
     "@astrojs/react": "4.3.0",
     "@aws-sdk/client-s3": "3.842.0",
     "@aws-sdk/s3-request-presigner": "3.842.0",
