@@ -47,9 +47,12 @@ import { useStore } from '@nanostores/react'
 import {
   $currentRegion,
   $targets,
+  $targetsPagination,
   setCurrentTarget,
+  setCurrentPage,
   type Targets
 } from './target.store'
+import Pagination from '~/components/common/pagination/pagination'
 import AddTargetIcon from '~icons/lucide/user-plus'
 import EditIcon from '~icons/lucide/pen'
 import WhatsAppIcon from '~icons/simple-icons/whatsapp'
@@ -306,6 +309,7 @@ const createMobileColumns = (
 const TargetRC: FC = () => {
   const targets = useStore($targets)
   const currentRegion = useStore($currentRegion)
+  const pagination = useStore($targetsPagination)
   const [searchInput, setSearchInput] = useState('')
   const { userRegion, loading, currentUser } = useUserRegion()
 
@@ -324,6 +328,25 @@ const TargetRC: FC = () => {
         target.motherName?.toLowerCase().includes(search)
     )
   }, [targets, searchInput])
+
+  // Handle pagination
+  const handlePageChange = async (page: number) => {
+    if (!currentRegion) return
+
+    setCurrentPage(page)
+    // The page change will trigger a reload in the Astro component
+    const event = new CustomEvent('targetPageChange', { detail: { page } })
+    window.dispatchEvent(event)
+  }
+
+  const handlePageSizeChange = async (size: number) => {
+    if (!currentRegion) return
+
+    setCurrentPage(1) // Reset to first page when changing page size
+    // The page size change will trigger a reload in the Astro component
+    const event = new CustomEvent('targetPageSizeChange', { detail: { size } })
+    window.dispatchEvent(event)
+  }
 
   if (!targets) return <></>
 
@@ -348,6 +371,23 @@ const TargetRC: FC = () => {
         currentRegion={currentRegion}
         loading={loading}
       />
+
+      {/* Pagination Controls */}
+      {pagination && pagination.totalCount > 0 && (
+        <div className='mt-6'>
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalCount={pagination.totalCount}
+            pageSize={pagination.pageSize}
+            hasNextPage={pagination.hasNextPage}
+            hasPreviousPage={pagination.hasPreviousPage}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            pageSizeOptions={[10, 25, 50, 100]}
+          />
+        </div>
+      )}
     </>
   )
 }

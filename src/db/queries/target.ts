@@ -170,11 +170,11 @@ export const getTargetBySlug = async (slug: string) => {
 }
 
 /**
- * Get a paginated list of targets.
+ * Get a paginated list of targets with metadata.
  * @param page Page number (1-based, defaults to 1)
  * @param size Page size (defaults to 10)
  * @param regionSlug Region slug to filter targets by region (required)
- * @returns Array of targets for the page
+ * @returns Object with targets data and pagination metadata
  */
 export const getAllTargets = async (
   page: number = 1,
@@ -183,22 +183,57 @@ export const getAllTargets = async (
 ) => {
   const offset = (page - 1) * size
 
-  // Use subquery to filter by regionSlug directly
-  return db
+  // Get region ID first
+  const regionResult = await db
+    .select({ id: region.id })
+    .from(region)
+    .where(eq(region.slug, regionSlug))
+    .limit(1)
+
+  if (!regionResult[0]) {
+    return {
+      data: [],
+      meta: {
+        currentPage: page,
+        pageSize: size,
+        totalCount: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    }
+  }
+
+  const regionId = regionResult[0].id
+
+  // Get total count
+  const totalCountResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(target)
+    .where(eq(target.regionId, regionId))
+
+  const totalCount = totalCountResult[0]?.count || 0
+  const totalPages = Math.ceil(totalCount / size)
+
+  // Get paginated data
+  const data = await db
     .select()
     .from(target)
-    .where(
-      eq(
-        target.regionId,
-        db
-          .select({ id: region.id })
-          .from(region)
-          .where(eq(region.slug, regionSlug))
-          .limit(1)
-      )
-    )
+    .where(eq(target.regionId, regionId))
     .limit(size)
     .offset(offset)
+
+  return {
+    data,
+    meta: {
+      currentPage: page,
+      pageSize: size,
+      totalCount,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1
+    }
+  }
 }
 
 /**

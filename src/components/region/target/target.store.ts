@@ -22,7 +22,29 @@ import { actions } from 'astro:actions'
  * Type definition for targets data
  * Retrieved from the target.getAll action, contains array of targets in a region
  */
-export type Targets = Awaited<ReturnType<typeof actions.target.getAll.orThrow>>
+export type Targets = Awaited<
+  ReturnType<typeof actions.target.getAll.orThrow>
+>['data']
+
+/**
+ * Type definition for pagination metadata
+ */
+export type PaginationMeta = {
+  currentPage: number
+  pageSize: number
+  totalCount: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}
+
+/**
+ * Type definition for paginated targets response
+ */
+export type PaginatedTargets = {
+  data: Targets
+  meta: PaginationMeta
+}
 
 /**
  * Nanostore for targets data
@@ -33,12 +55,45 @@ export type Targets = Awaited<ReturnType<typeof actions.target.getAll.orThrow>>
 export const $targets = atom<Targets | undefined>(undefined)
 
 /**
+ * Nanostore for pagination metadata
+ * Contains pagination information for the targets list
+ *
+ * @default undefined - No pagination data initially
+ */
+export const $targetsPagination = atom<PaginationMeta | undefined>(undefined)
+
+/**
+ * Nanostore for current page number
+ * Tracks the current page being displayed
+ *
+ * @default 1 - Start with first page
+ */
+export const $currentPage = atom<number>(1)
+
+/**
  * Setter function for targets state
  * Used to update the store with new targets data from API calls
  *
  * @param state - New targets array to set, or undefined to clear
  */
 export const setTargets = (state: Targets | undefined) => $targets.set(state)
+
+/**
+ * Setter function for pagination metadata
+ * Used to update pagination information
+ *
+ * @param meta - Pagination metadata to set, or undefined to clear
+ */
+export const setTargetsPagination = (meta: PaginationMeta | undefined) =>
+  $targetsPagination.set(meta)
+
+/**
+ * Setter function for current page
+ * Used to update the current page number
+ *
+ * @param page - Page number to set
+ */
+export const setCurrentPage = (page: number) => $currentPage.set(page)
 
 /**
  * Type definition for individual target data
