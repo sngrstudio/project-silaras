@@ -312,7 +312,7 @@ const TargetDialog: FC = () => {
     const updatedTargets = await actions.target.getAll.orThrow({
       regionSlug: currentRegion?.slug ?? ''
     })
-    setTargets(updatedTargets)
+    setTargets(updatedTargets.data)
     setCurrentTarget(undefined)
     showSuccessToast(
       currentTarget?.id
@@ -346,7 +346,7 @@ const TargetDialog: FC = () => {
       const updatedTargets = await actions.target.getAll.orThrow({
         regionSlug: currentRegion?.slug ?? ''
       })
-      setTargets(updatedTargets)
+      setTargets(updatedTargets.data)
       setCurrentTarget(undefined)
       showSuccessToast('Data sasaran berhasil dihapus!')
     } catch (error) {

@@ -209,12 +209,12 @@ const target = {
   }),
 
   /**
-   * Get a paginated list of targets.
+   * Get a paginated list of targets with metadata.
    * Requires editor level access or above.
    * @param page Page number (1-based, defaults to 1)
    * @param size Page size (defaults to 10)
    * @param regionSlug Region slug to filter targets by region (required)
-   * @returns Array of targets for the page
+   * @returns Object with targets data and pagination metadata
    */
   getAll: defineAction({
     input: z.object({
@@ -233,7 +233,8 @@ const target = {
         })
       }
 
-      return getAllTargets(page, size, regionSlug)
+      const result = await getAllTargets(page, size, regionSlug)
+      return result
     }
   }),
 

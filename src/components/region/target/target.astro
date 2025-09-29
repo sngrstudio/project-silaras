@@ -47,11 +47,34 @@ import TargetDialogRC from './target-dialog'
     $targets,
     setTargets,
     $currentRegion,
-    setCurrentRegion
+    setCurrentRegion,
+    setCurrentPage,
+    setTargetsPagination
   } from './target.store'
   import { actions } from 'astro:actions'
 
   const getRegionSlug = () => window.location.pathname.split('/').at(-1) ?? ''
+
+  let currentPageSize = 10 // Default page size
+
+  const loadTargetsData = async (page = 1, size = currentPageSize) => {
+    try {
+      const result = await actions.target.getAll.orThrow({
+        regionSlug: getRegionSlug(),
+        page,
+        size
+      })
+
+      setTargets(result.data)
+      setTargetsPagination(result.meta)
+      setCurrentPage(page)
+      currentPageSize = size
+    } catch (error) {
+      console.error('Failed to load targets:', error)
+      setTargets([])
+      setTargetsPagination(undefined)
+    }
+  }
 
   onMount($currentRegion, () => {
     task(async () => {
@@ -67,13 +90,11 @@ import TargetDialogRC from './target-dialog'
 
   onMount($targets, () => {
     task(async () => {
-      const state = await actions.target.getAll.orThrow({
-        regionSlug: getRegionSlug()
-      })
-      setTargets(state)
+      await loadTargetsData(1, currentPageSize)
     })
     return () => {
       setTargets(undefined)
+      setTargetsPagination(undefined)
     }
   })
 
@@ -83,9 +104,17 @@ import TargetDialogRC from './target-dialog'
     })
     setCurrentRegion(currentRegionState!)
 
-    const targetsState = await actions.target.getAll.orThrow({
-      regionSlug: getRegionSlug()
-    })
-    setTargets(targetsState)
+    await loadTargetsData(1, currentPageSize)
+  })
+
+  // Handle pagination events from React component
+  window.addEventListener('targetPageChange', async (event) => {
+    const { page } = (event as CustomEvent).detail
+    await loadTargetsData(page, currentPageSize)
+  })
+
+  window.addEventListener('targetPageSizeChange', async (event) => {
+    const { size } = (event as CustomEvent).detail
+    await loadTargetsData(1, size)
   })
 </script>
