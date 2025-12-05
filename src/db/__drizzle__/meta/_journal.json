@@ -22,6 +22,13 @@
       "when": 1764916077930,
       "tag": "0002_add_december_2025",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764919283913,
+      "tag": "0003_backfill_december_for_existing_targets",
+      "breakpoints": true
     }
   ]
 }
