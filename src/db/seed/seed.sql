@@ -299,20 +299,21 @@ INSERT INTO region (id, name, slug, type, parent_id) VALUES
 -- =====================================================
 -- MONTHLY ASSESSMENT TEMPLATES SEEDING
 -- =====================================================
--- Create monthly assessment templates for July-November 2025
--- Matches TypeScript seed: months JULY through NOVEMBER
+-- Create monthly assessment templates for July-December 2025
+-- Matches TypeScript seed: months JULY through DECEMBER
 
 INSERT INTO monthly_assesment (id, month) VALUES 
 (UUID(), 'JULY'),
 (UUID(), 'AUGUST'),
 (UUID(), 'SEPTEMBER'),
 (UUID(), 'OCTOBER'),
-(UUID(), 'NOVEMBER');
+(UUID(), 'NOVEMBER'),
+(UUID(), 'DECEMBER');
 
 -- =====================================================
 -- DAILY ASSESSMENT TEMPLATES SEEDING
 -- =====================================================
--- Create daily assessment templates for each day in the 5-month period
+-- Create daily assessment templates for each day in the 6-month period
 -- Each day gets placeholder menu entries: '<<menu>>'
 
 -- Set monthly assessment variables
@@ -321,6 +322,7 @@ SET @august_id = (SELECT id FROM monthly_assesment WHERE month = 'AUGUST');
 SET @september_id = (SELECT id FROM monthly_assesment WHERE month = 'SEPTEMBER');
 SET @october_id = (SELECT id FROM monthly_assesment WHERE month = 'OCTOBER');
 SET @november_id = (SELECT id FROM monthly_assesment WHERE month = 'NOVEMBER');
+SET @december_id = (SELECT id FROM monthly_assesment WHERE month = 'DECEMBER');
 
 -- JULY 2025 (30 days - skip day 31)
 INSERT INTO daily_assesment (id, monthly_assesment_id, date, menu_1, menu_2)
@@ -405,6 +407,24 @@ FROM (
   SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION
   SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION
   SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30
+) days;
+
+-- DECEMBER 2025 (31 days)
+INSERT INTO daily_assesment (id, monthly_assesment_id, date, menu_1, menu_2)
+SELECT 
+  UUID(),
+  @december_id,
+  DATE('2025-12-01') + INTERVAL (n-1) DAY,
+  '<<menu>>',
+  '<<menu>>'
+FROM (
+  SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION
+  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION
+  SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION
+  SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION
+  SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION
+  SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION
+  SELECT 31
 ) days;
 
 -- =====================================================

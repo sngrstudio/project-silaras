@@ -82,7 +82,7 @@ const Navigation: FC = () => {
         className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
         aria-label='bulan sebelumnya'
         onClick={handlePrevPage}
-        disabled={currentMonthIndex <= 6}
+        disabled={currentMonthIndex <= 7}
       >
         <PreviousIcon className='h-5 w-5' />
       </button>
@@ -95,7 +95,7 @@ const Navigation: FC = () => {
         className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
         aria-label='bulan selanjutnya'
         onClick={handleNextPage}
-        disabled={currentMonthIndex >= 10}
+        disabled={currentMonthIndex >= 12}
       >
         <NextIcon className='h-5 w-5' />
       </button>

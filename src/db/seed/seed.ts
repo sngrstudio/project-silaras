@@ -64,8 +64,8 @@ async function seed() {
     console.log('')
     console.log('📊 Seeded data summary:')
     console.log('   • 203 regions (1 KABUPATEN + 17 KECAMATAN + 185 DESA)')
-    console.log('   • 5 monthly assessment templates (June-October 2025)')
-    console.log('   • 150 daily assessment entries (30 days per month)')
+    console.log('   • 6 monthly assessment templates (July-December 2025)')
+    console.log('   • 181 daily assessment entries (30-31 days per month)')
     console.log('   • 3 site properties configured')
   } catch (error) {
     console.error('💥 Seed process failed:', error)

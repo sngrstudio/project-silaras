@@ -110,7 +110,7 @@ const Navigation: FC = () => {
           className='hover:bg-primary hover:text-primary-content disabled:hover:text-base-content flex h-12 items-center justify-center px-4 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent'
           aria-label='bulan selanjutnya'
           onClick={handleNextPage}
-          disabled={currentMonthIndex >= 11}
+          disabled={currentMonthIndex >= 12}
         >
           <NextIcon className='h-5 w-5' />
         </button>
