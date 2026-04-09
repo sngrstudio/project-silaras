@@ -34,7 +34,7 @@
     "astro": "5.18.1",
     "cloudinary": "2.7.0",
     "clsx": "2.1.1",
-    "drizzle-orm": "0.44.2",
+    "drizzle-orm": "0.45.2",
     "drizzle-zod": "0.8.2",
     "express": "5.1.0",
     "leaflet": "1.9.4",
