@@ -39,7 +39,7 @@
     "express": "5.1.0",
     "leaflet": "1.9.4",
     "morgan": "1.11.0",
-    "mysql2": "3.14.1",
+    "mysql2": "3.23.1",
     "nanostores": "1.0.1",
     "radix-ui": "1.4.2",
     "react": "19.1.0",
